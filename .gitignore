@@ -1,0 +1,44 @@
+# Binaries for programs and plugins
+*.exe
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Vendor direcotry
+vendor/
+
+# Vim swap file
+*.swp
+
+# mac OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode
+
+# log file
+*.log
+
+# config file
+config.yaml
+
+# sqlite3
+*.db
+logs
+demo/
+web/
+modules/testModule
+modules/webSocketModule
+AppLog
+voice
+main.ini
+main.ini.gw
+main.ini.zw
+erp.log
+main.exe
+
