@@ -11,8 +11,9 @@ import (
 	"encoding/json"
 	"os"
 	"sync"
-	erp_interfaces "github.com/gw123/GMQ/interfaces"
-	"github.com/gw123/GMQ/common"
+	erp_interfaces "github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/common/types"
+	"github.com/fpay/erp-client-s/common"
 )
 
 const MaxMsgLen = 100
@@ -154,7 +155,7 @@ func (this *Iot) SubscribeAndCheck(topic string, qos byte) error {
 
 func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) {
 	topic := "/" + this.ProductKey + "/" + this.DeviceName + "/get"
-	msg := &common.LhMsg{}
+	msg := &types.LhMsg{}
 	err := json.Unmarshal(message.Payload(), msg)
 	if err != nil {
 		this.writeLog("error", "Topic "+topic+" 消息解密失败 "+err.Error()+" Payload: "+string(message.Payload()))

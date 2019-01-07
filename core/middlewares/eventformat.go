@@ -1,6 +1,6 @@
 package middlewares
 
-import "github.com/gw123/GMQ/interfaces"
+import "github.com/gw123/GMQ/core/interfaces"
 
 type EventFormat struct {
 	app interfaces.App

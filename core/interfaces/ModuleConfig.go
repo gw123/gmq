@@ -2,7 +2,7 @@ package interfaces
 
 type ModuleConfig interface {
 	GetPath() string
-	IsInnerModule() bool
+	GetModuleType() string
 	IsEnable() bool
 	GetModuleName() string
 	GetItem(key string) (value string)

@@ -2,8 +2,8 @@ package mqttModule
 
 import (
 	"github.com/gw123/GMQ/modules/base"
-	"github.com/gw123/GMQ/interfaces"
-	"github.com/gw123/GMQ/common"
+	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/common/types"
 	"github.com/eclipse/paho.mqtt.golang"
 	"encoding/json"
 	"time"
@@ -66,12 +66,12 @@ func (this *MqttModule) initAliIot(app interfaces.App, config interfaces.ModuleC
 	params.DefaultHandel = func(client mqtt.Client, msg mqtt.Message) {
 		switch msg.Topic() {
 		case "/ota/device/upgrade/" + params.ProductKey + "/" + params.DeviceName:
-			event := &common.Event{}
+			event := &types.Event{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;
 		case "/" + params.ProductKey + "/" + params.DeviceName + "/get":
-			event := &common.Event{}
+			event := &types.Event{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;

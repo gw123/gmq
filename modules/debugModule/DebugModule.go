@@ -2,11 +2,12 @@ package debugModule
 
 import (
 	"github.com/gw123/GMQ/modules/base"
-	"github.com/gw123/GMQ/interfaces"
-	"github.com/gw123/GMQ/common"
+	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/common/types"
 	"fmt"
 	"time"
 	"strconv"
+	"github.com/fpay/erp-client-s/common"
 )
 
 type DebugModule struct {
@@ -51,7 +52,7 @@ func (this *DebugModule) Watch() (event interfaces.Event) {
 		this.App.Pub(event)
 	}
 	if this.count%40 == 0 {
-		event = common.NewEvent("printe", []byte("test printe"))
+		event = types.NewEvent("printe", []byte("test printe"))
 		this.App.Pub(event)
 	}
 

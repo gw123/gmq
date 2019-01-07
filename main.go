@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/gw123/GMQ/app"
 	_ "net/http/pprof"
 	"io/ioutil"
 	"fmt"
 	"net/http"
 	"log"
+	"github.com/gw123/GMQ/core"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	appInstance := app.NewApp(data)
+	appInstance := core.NewApp(data)
 	appInstance.Start()
 
 	go func() {

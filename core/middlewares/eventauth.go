@@ -1,6 +1,6 @@
 package middlewares
 
-import "github.com/gw123/GMQ/interfaces"
+import "github.com/gw123/GMQ/core/interfaces"
 
 type EventAuth struct {
 	app interfaces.App

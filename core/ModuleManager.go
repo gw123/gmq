@@ -1,15 +1,15 @@
 // + !debug
 
-package app
+package core
 
 import (
 	"github.com/gw123/GMQ/modules/debugModule"
 	"github.com/gw123/GMQ/modules/mqttModule"
 	"github.com/gw123/GMQ/modules/base"
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"errors"
 	"fmt"
-	"github.com/fpay/erp-client-s/modules/printerModule"
+	"github.com/gw123/GMQ/modules/webSocketModule"
 )
 
 /*
@@ -48,12 +48,20 @@ func (this *ModuleManager) LoadModules() {
 }
 
 func (this *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
-	if config.IsInnerModule() {
+
+	switch config.GetModuleType() {
+	case "inner":
 		this.app.Info("ConfigManager", "加载内部模块 "+moduleName)
 		err = this.loadInnerModule(moduleName, config)
-	} else {
+		break
+	case "dll":
 		this.app.Info("ConfigManager", "加载外部模块 "+moduleName)
 		err = this.loadDll(moduleName, config)
+		break
+	case "exe":
+		this.app.Info("ConfigManager", "加载外部模块 "+moduleName)
+		err = this.loadExe(moduleName, config)
+		break
 	}
 	return
 }
@@ -72,12 +80,14 @@ func (this *ModuleManager) loadDll(muduleName string, config interfaces.ModuleCo
 	return err
 }
 
+func (this *ModuleManager) loadExe(muduleName string, config interfaces.ModuleConfig) (err error) {
+	module := base.NewExeModule()
+	err = module.Init(this.app, config)
+	return
+}
+
 func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
 	switch moduleName {
-	case "PrinterModule":
-		this.Modules[moduleName] = printerModule.NewPrinterModule()
-		err = this.Modules[moduleName].Init(this.app, config)
-		break
 	case "MqttModule":
 		this.Modules[moduleName] = mqttModule.NewMqttModule()
 		err = this.Modules[moduleName].Init(this.app, config)
@@ -86,10 +96,10 @@ func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.
 		this.Modules[moduleName] = debugModule.NewDebugModule()
 		err = this.Modules[moduleName].Init(this.app, config)
 		break
-		//case "WebSocketModule":
-		//	this.Modules[moduleName] = webSocketModule.NewWebSocketModule()
-		//	err = this.Modules[moduleName].Init(this.app, config)
-		//	break;
+	case "WebSocketModule":
+		this.Modules[moduleName] = webSocketModule.NewWebSocketModule()
+		err = this.Modules[moduleName].Init(this.app, config)
+		break;
 	default:
 		err = errors.New("没有这样的模块")
 	}

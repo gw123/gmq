@@ -1,13 +1,13 @@
-package app
+package core
 
 import (
-	"github.com/gw123/GMQ/middlewares"
-	"github.com/gw123/GMQ/interfaces"
-	"github.com/gw123/GMQ/common"
+	"github.com/gw123/GMQ/core/middlewares"
+	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/go-ini/ini"
 	"encoding/json"
 	"time"
 	"fmt"
+	"github.com/gw123/GMQ/common/types"
 )
 
 type App struct {
@@ -62,9 +62,8 @@ func (this *App) doWorker() {
 	this.appEventNames = this.configManager.GlobalConfig.GetItem("subs")
 	this.dispatch.SetEventNames(this.appEventNames)
 	//this.dispatch.Start()
-
 	time.Sleep(time.Second)
-	event := common.NewEvent("appReady", []byte{})
+	event := types.NewEvent("appReady", []byte{})
 	this.Pub(event)
 }
 
@@ -165,3 +164,5 @@ func (this *App) GetConfigItem(section, key string) (string, error) {
 func (this *App) GetDefaultConfigItem(key string) (string, error) {
 	return this.GetConfigItem("DEFAULT", key)
 }
+
+

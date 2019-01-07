@@ -1,7 +1,7 @@
-package app
+package core
 
 import (
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"sync"
 )
 
@@ -27,10 +27,10 @@ func (this *ModuleConfig) GetPath() string {
 }
 
 //默认情况下是内部模块
-func (this *ModuleConfig) IsInnerModule() bool {
+func (this *ModuleConfig) GetModuleType() string {
 	this.Mutex.Lock()
 	defer this.Mutex.Unlock()
-	return this.configs["inner"] == "true" || this.configs["inner"] == "1" || this.configs["inner"] == ""
+	return this.configs["type"]
 }
 
 //是否启动

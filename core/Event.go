@@ -1,4 +1,4 @@
-package app
+package core
 
 type Event struct {
 	MsgId     string

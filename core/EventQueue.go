@@ -1,9 +1,9 @@
-package app
+package core
 
 import (
 	"sync"
 	"errors"
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 )
 
 const MaxEventLen = 1024

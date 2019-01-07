@@ -1,7 +1,7 @@
-package app
+package core
 
 import (
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"fmt"
 	"time"
 	"os"
@@ -9,7 +9,7 @@ import (
 	"strings"
 	"strconv"
 	"sync"
-	"github.com/gw123/GMQ/common"
+	"github.com/gw123/GMQ/common/types"
 	"encoding/json"
 )
 
@@ -134,7 +134,7 @@ func (this *LogManager) filter(logType, category, content string) {
 	this.Write(data)
 
 	if logType == "Error" {
-		msg := &common.LhMsg{}
+		msg := &types.LhMsg{}
 		msg.Timestamp = time.Now().Unix()
 		msg.EventName = "log"
 		msg.MsgId = time.Now().Format("2016-10-10 10:10:10")
@@ -144,7 +144,7 @@ func (this *LogManager) filter(logType, category, content string) {
 			fmt.Println(err)
 			return
 		}
-		msg1 := common.NewEvent("sendMqttMsg", msgData)
+		msg1 := types.NewEvent("sendMqttMsg", msgData)
 		this.app.Pub(msg1)
 	}
 }

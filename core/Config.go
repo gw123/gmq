@@ -1,9 +1,9 @@
 // + !debug
 
-package app
+package core
 
 import (
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/go-ini/ini"
 	"fmt"
 )

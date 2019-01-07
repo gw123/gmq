@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"golang.org/x/net/websocket"
 	"sync"
 	"time"

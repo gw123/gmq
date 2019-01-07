@@ -1,7 +1,7 @@
 package base
 
 import (
-	"github.com/gw123/GMQ/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"errors"
 	"sync"
 	"time"
