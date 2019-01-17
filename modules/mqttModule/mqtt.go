@@ -155,7 +155,7 @@ func (this *Iot) SubscribeAndCheck(topic string, qos byte) error {
 
 func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) {
 	topic := "/" + this.ProductKey + "/" + this.DeviceName + "/get"
-	msg := &types.LhMsg{}
+	msg := &common_types.LhMsg{}
 	err := json.Unmarshal(message.Payload(), msg)
 	if err != nil {
 		this.writeLog("error", "Topic "+topic+" 消息解密失败 "+err.Error()+" Payload: "+string(message.Payload()))

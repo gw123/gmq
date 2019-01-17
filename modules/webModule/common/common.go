@@ -1,18 +1,18 @@
-package types
+package common
 
 import (
-	"fmt"
 	"time"
+	"fmt"
 )
 
 type Event struct {
-	MsgId        string
-	EventName    string
-	Payload      []byte
-	sourceModuleName string
+	MsgId      string
+	EventName  string
+	ModuleName string
+	Payload    string
 }
 
-func NewEvent(eventType string, result []byte) *Event {
+func NewEvent(eventType string, result string) *Event {
 	this := new(Event)
 	this.MsgId = this.CreateMsgId()
 	this.Payload = result
@@ -29,7 +29,7 @@ func (this *Event) GetEventName() string {
 }
 
 func (this *Event) GetPayload() []byte {
-	return this.Payload
+	return []byte(this.Payload)
 }
 
 func (this *Event) CreateMsgId() string {
@@ -43,9 +43,14 @@ func (this *Event) CreateMsgId() string {
 }
 
 func (this *Event) SetSourceModule(name string) {
-	this.sourceModuleName = name
+	this.ModuleName = name
 }
 
 func (this *Event) GetSourceModule() string {
-	return this.sourceModuleName
+	return this.ModuleName
+}
+
+type RequestEvent struct {
+	Event
+	Token string
 }

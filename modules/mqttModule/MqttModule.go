@@ -66,12 +66,12 @@ func (this *MqttModule) initAliIot(app interfaces.App, config interfaces.ModuleC
 	params.DefaultHandel = func(client mqtt.Client, msg mqtt.Message) {
 		switch msg.Topic() {
 		case "/ota/device/upgrade/" + params.ProductKey + "/" + params.DeviceName:
-			event := &types.Event{}
+			event := &common_types.Event{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;
 		case "/" + params.ProductKey + "/" + params.DeviceName + "/get":
-			event := &types.Event{}
+			event := &common_types.Event{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;

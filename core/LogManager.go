@@ -134,7 +134,7 @@ func (this *LogManager) filter(logType, category, content string) {
 	this.Write(data)
 
 	if logType == "Error" {
-		msg := &types.LhMsg{}
+		msg := &common_types.LhMsg{}
 		msg.Timestamp = time.Now().Unix()
 		msg.EventName = "log"
 		msg.MsgId = time.Now().Format("2016-10-10 10:10:10")
@@ -144,7 +144,7 @@ func (this *LogManager) filter(logType, category, content string) {
 			fmt.Println(err)
 			return
 		}
-		msg1 := types.NewEvent("sendMqttMsg", msgData)
+		msg1 := common_types.NewEvent("sendMqttMsg", msgData)
 		this.app.Pub(msg1)
 	}
 }

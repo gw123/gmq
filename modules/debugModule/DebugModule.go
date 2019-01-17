@@ -52,7 +52,7 @@ func (this *DebugModule) Watch() (event interfaces.Event) {
 		this.App.Pub(event)
 	}
 	if this.count%40 == 0 {
-		event = types.NewEvent("printe", []byte("test printe"))
+		event = common_types.NewEvent("printe", []byte("test printe"))
 		this.App.Pub(event)
 	}
 

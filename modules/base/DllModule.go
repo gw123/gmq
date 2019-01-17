@@ -3,12 +3,12 @@ package base
 import "C"
 import (
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/types"
 	"syscall"
 	"unsafe"
 	"encoding/json"
 	"strconv"
 	"strings"
+	"github.com/gw123/GMQ/common/common_types"
 )
 
 type DllModule struct {
@@ -70,7 +70,7 @@ func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 		eventStr := C.GoString(event)
 		this.Debug("Callback" + this.GetModuleName() + " " + eventStr)
 		//fmt.Println("callback:", eventStr)
-		resultEvent := &types.ResultEvent{}
+		resultEvent := &common_types.ResultEvent{}
 		err := json.Unmarshal([]byte(eventStr), resultEvent)
 		if err != nil {
 			this.Error("Call back Json.Unmarshal " + err.Error())

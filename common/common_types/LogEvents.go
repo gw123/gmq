@@ -1,4 +1,4 @@
-package types
+package common_types
 
 type LogEvent struct {
 	Event

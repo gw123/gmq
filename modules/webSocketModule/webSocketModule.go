@@ -1,26 +1,26 @@
 package webSocketModule
 
 import (
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"fmt"
-	"time"
-	"strings"
-	"sync"
 	"golang.org/x/net/websocket"
-	"encoding/json"
 	"qiniupkg.com/x/errors.v7"
-	"github.com/gw123/GMQ/common"
+	"encoding/json"
+	"strings"
+	"time"
+	"sync"
+	"fmt"
 )
 
 type WebSocketModule struct {
-	base.BaseModule
 	eventNames   []string
 	originUrl    string
 	websocketUrl string
 	authToken    string
 	clientName   string
 	Conn         *websocket.Conn
+	base.BaseModule
 }
 
 func NewWebSocketModule() *WebSocketModule {
@@ -104,13 +104,13 @@ func (this *WebSocketModule) InitWebSocket() error {
 		for {
 			length, err := ws.Read(msg)
 			if err != nil {
-				if strings.Contains(err.Error(),"forcibly closed"){
+				if strings.Contains(err.Error(), "forcibly closed") {
 					break
 				}
 				this.Error("InitWebSocket " + err.Error())
 				continue
 			}
-			event := &common.Event{}
+			event := &common_types.Event{}
 			err = json.Unmarshal(msg[0:length], event)
 			if err != nil {
 				this.Error("InitWebSocket " + err.Error())

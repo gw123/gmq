@@ -63,7 +63,7 @@ func (this *App) doWorker() {
 	this.dispatch.SetEventNames(this.appEventNames)
 	//this.dispatch.Start()
 	time.Sleep(time.Second)
-	event := types.NewEvent("appReady", []byte{})
+	event := common_types.NewEvent("appReady", []byte{})
 	this.Pub(event)
 }
 

@@ -1,4 +1,4 @@
-package types
+package common_types
 
 //上报阿里云任务执行结果
 //payload 是 Lhmsg 的字符串

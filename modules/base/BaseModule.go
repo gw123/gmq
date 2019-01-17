@@ -16,6 +16,7 @@ type BaseModule struct {
 	queue       chan interfaces.Event
 	App         interfaces.App
 	isBusyMutex sync.Mutex
+	signal      chan int
 	muduleNmae  string
 	fullFlag    int
 	length      int
@@ -31,7 +32,7 @@ func (this *BaseModule) Init(app interfaces.App, config interfaces.ModuleConfig)
 	this.muduleNmae = config.GetModuleName()
 	this.InitQueue(1024)
 	this.StopFlag = false
-
+	this.signal = make(chan int, 1)
 	evnetsStr := config.GetItem("subs")
 	events := strings.Split(evnetsStr, ",")
 	this.eventNames = events
@@ -127,7 +128,7 @@ func (this *BaseModule) Start() {
 			} else {
 				this.Info(event.GetMsgId() + " " + event.GetEventName() + " 执行成功")
 			}
-			time.Sleep(time.Millisecond *10)
+			time.Sleep(time.Millisecond * 10)
 		}
 	}()
 }
