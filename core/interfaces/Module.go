@@ -28,4 +28,6 @@ type Module interface {
 	GetVersion() string
 
 	GetEventNum() int
+
+	Start()
 }

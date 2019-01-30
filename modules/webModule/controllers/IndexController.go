@@ -9,6 +9,7 @@ import (
 	context2 "golang.org/x/net/context"
 	"encoding/json"
 	"github.com/fpay/erp-client-s/interfaces"
+	"time"
 )
 
 type Response struct {
@@ -42,10 +43,10 @@ func (c *IndexController) Index(ctx echo.Context) error {
 
 func (c *IndexController) Message(ctx echo.Context) error {
 	moduleName := ctx.QueryParam("moduleName")
-	c.webModule.Info("New Message coming! moduleName:" + moduleName)
+	c.webModule.Info("New WsClient coming! moduleName:" + moduleName)
 	if ctx.IsWebSocket() {
 		websocket.Handler(func(ws *websocket.Conn) {
-			c.webModule.Debug("ws handel ->")
+			//c.webModule.Debug("ws handel ->")
 			client, ok := c.WebSocketClientMap[moduleName]
 			if ok {
 				stopEvent := common.NewEvent("stop", "新的同名模块连接到来")
@@ -53,15 +54,15 @@ func (c *IndexController) Message(ctx echo.Context) error {
 				client.Stop()
 			}
 			context := context2.Background()
-			client = models.NewWsClientModel(ws, context, c.webModule)
+			client = models.NewWsClientModel(ws, context, c.webModule, moduleName)
 			c.Mutex.Lock()
 			c.WebSocketClientMap[moduleName] = client
 			c.Mutex.Unlock()
-			c.webModule.Debug("ws handel ->2")
+			//c.webModule.Debug("ws handel ->2")
 			client.Run()
 		}).ServeHTTP(ctx.Response(), ctx.Request())
 	} else {
-		c.webModule.Info("Message: 非法请求" )
+		c.webModule.Info("Message: 非法请求")
 		response := &Response{
 			Code: 1,
 			Msg:  "非法请求",
@@ -72,13 +73,18 @@ func (c *IndexController) Message(ctx echo.Context) error {
 }
 
 func (c *IndexController) SendMessage(msg interfaces.Event) {
-	for _, client := range c.WebSocketClientMap {
-		if client == nil {
-			continue
+	var flag = false
+	for !flag {
+		for _, client := range c.WebSocketClientMap {
+			if client == nil {
+				continue
+			}
+			flag = true
+			err := client.SendMsg(msg)
+			if err != nil {
+				c.webModule.Warning("snedMsg error " + err.Error())
+			}
 		}
-		err := client.SendMsg(msg)
-		if err != nil {
-			c.webModule.Warning("snedMsg error " + err.Error())
-		}
+		time.Sleep(time.Second)
 	}
 }

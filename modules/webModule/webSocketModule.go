@@ -33,10 +33,6 @@ func (this *WebModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 		this.port = 17335
 	}
 	this.Debug("webModule subs: "+this.Config.GetItem("subs"))
-	ok := make(chan int, 1)
-	go this.InitWebSocket(ok)
-	<-ok
-	go this.Start()
 	return nil
 }
 
@@ -50,6 +46,8 @@ func (this *WebModule) GetStatus() uint64 {
 }
 
 func (this *WebModule) Start() {
+	go this.InitWebSocket()
+	time.Sleep(time.Second)
 	for ; ; {
 		event := this.BaseModule.Pop()
 		err := this.service(event)
@@ -66,13 +64,12 @@ func (this *WebModule) service(event interfaces.Event) error {
 	return nil
 }
 
-func (this *WebModule) InitWebSocket(ok chan int) error {
+func (this *WebModule) InitWebSocket() error {
 	controller := controllers.NewIndexController(this)
 	this.controller = controller
 	e := echo.New()
 	e.GET("/message", controller.Message)
 	e.GET("/", controller.Index)
-	ok <- 0
 	addr := fmt.Sprintf("127.0.0.1:%d", this.port)
 	this.Info("端口监听在: " + addr)
 	this.echo = e

@@ -19,7 +19,6 @@ func NewtestModule() *testModule {
 func (this *testModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, config)
 	app.Sub("printe", this)
-	go this.Start()
 	return nil
 }
 

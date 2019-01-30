@@ -12,7 +12,7 @@ import (
 	"os"
 	"sync"
 	erp_interfaces "github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/types"
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/fpay/erp-client-s/common"
 )
 

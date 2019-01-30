@@ -1,13 +1,12 @@
 package core
 
 import (
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/core/middlewares"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/go-ini/ini"
 	"encoding/json"
-	"time"
 	"fmt"
-	"github.com/gw123/GMQ/common/types"
 )
 
 type App struct {
@@ -57,18 +56,17 @@ func (this *App) doWorker() {
 		eventAuth := middlewares.NewEventView(this)
 		this.middlewareManager.RegisterMiddleware(eventAuth)
 	}()
-	this.Debug("App", "load modules")
+	this.Debug("App", "Load modules")
 	this.moduleManager.LoadModules()
 	this.appEventNames = this.configManager.GlobalConfig.GetItem("subs")
 	this.dispatch.SetEventNames(this.appEventNames)
-	//this.dispatch.Start()
-	time.Sleep(time.Second)
 	event := common_types.NewEvent("appReady", []byte{})
 	this.Pub(event)
+	go this.dispatch.Start()
 }
 
 func (this *App) Handel(event interfaces.Event) {
-	this.Debug("App", "App event"+event.GetEventName())
+	//this.Debug("App", "App event"+event.GetEventName())
 	switch event.GetEventName() {
 	case "configChange":
 		mconfig := &ModuleConfig{}

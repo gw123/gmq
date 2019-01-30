@@ -37,7 +37,9 @@ func (this *BaseModule) Init(app interfaces.App, config interfaces.ModuleConfig)
 	events := strings.Split(evnetsStr, ",")
 	this.eventNames = events
 	for _, eventName := range events {
-		this.App.Sub(eventName, this)
+		if eventName != "" {
+			this.App.Sub(eventName, this)
+		}
 	}
 	return nil
 }

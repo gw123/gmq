@@ -9,7 +9,7 @@ import (
 	"strings"
 	"strconv"
 	"sync"
-	"github.com/gw123/GMQ/common/types"
+	"github.com/gw123/GMQ/common/common_types"
 	"encoding/json"
 )
 
