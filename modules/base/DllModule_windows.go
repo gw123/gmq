@@ -1,5 +1,3 @@
-// +build !windows
-
 package base
 
 import "C"
@@ -11,17 +9,16 @@ import (
 	"strconv"
 	"strings"
 	"github.com/gw123/GMQ/common/common_types"
-	"plugin"
 )
 
 type DllModule struct {
 	BaseModule
 	eventNames []string
-	moduleDll  *plugin.Plugin
-	handel     *plugin.Symbol
-	start      *plugin.Symbol
-	stop       *plugin.Symbol
-	getVersion *plugin.Symbol
+	moduleDll  *syscall.DLL
+	handel     *syscall.Proc
+	start      *syscall.Proc
+	stop       *syscall.Proc
+	getVersion *syscall.Proc
 }
 
 func NewDllModule() *DllModule {
@@ -37,36 +34,35 @@ func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 	var err error
 	path := config.GetPath()
 	//this.Debug("path :" + path)
-	this.moduleDll, err = plugin.Open(path)
-
+	this.moduleDll, err = syscall.LoadDLL(path)
 	if err != nil {
 		this.Error("LoadDLL faild " + this.GetModuleName())
 		return err
 	}
-	this.handel, err = this.moduleDll.Lookup("handle")
+	this.handel, err = this.moduleDll.FindProc("handle")
 	if err != nil {
 		this.Error("FindProc handel faild " + this.GetModuleName())
 		return err
 	}
 
-	this.start, err = this.moduleDll.Lookup("start")
+	this.start, err = this.moduleDll.FindProc("start")
 	if err != nil {
 		this.Error("FindProc start faild " + this.GetModuleName())
 		return err
 	}
 
-	this.stop, err = this.moduleDll.Lookup("stop")
+	this.stop, err = this.moduleDll.FindProc("stop")
 	if err != nil {
 		this.Error("FindProc stop faild " + this.GetModuleName())
 		return err
 	}
 	//C.GoString((*C.char)(unsafe.Pointer(version)))
-	this.getVersion, err = this.moduleDll.Lookup("getModuleVersion")
+	this.getVersion, err = this.moduleDll.FindProc("getModuleVersion")
 	if err != nil {
 		this.Warning("FindProc getVersion faild " + this.GetModuleName())
 		this.Version = ""
 	} else {
-		version, _, _ := this.getVersion()
+		version, _, _ := this.getVersion.Call()
 		this.Version = C.GoString((*C.char)(unsafe.Pointer(version)))
 	}
 
