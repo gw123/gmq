@@ -3,7 +3,7 @@ package debugModule
 import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/types"
+	"github.com/gw123/GMQ/common/common_types"
 	"fmt"
 	"time"
 	"strconv"
@@ -26,7 +26,6 @@ func (this *DebugModule) Init(app interfaces.App, config interfaces.ModuleConfig
 	this.BaseModule.Init(app, config)
 	app.Sub("debug", this)
 	//config.GetGlobalItem("")
-	go this.Start()
 	go this.StartDaemon()
 	return nil
 }

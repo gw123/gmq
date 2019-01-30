@@ -3,7 +3,7 @@ package mqttModule
 import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/types"
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/eclipse/paho.mqtt.golang"
 	"encoding/json"
 	"time"
@@ -27,7 +27,6 @@ func (this *MqttModule) Init(app interfaces.App, config interfaces.ModuleConfig)
 	app.Sub("reply", this)
 	app.Sub("sendMqttMsg", this)
 	this.initAliIot(app, config)
-	go this.Start()
 	return nil
 }
 
@@ -36,7 +35,7 @@ func (this *MqttModule) initAliIot(app interfaces.App, config interfaces.ModuleC
 	params.ProductKey = config.GetItem("productKey")
 	params.DeviceName = config.GetGlobalItem("deviceName")
 	params.DeviceSecret = config.GetItem("deviceSecret")
-
+	//this.Debug(fmt.Sprintf("PK:%s ,DN:%s ,DS:%s", params.ProductKey, params.DeviceName, params.DeviceSecret))
 	params.OnConnectHandler = func(client mqtt.Client) {
 		this.Info("连接阿里云成功")
 		this.IotInstance.PublishInform(app.GetVersion())
@@ -127,7 +126,7 @@ func (this *MqttModule) Start() {
 }
 
 func (this *MqttModule) service(event interfaces.Event) error {
-	this.Debug("service " + event.GetEventName() + " " + event.GetSourceModule() + " " + event.GetMsgId() +" "+ string(event.GetPayload()))
+	this.Debug("service " + event.GetEventName() + " " + event.GetSourceModule() + " " + event.GetMsgId() + " " + string(event.GetPayload()))
 	//data, err := json.Marshal()
 	//if err != nil {
 	//	this.Error("service " + err.Error())

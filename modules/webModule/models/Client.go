@@ -26,11 +26,13 @@ type WsClientModel struct {
 	runFlag    bool
 }
 
-func NewWsClientModel(conn *websocket.Conn, ctx context.Context, module interfaces.Module) *WsClientModel {
+func NewWsClientModel(conn *websocket.Conn, ctx context.Context, module interfaces.Module, ModuleName string) *WsClientModel {
 	this := new(WsClientModel)
 	this.webSocket = conn
 	this.webModule = module
 	this.context = ctx
+	//key := "ModuleName"
+	this.ModuleName = ModuleName
 	this.runFlag = true
 	return this
 }
@@ -78,6 +80,7 @@ func (this *WsClientModel) Run() {
 }
 
 func (this *WsClientModel) DealMsg(event *common.RequestEvent) {
+	this.webModule.Debug(fmt.Sprintf("EeventName:%s; ModuleName:%s; Payload:%s", event.EventName, this.ModuleName, event.Payload))
 	switch event.EventName {
 	case "auth":
 		this.ModuleName = event.ModuleName
@@ -92,7 +95,7 @@ func (this *WsClientModel) DealMsg(event *common.RequestEvent) {
 		os.Exit(0)
 		break
 	default:
-		this.webModule.Debug(fmt.Sprintf("EeventName:%s,ModuleName:%s,Payload:%s", event.EventName, event.ModuleName, event.Payload))
+
 		if this.IsSafe(event) {
 			this.webModule.Pub(event)
 		} else {

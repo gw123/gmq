@@ -14,4 +14,6 @@ type App interface {
 	GetConfigItem(section, key string) (val string, err error)
 	//获取全局配置信息
 	GetDefaultConfigItem(key string) (val string, err error)
+	//
+	Handel(event Event)
 }

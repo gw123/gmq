@@ -35,7 +35,7 @@ func NewModuleManager(app interfaces.App, configManger *ConfigManager) *ModuleMa
 func (this *ModuleManager) LoadModules() {
 	for moduleName, moduleConfig := range this.configManager.ModuleConfigs {
 		if moduleConfig.IsEnable() == false {
-			this.app.Info("ConfigManager", "禁止加载 "+moduleName)
+			//this.app.Info("ConfigManager", "禁止加载 "+moduleName)
 			continue
 		}
 		err := this.LoadModule(moduleName, moduleConfig)
@@ -45,16 +45,22 @@ func (this *ModuleManager) LoadModules() {
 			this.app.Info("ConfigManager", "加载成功 "+moduleName)
 		}
 	}
+
+	for _, module := range this.Modules {
+		if module != nil {
+			go module.Start()
+		}
+	}
 }
 
 func (this *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
-
 	switch config.GetModuleType() {
 	case "inner":
 		this.app.Info("ConfigManager", "加载内部模块 "+moduleName)
 		err = this.loadInnerModule(moduleName, config)
 		break
 	case "dll":
+	case "lib":
 		this.app.Info("ConfigManager", "加载外部模块 "+moduleName)
 		err = this.loadDll(moduleName, config)
 		break

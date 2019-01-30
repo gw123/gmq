@@ -33,7 +33,6 @@ func (this *WebSocketModule) Init(app interfaces.App, config interfaces.ModuleCo
 	this.originUrl = config.GetItem("originUrl")
 	this.websocketUrl = config.GetItem("websocketUrl")
 	go this.InitWebSocket()
-	go this.Start()
 	return nil
 }
 

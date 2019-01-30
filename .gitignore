@@ -33,6 +33,7 @@ logs
 demo/
 web/
 main.ini
+main.ini.gw
 erp.log
 main.exe
 
