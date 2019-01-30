@@ -1,0 +1,45 @@
+queuelength = 1024
+middlewares = eventformat,eventview
+logFilterCategories = EventQueue,Dispath
+#logOnlyCategories = MqttModule
+logInterval = 1
+debugLevel  = debug
+subs = configChange,stopModule,startModule
+deviceName = PC1219
+basePath = /Users/kky/Desktop/lh
+accessToken = accessToken
+
+[PrinterModule]
+type  =  inner
+enable = 1
+dropFlag = 0
+width = 58
+path = printer
+
+[MqttModule]
+type  =  inner
+productKey = a1GvAwy4lNt
+deviceSecret = ulsuWZkXGzOQsR5L5AYUQpQxLKvidmUi
+
+[DebugModule]
+type  =  inner
+enable = 1
+
+[VoiceModule]
+enable = 1
+type  =  lib
+path   =  ./libs/libvoice.dll
+subs   =  voice
+
+[libTestModule]
+enable = 0
+type  =  dll
+path   =  ./libs/libTestModule.dll
+subs   =  testlib
+
+[WebSocketModule]
+enable = 0
+type  =  inner
+subs   =  log,allEvents
+originUrl = "http://localhost:1323"
+websocketUrl = "ws://localhost:1323/sendLog"
