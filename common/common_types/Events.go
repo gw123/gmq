@@ -6,10 +6,11 @@ import (
 )
 
 type Event struct {
-	MsgId        string
-	EventName    string
-	Payload      []byte
+	MsgId            string
+	EventName        string
+	Payload          []byte
 	sourceModuleName string
+	dstModuleName    string
 }
 
 func NewEvent(eventType string, result []byte) *Event {
@@ -48,4 +49,15 @@ func (this *Event) SetSourceModule(name string) {
 
 func (this *Event) GetSourceModule() string {
 	return this.sourceModuleName
+}
+
+func (this *Event) GetDstModule() string {
+	if this.dstModuleName == "" {
+		return "*"
+	}
+	return this.dstModuleName
+}
+
+func (this *Event) SetDstModule(string2 string) {
+	this.dstModuleName = string2
 }

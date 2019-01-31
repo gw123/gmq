@@ -115,32 +115,32 @@ func (this *App) Pub(event interfaces.Event) {
 	}
 }
 
-func (this *App) Info(category string, content string) {
-	if content == "" {
+func (this *App) Info(category string, format string, a ...interface{}) {
+	if format == "" {
 		return
 	}
-	this.logManager.Info(category, content)
+	this.logManager.Info(category, format, a...)
 }
 
-func (this *App) Warning(category string, content string) {
-	if content == "" {
+func (this *App) Warning(category string, format string, a ...interface{}) {
+	if format == "" {
 		return
 	}
-	this.logManager.Waring(category, content)
+	this.logManager.Waring(category, format, a...)
 }
 
-func (this *App) Error(category string, content string) {
-	if content == "" {
+func (this *App) Error(category string, format string, a ...interface{}) {
+	if format == "" {
 		return
 	}
-	this.logManager.Error(category, content)
+	this.logManager.Error(category, format, a...)
 }
 
-func (this *App) Debug(category string, content string) {
-	if content == "" {
+func (this *App) Debug(category string, format string, a ...interface{}) {
+	if format == "" {
 		return
 	}
-	this.logManager.Debug(category, content)
+	this.logManager.Debug(category, format, a...)
 }
 
 func (this *App) GetVersion() string {
@@ -162,5 +162,3 @@ func (this *App) GetConfigItem(section, key string) (string, error) {
 func (this *App) GetDefaultConfigItem(key string) (string, error) {
 	return this.GetConfigItem("DEFAULT", key)
 }
-
-

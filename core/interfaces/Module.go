@@ -6,6 +6,11 @@ const ModuleUnLoad = 0x03
 const ModuleUnInstall = 0x04
 
 type Module interface {
+	Info(format string, a ...interface{})
+	Warning(format string, a ...interface{})
+	Error(format string, a ...interface{})
+	Debug(format string, a ...interface{})
+
 	//订阅事件
 	Init(app App, config ModuleConfig) error
 

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gw123/GMQ/modules/webSocketModule"
+	"github.com/gw123/GMQ/modules/printerModule"
 )
 
 /*
@@ -40,9 +41,9 @@ func (this *ModuleManager) LoadModules() {
 		}
 		err := this.LoadModule(moduleName, moduleConfig)
 		if err != nil {
-			this.app.Error("ConfigManager", "模块加载失败 "+moduleName+" "+err.Error())
+			this.app.Error("ModuleManager", "模块加载失败 "+moduleName+" "+err.Error())
 		} else {
-			this.app.Info("ConfigManager", "加载成功 "+moduleName)
+			this.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
 	}
 
@@ -56,16 +57,16 @@ func (this *ModuleManager) LoadModules() {
 func (this *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
 	switch config.GetModuleType() {
 	case "inner":
-		this.app.Info("ConfigManager", "加载内部模块 "+moduleName)
+		this.app.Info("ModuleManager", "加载内部模块 "+moduleName)
 		err = this.loadInnerModule(moduleName, config)
 		break
 	case "dll":
 	case "lib":
-		this.app.Info("ConfigManager", "加载外部模块 "+moduleName)
+		this.app.Info("ModuleManager", "加载外部模块 "+moduleName)
 		err = this.loadDll(moduleName, config)
 		break
 	case "exe":
-		this.app.Info("ConfigManager", "加载外部模块 "+moduleName)
+		this.app.Info("ModuleManager", "加载外部模块 "+moduleName)
 		err = this.loadExe(moduleName, config)
 		break
 	}
@@ -106,6 +107,13 @@ func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.
 		this.Modules[moduleName] = webSocketModule.NewWebSocketModule()
 		err = this.Modules[moduleName].Init(this.app, config)
 		break;
+	case "PrinterModule":
+		this.Modules[moduleName] = printerModule.NewPrinterModule()
+		err = this.Modules[moduleName].Init(this.app, config)
+		//case "MnstModule":
+		//	this.Modules[moduleName] = webSocketModule.NewMn()
+		//	err = this.Modules[moduleName].Init(this.app, config)
+		//	break;
 	default:
 		err = errors.New("没有这样的模块")
 	}

@@ -6,4 +6,6 @@ type Event interface {
 	GetPayload() []byte
 	SetSourceModule(string)
 	GetSourceModule() string
+	GetDstModule() string
+	SetDstModule(string)
 }

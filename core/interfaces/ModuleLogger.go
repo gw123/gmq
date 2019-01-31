@@ -1,8 +1,8 @@
 package interfaces
 
 type ModuleLogger interface {
-	Info(content string)
-	Warning(content string)
-	Error(content string)
-	Debug(content string)
+	Info(format string, a ...interface{})
+	Warning(format string, a ...interface{})
+	Error(format string, a ...interface{})
+	Debug(format string, a ...interface{})
 }
