@@ -6,7 +6,7 @@ logInterval = 1
 debugLevel  = debug
 subs = configChange,stopModule,startModule
 deviceName = PC1219
-basePath = /Users/kky/Desktop/lh
+basePath = /Users/gw/Desktop/lh
 accessToken = accessToken
 
 [PrinterModule]
