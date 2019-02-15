@@ -165,7 +165,7 @@ func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) 
 		this.writeLog("warning", "msgId "+msg.MsgId+" Topic"+topic+" 重复消息")
 		return
 	}
-	event := common.NewEvent(msg.GetEventName(),message.Payload())
+	event := common_types.NewEvent(msg.GetEventName(),message.Payload())
 	this.App.Pub(event)
 }
 

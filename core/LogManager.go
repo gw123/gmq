@@ -88,23 +88,23 @@ func (this *LogManager) SetIntVal(interval int) {
 	this.interval = interval
 }
 
-func (this *LogManager) Info(category string, content string) {
-	this.filter("Info", category, content)
+func (this *LogManager) Info(category string, format string, a ...interface{}) {
+	this.filter("Info", category, format, a...)
 }
 
-func (this *LogManager) Waring(category string, content string) {
-	this.filter("Waring", category, content)
+func (this *LogManager) Waring(category string, format string, a ...interface{}) {
+	this.filter("Waring", category, format, a...)
 }
 
-func (this *LogManager) Error(category string, content string) {
-	this.filter("Error", category, content)
+func (this *LogManager) Error(category string, format string, a ...interface{}) {
+	this.filter("Error", category, format, a...)
 }
 
-func (this *LogManager) Debug(category string, content string) {
-	this.filter("Debug", category, content)
+func (this *LogManager) Debug(category string, format string, a ...interface{}) {
+	this.filter("Debug", category, format, a...)
 }
 
-func (this *LogManager) filter(logType, category, content string) {
+func (this *LogManager) filter(logType, category string, format string, a ...interface{}) {
 	//fmt.Println(this.filter_log_categories)
 	//fmt.Println(this.only_log_categories)
 	var pass = true
@@ -130,7 +130,7 @@ func (this *LogManager) filter(logType, category, content string) {
 	}
 	tpl := "[%s,%s,%s] %s"
 	date := time.Now().Format("2006-01-02 15:04:05")
-	data := fmt.Sprintf(tpl, date, logType, category, content)
+	data := fmt.Sprintf(tpl, date, logType, category, fmt.Sprintf(format, a...))
 	this.Write(data)
 
 	if logType == "Error" {

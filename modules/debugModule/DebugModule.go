@@ -7,8 +7,7 @@ import (
 	"fmt"
 	"time"
 	"strconv"
-	"github.com/fpay/erp-client-s/common"
-)
+	)
 
 type DebugModule struct {
 	base.BaseModule
@@ -47,7 +46,7 @@ func (this *DebugModule) GetStatus() uint64 {
 func (this *DebugModule) Watch() (event interfaces.Event) {
 	this.count++
 	if this.count%20 == 0 {
-		event = common.NewEvent("testlib", []byte("10"+strconv.Itoa(this.count)))
+		event = common_types.NewEvent("testlib", []byte("10"+strconv.Itoa(this.count)))
 		this.App.Pub(event)
 	}
 	if this.count%40 == 0 {

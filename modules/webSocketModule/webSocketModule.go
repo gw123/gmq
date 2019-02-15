@@ -5,12 +5,12 @@ import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
 	"golang.org/x/net/websocket"
-	"qiniupkg.com/x/errors.v7"
 	"encoding/json"
 	"strings"
 	"time"
 	"sync"
 	"fmt"
+	"errors"
 )
 
 type WebSocketModule struct {

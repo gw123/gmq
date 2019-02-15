@@ -145,20 +145,20 @@ func (this *BaseModule) GetModuleName() string {
 	return this.muduleNmae
 }
 
-func (this *BaseModule) Info(content string) {
-	this.App.Info(this.GetModuleName(), content)
+func (this *BaseModule) Info(format string, a ...interface{}) {
+	this.App.Info(this.GetModuleName(), format, a...)
 }
 
-func (this *BaseModule) Warning(content string) {
-	this.App.Warning(this.GetModuleName(), content)
+func (this *BaseModule) Warning(format string, a ...interface{}) {
+	this.App.Warning(this.GetModuleName(), format, a...)
 }
 
-func (this *BaseModule) Error(content string) {
-	this.App.Error(this.GetModuleName(), content)
+func (this *BaseModule) Error(format string, a ...interface{}) {
+	this.App.Error(this.GetModuleName(), format, a...)
 }
 
-func (this *BaseModule) Debug(content string) {
-	this.App.Debug(this.GetModuleName(), content)
+func (this *BaseModule) Debug(format string, a ...interface{}) {
+	this.App.Debug(this.GetModuleName(), format, a...)
 }
 
 //发布消息
