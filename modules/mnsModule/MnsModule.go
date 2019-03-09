@@ -4,8 +4,11 @@ import (
 	"github.com/gogap/ali_mns"
 	"github.com/gogap/logs"
 	"strings"
-		"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/base"
+	"encoding/json"
+	"fmt"
+	"encoding/base64"
 )
 
 type MnsModule struct {
@@ -57,7 +60,26 @@ func (this *MnsModule) Watch() {
 			select {
 			case resp := <-respChan:
 				{
-					logs.Pretty("message:", string(resp.MessageBody))
+					//logs.Pretty("message:", string(resp.MessageBody))
+
+					msg := &MNSmsg{}
+					err := json.Unmarshal(resp.MessageBody, msg)
+					if err != nil {
+						fmt.Println(err)
+						this.Warning(err.Error())
+						break
+					}
+
+					content, err := base64.StdEncoding.DecodeString(msg.Payload)
+					if err != nil {
+						this.Warning(err.Error())
+						break
+					}
+
+					fmt.Println("Topic: ", msg.Topic, "MessageType: ", msg.MessageType)
+					fmt.Println("Message: ", msg.Messageid)
+					fmt.Println("content: ", string(content))
+
 					if this.Config.GetBoolItem("Delete") {
 						if e := queue.DeleteMessage(resp.ReceiptHandle); e != nil {
 							logs.Error(e)
