@@ -10,4 +10,5 @@ type ModuleConfig interface {
 	GetItems() (value map[string]string)
 	GetGlobalItems() (value map[string]string)
 	SetItem(key, value string)
+	GetBoolItem(key string) bool
 }

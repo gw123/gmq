@@ -71,9 +71,8 @@ func NewLogManager(app interfaces.App) *LogManager {
 		this.interval = 1
 	}
 
-	//date := time.Now().Format("2006-01-02")
-
-	this.fileHandel, err = os.OpenFile("erp.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0660)
+	date := time.Now().Format("2006-01-02")
+	this.fileHandel, err = os.OpenFile(date+".log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0660)
 	if err != nil {
 		this.Error("LogManager", err.Error())
 	}

@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/gw123/GMQ/core/interfaces"
 	"sync"
+	"strings"
 )
 
 type ModuleConfig struct {
@@ -52,10 +53,18 @@ func (this *ModuleConfig) GetItem(key string) (value string) {
 	return this.configs[key]
 }
 
+func (this *ModuleConfig) GetBoolItem(key string) bool {
+	this.Mutex.Lock()
+	defer this.Mutex.Unlock()
+	val := strings.ToLower(this.configs[key])
+	return val == "true" || val == "1" || val == "on"
+}
+
 func (this *ModuleConfig) SetItem(key, value string) {
 	this.Mutex.Lock()
 	defer this.Mutex.Unlock()
 	this.configs[key] = value
+
 }
 
 func (this *ModuleConfig) GetItems() (value map[string]string) {

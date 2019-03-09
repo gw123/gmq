@@ -1,4 +1,4 @@
-package printerModule
+package scanModule
 
 import (
 	"github.com/gw123/GMQ/core/interfaces"

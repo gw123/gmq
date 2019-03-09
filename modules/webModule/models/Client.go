@@ -4,14 +4,14 @@ import (
 	"golang.org/x/net/websocket"
 	"sync"
 	"context"
-	"github.com/fpay/erp-client-s/modules/webModule/common"
 	"encoding/json"
-	"github.com/fpay/erp-client-s/interfaces"
 	"io"
 	"math/rand"
 	"time"
 	"fmt"
 	"os"
+	"github.com/gw123/GMQ/modules/webModule/common"
+	"github.com/gw123/GMQ/core/interfaces"
 )
 
 var gbuffer = make([]byte, 1024*1024)
