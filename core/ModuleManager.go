@@ -10,7 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gw123/GMQ/modules/webSocketModule"
-	"github.com/gw123/GMQ/modules/printerModule"
+	"github.com/gw123/GMQ/modules/scanModule"
+	"github.com/gw123/GMQ/modules/mnsModule"
 )
 
 /*
@@ -106,14 +107,15 @@ func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.
 	case "WebSocketModule":
 		this.Modules[moduleName] = webSocketModule.NewWebSocketModule()
 		err = this.Modules[moduleName].Init(this.app, config)
-		break;
-	case "PrinterModule":
-		this.Modules[moduleName] = printerModule.NewPrinterModule()
+		break
+	case "ScanModule":
+		this.Modules[moduleName] = scanModule.NewPrinterModule()
 		err = this.Modules[moduleName].Init(this.app, config)
-		//case "MnstModule":
-		//	this.Modules[moduleName] = webSocketModule.NewMn()
-		//	err = this.Modules[moduleName].Init(this.app, config)
-		//	break;
+		break
+	case "MnsModule":
+		this.Modules[moduleName] = mnsModule.NewMnsModule()
+		err = this.Modules[moduleName].Init(this.app, config)
+		break
 	default:
 		err = errors.New("没有这样的模块")
 	}

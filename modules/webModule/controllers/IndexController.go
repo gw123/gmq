@@ -1,15 +1,15 @@
 package controllers
 
 import (
+	"github.com/gw123/GMQ/modules/webModule/models"
+	"github.com/gw123/GMQ/core/interfaces"
 	"golang.org/x/net/websocket"
-	"sync"
 	"github.com/labstack/echo"
-	"github.com/fpay/erp-client-s/modules/webModule/models"
-	"github.com/fpay/erp-client-s/modules/webModule/common"
 	context2 "golang.org/x/net/context"
 	"encoding/json"
-	"github.com/fpay/erp-client-s/interfaces"
 	"time"
+	"sync"
+	"github.com/gw123/GMQ/common/common_types"
 )
 
 type Response struct {
@@ -49,7 +49,7 @@ func (c *IndexController) Message(ctx echo.Context) error {
 			//c.webModule.Debug("ws handel ->")
 			client, ok := c.WebSocketClientMap[moduleName]
 			if ok {
-				stopEvent := common.NewEvent("stop", "新的同名模块连接到来")
+				stopEvent := common_types.NewEvent("stop", []byte("新的同名模块连接到来"))
 				client.SendMsg(stopEvent)
 				client.Stop()
 			}

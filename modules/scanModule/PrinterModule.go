@@ -1,4 +1,4 @@
-package printerModule
+package scanModule
 
 import (
 	"github.com/gw123/GMQ/modules/base"
@@ -6,7 +6,7 @@ import (
 	"github.com/gw123/net_tool/net_utils"
 	"github.com/gw123/gworker"
 	"github.com/gw123/GMQ/common/common_types"
-	"github.com/gw123/GMQ/modules/printerModule/PrinterModels"
+	"github.com/gw123/GMQ/modules/scanModule/PrinterModels"
 	"encoding/json"
 	"github.com/fpay/openwrt-gateway-go/src/gateway/model"
 	"time"
