@@ -7,9 +7,9 @@ import (
 	"github.com/labstack/echo"
 	context2 "golang.org/x/net/context"
 	"encoding/json"
-	"time"
 	"sync"
 	"github.com/gw123/GMQ/common/common_types"
+	"time"
 )
 
 type Response struct {
@@ -72,7 +72,7 @@ func (c *IndexController) Message(ctx echo.Context) error {
 	return nil
 }
 
-func (c *IndexController) SendMessage(msg interfaces.Event) {
+func (c *IndexController) SendClientMessage(msg interfaces.Event) {
 	var flag = false
 	for !flag {
 		for _, client := range c.WebSocketClientMap {
@@ -87,4 +87,9 @@ func (c *IndexController) SendMessage(msg interfaces.Event) {
 		}
 		time.Sleep(time.Second)
 	}
+}
+
+func (c *IndexController) SendMessage(ctx echo.Context) error {
+
+	return nil
 }

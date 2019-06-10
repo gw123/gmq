@@ -3,15 +3,11 @@
 package core
 
 import (
-	"github.com/gw123/GMQ/modules/debugModule"
-	"github.com/gw123/GMQ/modules/mqttModule"
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"errors"
 	"fmt"
-	"github.com/gw123/GMQ/modules/webSocketModule"
-	"github.com/gw123/GMQ/modules/scanModule"
-	"github.com/gw123/GMQ/modules/mnsModule"
+	"errors"
+	"strings"
 )
 
 /*
@@ -24,6 +20,7 @@ type ModuleManager struct {
 	Modules       map[string]interfaces.Module
 	app           interfaces.App
 	ConfigData    []byte
+	providers     map[string]interfaces.ModuleProvider
 }
 
 func NewModuleManager(app interfaces.App, configManger *ConfigManager) *ModuleManager {
@@ -31,6 +28,7 @@ func NewModuleManager(app interfaces.App, configManger *ConfigManager) *ModuleMa
 	this.app = app
 	this.configManager = configManger
 	this.Modules = make(map[string]interfaces.Module)
+	this.providers = make(map[string]interfaces.ModuleProvider, 0)
 	return this
 }
 
@@ -94,29 +92,20 @@ func (this *ModuleManager) loadExe(muduleName string, config interfaces.ModuleCo
 	return
 }
 
+//注意模块统一小写
+func (this *ModuleManager) LoadModuleProvider(provider interfaces.ModuleProvider) {
+	if provider == nil {
+		return
+	}
+	this.providers[strings.ToLower(provider.GetModuleName())] = provider
+}
+
 func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
-	switch moduleName {
-	case "MqttModule":
-		this.Modules[moduleName] = mqttModule.NewMqttModule()
+	provider, ok := this.providers[moduleName]
+	if ok {
+		this.Modules[moduleName] = provider.GetModule()
 		err = this.Modules[moduleName].Init(this.app, config)
-		break
-	case "DebugModule":
-		this.Modules[moduleName] = debugModule.NewDebugModule()
-		err = this.Modules[moduleName].Init(this.app, config)
-		break
-	case "WebSocketModule":
-		this.Modules[moduleName] = webSocketModule.NewWebSocketModule()
-		err = this.Modules[moduleName].Init(this.app, config)
-		break
-	case "ScanModule":
-		this.Modules[moduleName] = scanModule.NewPrinterModule()
-		err = this.Modules[moduleName].Init(this.app, config)
-		break
-	case "MnsModule":
-		this.Modules[moduleName] = mnsModule.NewMnsModule()
-		err = this.Modules[moduleName].Init(this.app, config)
-		break
-	default:
+	} else {
 		err = errors.New("没有这样的模块")
 	}
 	return err
@@ -125,12 +114,7 @@ func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.
 func (this ModuleManager) GetModuleStatus() string {
 	str := ""
 	for moduleName, module := range this.Modules {
-		str += fmt.Sprintf("%: %\n", moduleName, module.GetEventNum())
+		str += fmt.Sprintf("%s: %d\n", moduleName, module.GetStatus())
 	}
 	return str
 }
-
-//func (this *ConfigManager) LoadModule1(muduleName string, config []byte) {
-//	module := this.Modules[muduleName]
-//	module.Init(this.AppInstance, config)
-//}

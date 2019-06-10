@@ -1,32 +1,62 @@
 package core
 
-import "sync"
+import (
+	"sync"
+	"fmt"
+)
 
 type AppConfig struct {
-	sync.Mutex
-	configs    map[string]string
+	mutex   sync.Mutex
+	Configs map[string]interface{}
 }
 
 func NewAppConfig() *AppConfig {
 	this := new(AppConfig)
-	this.configs = make(map[string]string)
+	this.Configs = make(map[string]interface{})
 	return this
 }
 
 func (this *AppConfig) GetItem(key string) (value string) {
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	return this.configs[key]
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	value, ok := this.Configs[key].(string)
+	if ok {
+		return value
+	}
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", "App", key)
+	return ""
+}
+
+func (this *AppConfig) GetIntItem(key string) int {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	value, ok := this.Configs[key].(int)
+	if ok {
+		return value
+	}
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", "App", key)
+	return 0
+}
+
+func (this *AppConfig) GetBoolItem(key string) bool {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	value, ok := this.Configs[key].(bool)
+	if ok {
+		return value
+	}
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", "App", key)
+	return false
 }
 
 func (this *AppConfig) SetItem(key, value string) {
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	this.configs[key] = value
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	this.Configs[key] = value
 }
 
-func (this *AppConfig) GetItems() (value map[string]string) {
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	return this.configs
+func (this *AppConfig) GetItems() (value map[string]interface{}) {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.Configs
 }

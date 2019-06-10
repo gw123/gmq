@@ -9,9 +9,8 @@ import (
 	"math/rand"
 	"time"
 	"fmt"
-	"os"
-	"github.com/gw123/GMQ/modules/webModule/common"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/webModule/webEvent"
 )
 
 var gbuffer = make([]byte, 1024*1024)
@@ -22,14 +21,14 @@ type WsClientModel struct {
 	Token      string
 	ModuleName string
 	context    context.Context
-	webModule  interfaces.Module
+	webEvent  interfaces.Module
 	runFlag    bool
 }
 
 func NewWsClientModel(conn *websocket.Conn, ctx context.Context, module interfaces.Module, ModuleName string) *WsClientModel {
 	this := new(WsClientModel)
 	this.webSocket = conn
-	this.webModule = module
+	this.webEvent = module
 	this.context = ctx
 	//key := "ModuleName"
 	this.ModuleName = ModuleName
@@ -37,9 +36,9 @@ func NewWsClientModel(conn *websocket.Conn, ctx context.Context, module interfac
 	return this
 }
 
-func (this *WsClientModel) IsSafe(event *common.RequestEvent) bool {
+func (this *WsClientModel) IsSafe(event *webEvent.RequestEvent) bool {
 	return true
-	if event.Token == this.Token && event.ModuleName == this.ModuleName {
+	if event.Token == this.Token {
 		return true
 	}
 	return false
@@ -60,15 +59,15 @@ func (this *WsClientModel) Run() {
 			break
 		default:
 		}
-		//this.webModule.Info("ws handel ->6")
+		//this.webEvent.Info("ws handel ->6")
 		event, err := this.ReadMsg()
 
 		if err == io.EOF {
-			this.webModule.Warning("ReadMsg: 连接断开")
+			this.webEvent.Warning("ReadMsg: 连接断开")
 			break
 		}
 		if err != nil {
-			this.webModule.Warning("ReadMsg:" + err.Error())
+			this.webEvent.Warning("ReadMsg:" + err.Error())
 			if this.webSocket.IsClientConn() && this.webSocket.IsServerConn() {
 				continue
 			} else {
@@ -79,39 +78,33 @@ func (this *WsClientModel) Run() {
 	}
 }
 
-func (this *WsClientModel) DealMsg(event *common.RequestEvent) {
-	this.webModule.Debug(fmt.Sprintf("EeventName:%s; ModuleName:%s; Payload:%s", event.EventName, this.ModuleName, event.Payload))
+func (this *WsClientModel) DealMsg(event *webEvent.RequestEvent) {
+	this.webEvent.Debug(fmt.Sprintf("EeventName:%s; ModuleName:%s; Payload:%s", event.EventName, this.ModuleName, event.Payload))
 	switch event.EventName {
 	case "auth":
-		this.ModuleName = event.ModuleName
+		this.ModuleName = event.SourcModuleName
 		rand.Seed(time.Now().UnixNano())
 		this.Token = fmt.Sprintf("%d", rand.Uint64())
-		ev := common.NewEvent("auth_reply", this.Token)
+		ev := webEvent.NewEvent("auth_reply", this.Token)
 		this.SendMsg(ev)
 		break
-	case "exit":
-		this.webModule.Info("收到退出消息...")
-		time.Sleep(time.Second * 2)
-		os.Exit(0)
-		break
 	default:
-
 		if this.IsSafe(event) {
-			this.webModule.Pub(event)
+			this.webEvent.Pub(event)
 		} else {
-			this.webModule.Warning("未认证连接")
+			this.webEvent.Warning("未认证连接")
 			this.Stop()
 		}
 	}
 }
 
-func (this *WsClientModel) ReadMsg() (*common.RequestEvent, error) {
+func (this *WsClientModel) ReadMsg() (*webEvent.RequestEvent, error) {
 	n, err := this.webSocket.Read(gbuffer)
 	if err != nil {
 		return nil, err
 	}
 	decodeBufer := gbuffer[:n]
-	event := &common.RequestEvent{}
+	event := &webEvent.RequestEvent{}
 	err = json.Unmarshal(decodeBufer, event)
 	if err != nil {
 		return nil, err
@@ -120,11 +113,10 @@ func (this *WsClientModel) ReadMsg() (*common.RequestEvent, error) {
 }
 
 func (this *WsClientModel) SendMsg(event interfaces.Event) error {
-	event2 := &common.Event{}
+	event2 := &webEvent.Event{}
 	event2.EventName = event.GetEventName()
 	event2.Payload = string(event.GetPayload())
 	event2.MsgId = event.GetMsgId()
-	event2.SetSourceModule(event.GetSourceModule())
 	eventData, err := json.Marshal(event2)
 	if err != nil {
 		return err

@@ -155,7 +155,7 @@ func (this *Iot) SubscribeAndCheck(topic string, qos byte) error {
 
 func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) {
 	topic := "/" + this.ProductKey + "/" + this.DeviceName + "/get"
-	msg := &common_types.LhMsg{}
+	msg := &AliMsg{}
 	err := json.Unmarshal(message.Payload(), msg)
 	if err != nil {
 		this.writeLog("error", "Topic "+topic+" 消息解密失败 "+err.Error()+" Payload: "+string(message.Payload()))
@@ -165,7 +165,7 @@ func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) 
 		this.writeLog("warning", "msgId "+msg.MsgId+" Topic"+topic+" 重复消息")
 		return
 	}
-	event := common_types.NewEvent(msg.GetEventName(),message.Payload())
+	event := common_types.NewEvent(msg.MsgId ,message.Payload())
 	this.App.Pub(event)
 }
 

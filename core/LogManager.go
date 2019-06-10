@@ -9,8 +9,6 @@ import (
 	"strings"
 	"strconv"
 	"sync"
-	"github.com/gw123/GMQ/common/common_types"
-	"encoding/json"
 )
 
 /*
@@ -131,21 +129,6 @@ func (this *LogManager) filter(logType, category string, format string, a ...int
 	date := time.Now().Format("2006-01-02 15:04:05")
 	data := fmt.Sprintf(tpl, date, logType, category, fmt.Sprintf(format, a...))
 	this.Write(data)
-
-	if logType == "Error" {
-		msg := &common_types.LhMsg{}
-		msg.Timestamp = time.Now().Unix()
-		msg.EventName = "log"
-		msg.MsgId = time.Now().Format("2016-10-10 10:10:10")
-		msg.Payload = data
-		msgData, err := json.Marshal(msg)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		msg1 := common_types.NewEvent("sendMqttMsg", msgData)
-		this.app.Pub(msg1)
-	}
 }
 
 func (this *LogManager) Write(data string) {

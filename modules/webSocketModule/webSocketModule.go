@@ -47,9 +47,7 @@ func (this *WebSocketModule) GetStatus() uint64 {
 }
 
 func (this *WebSocketModule) Start() {
-	go func() {
-		//this.App.Pub()
-	}()
+
 	for ; ; {
 		event := this.BaseModule.Pop()
 		err := this.service(event)
@@ -67,7 +65,7 @@ func (this *WebSocketModule) Start() {
 	}
 }
 
-func (this *WebSocketModule) service(event interfaces.Event) error {
+func (this *WebSocketModule) Handel(event interfaces.Event) error {
 	this.Info(event.GetEventName() + ", " + event.GetMsgId() + " ," + string(event.GetPayload()))
 	if this.Conn == nil {
 		return errors.New("WebSocket 连接未建立")

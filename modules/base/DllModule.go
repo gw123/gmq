@@ -2,7 +2,6 @@
 
 package base
 
-import "C"
 import (
 	"plugin"
 	"github.com/gw123/GMQ/core/interfaces"
@@ -34,7 +33,7 @@ func (this *DllModule) GetStatus() uint64 {
 }
 
 func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
-	this.BaseModule.Init(app, config)
+	this.BaseModule.Init(app, this, config)
 	var err error
 	path := config.GetPath()
 	//this.Debug("path :" + path)
@@ -75,8 +74,13 @@ func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 	return nil
 }
 
-func (this *DllModule) Start() {
+func (this *DllModule) Handle(event interfaces.Event) error {
+	return nil
+}
 
+func (this *DllModule) Watch(index int) {
+
+	return
 }
 
 func (this *DllModule) UnInit() (err error) {

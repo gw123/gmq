@@ -6,12 +6,14 @@ const ModuleUnLoad = 0x03
 const ModuleUnInstall = 0x04
 
 type Module interface {
+	GetApp() App
+
 	Info(format string, a ...interface{})
 	Warning(format string, a ...interface{})
 	Error(format string, a ...interface{})
 	Debug(format string, a ...interface{})
 
-	//订阅事件
+	//订阅事件 初始化队列
 	Init(app App, config ModuleConfig) error
 
 	//取消事件订阅
@@ -32,7 +34,12 @@ type Module interface {
 	//获取模块版本
 	GetVersion() string
 
-	GetEventNum() int
-
+	//开始处理事件
 	Start()
+
+	//处理事件
+	Handle(event Event) (err error)
+
+	//定时调用方法
+	Watch(index int)
 }

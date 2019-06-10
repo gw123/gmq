@@ -2,13 +2,17 @@ package interfaces
 
 type ModuleConfig interface {
 	GetPath() string
-	GetModuleType() string
+	IsInnerModule() bool
 	IsEnable() bool
 	GetModuleName() string
 	GetItem(key string) (value string)
 	GetGlobalItem(key string) (value string)
-	GetItems() (value map[string]string)
-	GetGlobalItems() (value map[string]string)
-	SetItem(key, value string)
+	GetItems() (value map[string]interface{})
+	GetGlobalItems() (value map[string]interface{})
+	SetItem(key string, value interface{})
+	GetIntItem(key string) int
 	GetBoolItem(key string) bool
+	SetGlobalConfig(config AppConfig)
+	MergeNewConfig(newCofig ModuleConfig) bool
+	GetModuleType() string
 }

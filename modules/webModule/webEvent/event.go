@@ -1,4 +1,4 @@
-package common
+package webEvent
 
 import (
 	"time"
@@ -6,10 +6,11 @@ import (
 )
 
 type Event struct {
-	MsgId      string
-	EventName  string
-	ModuleName string
-	Payload    string
+	MsgId           string
+	EventName       string
+	SourcModuleName string
+	DstModuleName   string
+	Payload         string
 }
 
 func NewEvent(eventType string, result string) *Event {
@@ -32,6 +33,14 @@ func (this *Event) GetPayload() []byte {
 	return []byte(this.Payload)
 }
 
+func (this *Event) GetSourceModule() string {
+	return this.SourcModuleName
+}
+
+func (this *Event) GetDstModule() string {
+	return this.DstModuleName
+}
+
 func (this *Event) CreateMsgId() string {
 	now := time.Now()
 	hour := now.Hour()
@@ -40,14 +49,6 @@ func (this *Event) CreateMsgId() string {
 	nano := now.UnixNano() % 1000000
 	date := fmt.Sprintf("%d:%d:%d:%d", hour, minute, second, nano)
 	return fmt.Sprintf("%s", date)
-}
-
-func (this *Event) SetSourceModule(name string) {
-	this.ModuleName = name
-}
-
-func (this *Event) GetSourceModule() string {
-	return this.ModuleName
 }
 
 type RequestEvent struct {

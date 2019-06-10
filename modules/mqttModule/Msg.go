@@ -1,17 +1,16 @@
-package common_types
+package mqttModule
 
 import (
 	"encoding/json"
-	"time"
-	"strconv"
 )
 
 type AliMsg struct {
-	Id      string      `json:"id"`
+	MsgId   string      `json:"id"`
 	Code    int         `json:"code"`
 	Data    interface{} `json:"data"`
 	Message string      `json:"message"`
 }
+
 
 type Register struct {
 	IotId        string `json:"iotId"`
@@ -21,7 +20,7 @@ type Register struct {
 }
 
 type LoginResponse struct {
-	Id      string `json:"id"`
+	MsgId      string `json:"id"`
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data struct {
@@ -39,16 +38,6 @@ type ChangeIpResponse struct {
 		Ip     string `json:"ip"`
 		Msg    string `json:"msg"`
 	} `json:"data"`
-}
-
-func NewChangeIpResponse(status int64, ip string) *ChangeIpResponse {
-	this := new(ChangeIpResponse)
-	this.Timestamp = time.Now().Unix()
-	this.Event = "changeIp"
-	this.MsgId = strconv.Itoa(int(time.Now().UnixNano()))
-	this.Data.Status = status
-	this.Data.Ip = ip
-	return this
 }
 
 type UpdateResponse struct {

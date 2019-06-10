@@ -7,8 +7,8 @@ import (
 	"unsafe"
 	"encoding/json"
 	"strconv"
-	"strings"
 	"github.com/gw123/GMQ/common/common_types"
+	"strings"
 )
 
 type DllModule struct {
@@ -30,7 +30,7 @@ func (this *DllModule) GetStatus() uint64 {
 }
 
 func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
-	this.BaseModule.Init(app, config)
+	this.BaseModule.Init(app, this,config)
 	var err error
 	path := config.GetPath()
 	//this.Debug("path :" + path)
@@ -98,48 +98,38 @@ func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 	return nil
 }
 
-func (this *DllModule) Start() {
-	go func() {
-		for ; ; {
-			event := this.Pop()
-			this.App.Debug(this.GetModuleName(), event.GetEventName()+" "+string(event.GetPayload()))
-			type Event struct {
-				MsgId     string
-				EventName string
-				Payload   string
-			}
-			ev := Event{
-				MsgId:     event.GetMsgId(),
-				EventName: event.GetEventName(),
-				Payload:   string(event.GetPayload()),
-			}
-			jsonData, err := json.Marshal(ev)
 
-			//fmt.Println("jsonData", jsonData)
-			//e := common.LhMsg{}
-			//err = json.Unmarshal(jsonData, &ev)
-			//fmt.Println("err", err)
-			//err = json.Unmarshal([]byte(ev.Payload), &e)
-			//fmt.Println("err", err)
-			//fmt.Println("decode", e)
+func (this *DllModule) Handle(event interfaces.Event) error {
+	type Event struct {
+		MsgId     string
+		EventName string
+		Payload   string
+	}
+	ev := Event{
+		MsgId:     event.GetMsgId(),
+		EventName: event.GetEventName(),
+		Payload:   string(event.GetPayload()),
+	}
+	jsonData, err := json.Marshal(ev)
 
-			res, _, err := this.handel.Call(uintptr(unsafe.Pointer(&jsonData[0])))
-			if res == 0 {
-				if !strings.Contains(err.Error(), "successfully") {
-					this.Warning(event.GetMsgId() + " " + event.GetEventName() + "系统调用error: " + err.Error())
-				}
-				//执行成功
-				//replay := common.NewResultEvent([]byte("执行成功"))
-				//this.App.Pub(replay)
-				this.Info(event.GetMsgId() + " " + event.GetEventName() + " 执行成功")
-			} else {
-				//replay := common.NewResultEvent([]byte("执行失败"))
-				//this.App.Pub(replay)
-				this.Error(event.GetMsgId() + " " + event.GetEventName() + " 执行失败 " + err.Error())
-			}
+	res, _, err := this.handel.Call(uintptr(unsafe.Pointer(&jsonData[0])))
+	if res == 0 {
+		if !strings.Contains(err.Error(), "successfully") {
+			this.Warning(event.GetMsgId() + " " + event.GetEventName() + "系统调用error: " + err.Error())
 		}
-	}()
+		this.Info(event.GetMsgId() + " " + event.GetEventName() + " 执行成功")
+	} else {
+		this.Error(event.GetMsgId() + " " + event.GetEventName() + " 执行失败 " + err.Error())
+	}
+	return nil
 }
+
+func (this *DllModule) Watch(index int) {
+
+	return
+}
+
+
 
 func (this *DllModule) UnInit() (err error) {
 	this.BaseModule.UnInit()

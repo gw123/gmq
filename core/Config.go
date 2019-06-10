@@ -4,8 +4,7 @@ package core
 
 import (
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/go-ini/ini"
-	"fmt"
+	"github.com/spf13/viper"
 )
 
 /*
@@ -17,10 +16,10 @@ type ConfigManager struct {
 	ModuleConfigs map[string]interfaces.ModuleConfig
 	app           interfaces.App
 	GlobalConfig  interfaces.AppConfig
-	ConfigData    []byte
+	ConfigData    *viper.Viper
 }
 
-func NewConfigManager(app interfaces.App, configData []byte) *ConfigManager {
+func NewConfigManager(app interfaces.App, configData *viper.Viper) *ConfigManager {
 	this := new(ConfigManager)
 	this.app = app
 	this.ModuleConfigs = make(map[string]interfaces.ModuleConfig)
@@ -34,60 +33,21 @@ func NewConfigManager(app interfaces.App, configData []byte) *ConfigManager {
 }
 
 func (this *ConfigManager) ParseConfig() (err error) {
-	cfg, err := ini.Load(this.ConfigData)
-	if err != nil {
-		return
-	}
-	sections := cfg.Sections()
-	section := cfg.Section("DEFAULT")
-	keys := section.Keys()
-	for _, key := range keys {
-		//fmt.Println("\t", key.Name(), ":", key.String())
-		this.GlobalConfig.SetItem(key.Name(), key.String())
+	globalConfig := this.ConfigData.GetStringMapString("app")
+	for key, val := range globalConfig {
+		this.GlobalConfig.SetItem(key, val)
 	}
 
-	for _, section := range sections {
-		if section.Name() == "DEFAULT" {
-			continue
+	modulesConfig := this.ConfigData.GetStringMap("modules")
+	for moduleName, moduleConfig := range modulesConfig {
+		configs, ok := moduleConfig.(map[string]interface{})
+		moduleConfig := NewModuleConfig(moduleName, this.GlobalConfig)
+		if ok {
+			for key, val := range configs {
+				moduleConfig.SetItem(key, val)
+			}
 		}
-		//fmt.Println("section name :", section.Name())
-		moduleConfig := NewModuleConfig(section.Name(), this.GlobalConfig)
-		keys := section.Keys()
-		for _, key := range keys {
-			//fmt.Println("\t", key.Name(), ":", key.String())
-			moduleConfig.SetItem(key.Name(), key.String())
-		}
-		this.ModuleConfigs[section.Name()] = moduleConfig
-	}
-	return
-}
-
-func (this *ConfigManager) ParseJsonConfig(configData string) (err error) {
-	cfg, err := ini.Load(configData)
-	if err != nil {
-		fmt.Printf("Fail to load %v", err)
-		return
-	}
-	sections := cfg.Sections()
-	section := cfg.Section("DEFAULT")
-	keys := section.Keys()
-	for _, key := range keys {
-		//fmt.Println("\t", key.Name(), ":", key.String())
-		this.GlobalConfig.SetItem(key.Name(), key.String())
-	}
-
-	for _, section := range sections {
-		if section.Name() == "DEFAULT" {
-			continue
-		}
-		//fmt.Println("section name :", section.Name())
-		moduleConfig := NewModuleConfig(section.Name(), this.GlobalConfig)
-		keys := section.Keys()
-		for _, key := range keys {
-			//fmt.Println("\t", key.Name(), ":", key.String())
-			moduleConfig.SetItem(key.Name(), key.String())
-		}
-		this.ModuleConfigs[section.Name()] = moduleConfig
+		this.ModuleConfigs[moduleName] = moduleConfig
 	}
 	return
 }

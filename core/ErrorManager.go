@@ -13,3 +13,4 @@ func NewErrorManager(app interfaces.App) *ErrorManager {
 	this.app = app
 	return this
 }
+

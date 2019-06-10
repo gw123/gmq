@@ -2,15 +2,13 @@ package core
 
 import (
 	"github.com/gw123/GMQ/common/common_types"
-	"github.com/gw123/GMQ/core/middlewares"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/go-ini/ini"
 	"encoding/json"
-	"fmt"
+	"github.com/spf13/viper"
+	"github.com/jinzhu/gorm"
 )
 
 type App struct {
-	configFile        *ini.File
 	errorManager      *ErrorManager
 	moduleManager     *ModuleManager
 	configManager     *ConfigManager
@@ -19,46 +17,93 @@ type App struct {
 	dispatch          *Dispatch
 	appEventNames     string
 	Version           string
-	configData        []byte
+	configData        *viper.Viper
+	DbPool            interfaces.DbPool
 }
 
-func NewApp(config []byte) *App {
+func NewApp(viper2 *viper.Viper) *App {
 	this := &App{}
-	this.configData = config
-	var err error
-	this.configFile, err = ini.Load(this.configData)
-	if err != nil {
-		fmt.Printf("configFile Fail to load %v", err)
-	}
+	this.configData = viper2
+
 	this.Version = "2.0.0"
 	this.dispatch = NewDispath(this)
 	this.logManager = NewLogManager(this)
 	this.logManager.Start()
 
-	this.configManager = NewConfigManager(this, this.configData)
+	this.configManager = NewConfigManager(this, viper2)
 	this.moduleManager = NewModuleManager(this, this.configManager)
 	this.errorManager = NewErrorManager(this)
 	this.middlewareManager = NewMiddlewareManager(this)
+
+	this.DbPool = NewDbPool()
 	return this
 }
 
 func (this *App) Start() {
+	this.LoadDb()
 	go this.doWorker()
 }
 
+//加载数据库配置
+func (this *App) LoadDb() {
+	configs := this.configData.GetStringMap("dbpool")
+	for key, config := range configs {
+		configMap, ok := config.(map[string]interface{})
+		if ok {
+			drive, ok := configMap["drive"].(string)
+			if !ok {
+				drive = "mysql"
+			}
+			host, ok := configMap["host"].(string)
+			if !ok {
+				host = "127.0.0.1"
+			}
+			database, ok := configMap["database"].(string)
+			if !ok {
+				database = ""
+			}
+			username, ok := configMap["username"].(string)
+			if !ok {
+				database = "root"
+			}
+			password, ok := configMap["password"].(string)
+			if !ok {
+				password = ""
+			}
+
+			db, err := this.DbPool.NewDb(
+				drive,
+				host,
+				database,
+				username,
+				password);
+			if err != nil {
+				this.Warning("App", "db load error, %s: ", err.Error())
+			}
+			this.DbPool.SetDb(key, db)
+		}
+	}
+
+	//set default db
+	defaultDBkey, ok := configs["default"].(string)
+	if !ok {
+		return
+	}
+
+	this.Debug("App", "default DB  key", defaultDBkey)
+
+	db, err := this.DbPool.GetDb(defaultDBkey)
+	if err != nil {
+		this.Warning("App", "not found  db  default config :%s", err.Error())
+	} else {
+		this.DbPool.SetDb("default", db)
+	}
+}
+
 func (this *App) doWorker() {
-	this.Debug("App", "load middlewares")
-	func() {
-		eventView := middlewares.NewEventView(this)
-		this.middlewareManager.RegisterMiddleware(eventView)
-		eventformat := middlewares.NewEventFormat(this)
-		this.middlewareManager.RegisterMiddleware(eventformat)
-		eventAuth := middlewares.NewEventView(this)
-		this.middlewareManager.RegisterMiddleware(eventAuth)
-	}()
 	this.Debug("App", "Load modules")
 	this.moduleManager.LoadModules()
-	this.appEventNames = this.configManager.GlobalConfig.GetItem("subs")
+	this.appEventNames = "stopModule,startModule,configChange"
 	this.dispatch.SetEventNames(this.appEventNames)
 	event := common_types.NewEvent("appReady", []byte{})
 	this.Pub(event)
@@ -148,17 +193,36 @@ func (this *App) GetVersion() string {
 }
 
 func (this *App) GetConfigItem(section, key string) (string, error) {
-	sect, err := this.configFile.GetSection(section)
-	if err != nil {
+	sect := this.configData.GetStringMapString(section)
+	if sect != nil {
 		return "", nil
 	}
-	key1, err := sect.GetKey(key)
-	if err != nil {
-		return "", err
+	val, ok := sect[key]
+	if !ok {
+		return "", nil
 	}
-	return key1.String(), nil
+	return val, nil
 }
 
 func (this *App) GetDefaultConfigItem(key string) (string, error) {
-	return this.GetConfigItem("DEFAULT", key)
+	return this.GetConfigItem("app", key)
+}
+
+/***/
+func (this *App) LoadModuleProvider(provider interfaces.ModuleProvider) {
+	this.moduleManager.LoadModuleProvider(provider)
+}
+
+//获取数据库信息
+func (this *App) GetDb(dbname string) (*gorm.DB, error) {
+	if dbname == "" {
+		return this.GetDefaultDb()
+	}
+	return this.DbPool.GetDb(dbname)
+}
+
+//获取默认数据库
+func (this *App) GetDefaultDb() (*gorm.DB, error) {
+	dbname := "default"
+	return this.GetDb(dbname)
 }
