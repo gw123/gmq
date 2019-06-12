@@ -12,13 +12,8 @@ import (
 	"time"
 )
 
-type Response struct {
-	Code int
-	Msg  string
-	Data interface{}
-}
-
 type IndexController struct {
+	BaseController
 	WebSocketClientMap map[string]*models.WsClientModel
 	Mutex              sync.Mutex
 	webModule          interfaces.Module
@@ -30,6 +25,8 @@ func NewIndexController(module interfaces.Module) *IndexController {
 	temp.WebSocketClientMap = make(map[string]*models.WsClientModel, 10)
 	return temp
 }
+
+
 
 func (c *IndexController) Index(ctx echo.Context) error {
 	content, err := json.Marshal(c.WebSocketClientMap)
@@ -89,7 +86,4 @@ func (c *IndexController) SendClientMessage(msg interfaces.Event) {
 	}
 }
 
-func (c *IndexController) SendMessage(ctx echo.Context) error {
 
-	return nil
-}

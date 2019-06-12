@@ -4,10 +4,7 @@ import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/webModule/controllers"
-	"github.com/labstack/echo"
-	"fmt"
-	"github.com/gw123/GMQ/common/common_types"
-	"strconv"
+	"github.com/gw123/GMQ/modules/webModule/server"
 )
 
 type WebModule struct {
@@ -18,7 +15,7 @@ type WebModule struct {
 	port       int
 	addr       string
 	controller *controllers.IndexController
-	echo       *echo.Echo
+	server     *server.Server
 }
 
 func NewWebModule() *WebModule {
@@ -38,37 +35,20 @@ func (this *WebModule) Handle(event interfaces.Event) error {
 }
 
 func (this *WebModule) Watch(count int) {
-	if count%20 == 0 {
-		event := common_types.NewEvent("testlib", []byte("10"+strconv.Itoa(count)))
-		this.App.Pub(event)
-	}
-
-	if count%40 == 0 {
-		event := common_types.NewEvent("printe", []byte("test printe"))
-		this.App.Pub(event)
-	}
-
-	if count%100 == 10 {
-		this.Error("测试上报错误")
-	}
 	return
 }
 
 func (this *WebModule) Start() {
-	go this.InitWebServer()
-	this.BaseModule.Start()
-}
+	//初始化数据库
+	err := autoMigrate(this.GetApp())
+	if err != nil {
+		this.Error("autoMigrate error %s .", err.Error())
+	}
 
-func (this *WebModule) InitWebServer() error {
-	controller := controllers.NewIndexController(this)
-	this.controller = controller
-	e := echo.New()
-	e.GET("/message", controller.Message)
-	e.GET("/sendMessage", controller.SendMessage)
-	//e.GET("/", controller.)
-	addr := fmt.Sprintf("%s:%d", this.addr, this.port)
-	this.Info("端口监听在:  %s", addr)
-	this.echo = e
-	e.Start(addr)
-	return nil
+	port := this.Config.GetIntItem("port")
+	addr := this.Config.GetItem("addr")
+	this.server = server.NewServer(addr, port, this)
+	this.server.Start()
+
+	this.BaseModule.Start()
 }
