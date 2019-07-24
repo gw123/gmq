@@ -10,9 +10,10 @@ func autoMigrate(app interfaces.App) error {
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&models.Service{})
+	db.AutoMigrate(&models.Task{})
+	db.AutoMigrate(&models.TaskDetail{})
 	db.AutoMigrate(&models.Client{})
-	db.AutoMigrate(&models.ClientServer{})
-
+	db.AutoMigrate(&models.ClientTask{})
+	db.AutoMigrate(&models.PingLog{})
 	return nil
 }

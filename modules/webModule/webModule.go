@@ -48,7 +48,6 @@ func (this *WebModule) Start() {
 	port := this.Config.GetIntItem("port")
 	addr := this.Config.GetItem("addr")
 	this.server = server.NewServer(addr, port, this)
-	this.server.Start()
-
+	go this.server.Start()
 	this.BaseModule.Start()
 }

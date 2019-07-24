@@ -38,4 +38,7 @@ erp.log
 main.exe
 resources/assets/
 resources/storage/
+cmd/config.client.yml
+cmd/config.yml
+cmd/config2.yml
 

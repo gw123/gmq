@@ -42,4 +42,8 @@ type Module interface {
 
 	//定时调用方法
 	Watch(index int)
+
+	GetConfig() ModuleConfig
+
+
 }

@@ -6,6 +6,7 @@ type ModuleConfig interface {
 	IsEnable() bool
 	GetModuleName() string
 	GetItem(key string) (value string)
+	GetItemOrDefault(key, defaultVal string) (value string)
 	GetGlobalItem(key string) (value string)
 	GetItems() (value map[string]interface{})
 	GetGlobalItems() (value map[string]interface{})
@@ -15,4 +16,6 @@ type ModuleConfig interface {
 	SetGlobalConfig(config AppConfig)
 	MergeNewConfig(newCofig ModuleConfig) bool
 	GetModuleType() string
+	GetArrayItem(key string) (value []string)
+	GetMapItem(key string) (value map[string]string)
 }

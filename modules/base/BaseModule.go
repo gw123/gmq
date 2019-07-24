@@ -195,3 +195,7 @@ func (this *BaseModule) Sub(eventName string) {
 func (this *BaseModule) GetApp() interfaces.App {
 	return this.App
 }
+
+func (this *BaseModule) GetConfig() interfaces.ModuleConfig {
+	return this.Config
+}

@@ -6,9 +6,9 @@ dbpool:
    default: xyt
    xyt:
       database: "gateway"
-      host: "192.168.30.138"
-      username: "gw"
-      password: "gao123456"
+      host: "192.168.1.1"
+      username: "user"
+      password: "pwd"
       drive: "mysql"
 
 modules:
@@ -18,12 +18,12 @@ modules:
 #      deviceSecret: ulsuWZkXGzOQsR5L5AYUQpQxLKvidmUi
 #      deviceName:  PC1219
 
-  web:
-      type : inner
-      addr: 0.0.0.0
-      port: 88
-      publicPath: "./public"
-      sotragePath: "./storage"
+  serverNode:
+      serverHost: "http://127.0.0.1:88"
+      nodeName:  xyt001
+      accessToken:  gw123
+      secret:  secret99019
+      load: 100
 
   debug:
       type : inner

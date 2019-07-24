@@ -6,10 +6,13 @@ import (
 	"golang.org/x/net/websocket"
 	"github.com/labstack/echo"
 	context2 "golang.org/x/net/context"
-	"encoding/json"
 	"sync"
 	"github.com/gw123/GMQ/common/common_types"
 	"time"
+	"github.com/gw123/GMQ/modules/webModule/webEvent"
+	"net/http"
+	"strconv"
+	"fmt"
 )
 
 type IndexController struct {
@@ -26,16 +29,18 @@ func NewIndexController(module interfaces.Module) *IndexController {
 	return temp
 }
 
-
-
 func (c *IndexController) Index(ctx echo.Context) error {
-	content, err := json.Marshal(c.WebSocketClientMap)
-	if err != nil {
-		ctx.HTML(503, err.Error())
-		return err
+	return ctx.Render(http.StatusOK, "index", nil)
+}
+
+func (c *IndexController) Ping(ctx echo.Context) error {
+	sleep := ctx.QueryParam("sleep")
+	sleepTime, err := strconv.Atoi(sleep)
+	fmt.Println(sleep, sleepTime)
+	if err == nil && sleepTime < 1000*120 {
+		time.Sleep(time.Duration(sleepTime) * time.Millisecond)
 	}
-	ctx.HTML(200, string(content))
-	return nil
+	return c.Success(ctx, nil)
 }
 
 func (c *IndexController) Message(ctx echo.Context) error {
@@ -60,7 +65,7 @@ func (c *IndexController) Message(ctx echo.Context) error {
 		}).ServeHTTP(ctx.Response(), ctx.Request())
 	} else {
 		c.webModule.Info("Message: 非法请求")
-		response := &Response{
+		response := &webEvent.Response{
 			Code: 1,
 			Msg:  "非法请求",
 		}
@@ -85,5 +90,3 @@ func (c *IndexController) SendClientMessage(msg interfaces.Event) {
 		time.Sleep(time.Second)
 	}
 }
-
-

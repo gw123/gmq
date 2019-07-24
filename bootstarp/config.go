@@ -23,7 +23,7 @@ func InitConfig() (*viper.Viper  ,error){
 			fmt.Errorf("配置文件不存在:%s", configFile)
 		}
 	} else {
-		Config.SetConfigType("yaml")            // or Config.SetConfigType("YAML")
+		Config.SetConfigType("yml")            // or Config.SetConfigType("YAML")
 		Config.SetConfigName("config")          // name of config file (without extension)
 		Config.AddConfigPath("/etc/GMQ/")  // path to look for the config file in
 		Config.AddConfigPath("$HOME/.GMQ") // call multiple times to add many search paths

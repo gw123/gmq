@@ -54,7 +54,12 @@ func (this *ModuleManager) LoadModules() {
 }
 
 func (this *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
-	switch config.GetModuleType() {
+	moduleType := config.GetModuleType()
+	if moduleType == "" {
+		moduleType = "inner"
+	}
+
+	switch moduleType {
 	case "inner":
 		this.app.Info("ModuleManager", "加载内部模块 "+moduleName)
 		err = this.loadInnerModule(moduleName, config)
@@ -68,8 +73,10 @@ func (this *ModuleManager) LoadModule(moduleName string, config interfaces.Modul
 		this.app.Info("ModuleManager", "加载外部模块 "+moduleName)
 		err = this.loadExe(moduleName, config)
 		break
+	default:
+		err = errors.New("not support module type 不支持的模块类型")
 	}
-	return
+	return err
 }
 
 func (this *ModuleManager) UnLoadModule(moduleName string) (err error) {

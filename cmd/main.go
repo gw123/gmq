@@ -1,20 +1,25 @@
 package main
 
 import (
-	_ "net/http/pprof"
 	"github.com/gw123/GMQ/core"
 	"github.com/gw123/GMQ/bootstarp"
+	"flag"
 )
 
+func parseConfig() {
+	configFile := flag.String("c", "config.yml", "配置文件")
+	flag.Parse()
+	bootstarp.SetConfigFile(*configFile)
+}
+
 func main() {
+
+	parseConfig()
+
 	config := bootstarp.GetConfig()
 	appInstance := core.NewApp(config)
 	bootstarp.LoadModuleProvider(appInstance)
 	appInstance.Start()
-	//go func() {
-	//	log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
-	//}()
 
-	select {
-	}
+	select {}
 }
