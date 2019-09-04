@@ -33,6 +33,7 @@ func (this *TaskController) Login(ctx echo.Context) error {
  */
 func (this *TaskController) AddTask(ctx echo.Context) error {
 	reqServer := new(db_models.TaskDetail)
+
 	if err := ctx.Bind(reqServer); err != nil {
 		return this.Fail(ctx, 0, "参数解析失败", err)
 	}
@@ -42,6 +43,7 @@ func (this *TaskController) AddTask(ctx echo.Context) error {
 	}
 
 	task := new(db_models.Task)
+
 	db, err := this.module.GetApp().GetDefaultDb()
 	if err != nil {
 		return this.Fail(ctx, 0, "保存失败 001", err)
@@ -67,6 +69,7 @@ func (this *TaskController) AddTask(ctx echo.Context) error {
 
 func (this *TaskController) AddClientTask(ctx echo.Context) error {
 	reqServer := new(db_models.ClientTask)
+
 	if err := ctx.Bind(reqServer); err != nil {
 		return this.Fail(ctx, 0, "参数解析失败", err)
 	}
@@ -76,6 +79,7 @@ func (this *TaskController) AddClientTask(ctx echo.Context) error {
 	}
 
 	task := new(db_models.ClientTask)
+
 	db, err := this.module.GetApp().GetDefaultDb()
 	if err != nil {
 		return this.Fail(ctx, 0, "保存失败 001", err)
@@ -98,6 +102,7 @@ func (this *TaskController) AddClientTask(ctx echo.Context) error {
 }
 
 
+
 func (this *TaskController) QueryTasksByName(ctx echo.Context) error {
 	key := ctx.QueryParam("key")
 	db, err := this.module.GetApp().GetDefaultDb()
@@ -105,6 +110,7 @@ func (this *TaskController) QueryTasksByName(ctx echo.Context) error {
 		return this.Fail(ctx, 0, "查找失败 001", err)
 	}
 	var tasks []db_models.Task
+
 	db.LogMode(true)
 	res := db.Where("name like ?", "%"+key+"%").Find(&tasks)
 	if res.Error != nil && !res.RecordNotFound() {

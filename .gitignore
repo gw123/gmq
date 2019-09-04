@@ -40,3 +40,8 @@ resources/assets/
 resources/storage/
 gateway.exe
 dist/
+cmd/config.client.yml
+cmd/config.yml
+cmd/config2.yml
+
+

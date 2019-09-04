@@ -52,6 +52,18 @@ func (this *Server) Start() error {
 	viewsRoot := this.module.GetConfig().GetItem("viewsRoot")
 	e.Renderer = NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion)
 
+
+	e.HTTPErrorHandler = func(err error, ctx echo.Context) {
+		if he, ok := err.(*webEvent.WebError); ok {
+			response := he.GetResponse()
+			ctx.JSON(http.StatusOK, response)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, map[string]string{"msg": "内部错误"})
+		}
+	}
+
+	e.Renderer = NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion)
+
 	loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `{"time":"${time_rfc3339}","remote_ip":"${remote_ip}","host":"${host}",` +
 			`"method":"${method}","uri":"${uri}","status":${status},` +

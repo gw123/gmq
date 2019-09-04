@@ -1,25 +1,38 @@
 #!/usr/bin/env bash
-#/root/code/output/mfrpc -c /root/code/output/frpc.ini
-outputDir=/root/code/output/
-GMQ=gateway
+srcDir=${GOPATH}"/src/github.com/gw123/GMQ"
+entryFile=cmd/main.go
+dstDir=${GOPATH}"/bin/GMQ"
+dstName=gateway
 
-export GO111MODULE=on
+if [[ ! -d "${dstDir}" ]]; then
+    mkdir -p ${dstDir}
+fi
 
+term() {
+    echo "term"
+    ps -aux|grep er|grep -v grep|awk '{print $2}'|xargs kill -TERM
+}
 
-function build() {
-    echo "build ${GMQ}..."
-    go build -o ${outputDir}${GMQ} cmd/main.go
-    if [ $? == 0 ]
-    then
-        echo "build ${GMQ} over... ,dist"${outputDir}${GMQ}
+gateway() {
+    buildStr="go build -o  ${dstDir}/${dstName}  ${srcDir}/${entryFile}"
+    echo ${buildStr}
+    ${buildStr}
+    if [[ $? -eq 0 ]]; then
+      echo "编译成功 开始运行"
+      cd ${dstDir} && ./${dstName}
     else
-        echo "build faild"
+       echo "编译失败"
     fi
 }
 
-
 case $1 in
-   build)
-   build
-   ;;
+  "term")
+    term
+  ;;
+  "gateway")
+    gateway
+  ;;
+  *)
+    echo "请输入要执行的命令 gateway"
+  ;;
 esac

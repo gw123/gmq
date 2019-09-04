@@ -15,5 +15,6 @@ func autoMigrate(app interfaces.App) error {
 	db.AutoMigrate(&db_models.Client{})
 	db.AutoMigrate(&db_models.ClientTask{})
 	db.AutoMigrate(&db_models.PingLog{})
+
 	return nil
 }

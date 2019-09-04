@@ -27,7 +27,6 @@ func (this *ClientController) ClientList(ctx echo.Context) error {
 	}
 
 	clients := &[]db_models.Client{}
-
 	res := db.Find(clients)
 	if res.Error != nil && !res.RecordNotFound() {
 		return this.Fail(ctx, 0, "获取列表失败2", err)
@@ -51,13 +50,13 @@ func (this *ClientController) ClientInfo(ctx echo.Context) error {
 	client := &db_models.Client{}
 	client.ID = uint(client_id)
 	//clientTasks := &[]db_models.ClientTask{}
+
 	//db.LogMode(true)
 	err = db.First(client, map[string]interface{}{"id": client_id}).Error
 	if err != nil {
 		return this.Fail(ctx, Error_DBError, "find client err", err)
 	}
 
-	//client.ClientTasks = make([]db_models.ClientTask, 0)
 	res := db.Find(&client.ClientTasks, map[string]interface{}{"client_id": client_id})
 	if res.Error != nil && !res.RecordNotFound() {
 		return this.Fail(ctx, Error_DBError, "find client_task err", err)
