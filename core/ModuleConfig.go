@@ -4,10 +4,11 @@ import (
 	"github.com/gw123/GMQ/core/interfaces"
 	"sync"
 	"fmt"
+	"strings"
 )
 
 type ModuleConfig struct {
-	mutex        sync.Mutex
+	mutex        sync.RWMutex
 	ModuleName   string                 `json:"module_name"`
 	Configs      map[string]interface{} `json:"configs"`
 	GlobalConfig interfaces.AppConfig
@@ -23,8 +24,8 @@ func NewModuleConfig(moduleName string, appConfig interfaces.AppConfig) *ModuleC
 }
 
 func (this *ModuleConfig) GetPath() string {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 
 	value, ok := this.Configs["path"].(string)
 	if ok {
@@ -36,8 +37,8 @@ func (this *ModuleConfig) GetPath() string {
 
 //默认情况下是内部模块
 func (this *ModuleConfig) IsInnerModule() bool {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 
 	return this.Configs["inner"] == "true" ||
 		this.Configs["inner"] == "1" ||
@@ -47,8 +48,8 @@ func (this *ModuleConfig) IsInnerModule() bool {
 
 //是否启动
 func (this *ModuleConfig) IsEnable() bool {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	return this.Configs["enable"] == "true" ||
 		this.Configs["enable"] == "1" ||
 		this.Configs["enable"] == "" ||
@@ -60,30 +61,33 @@ func (this *ModuleConfig) GetModuleName() string {
 }
 
 func (this *ModuleConfig) SetItem(key string, value interface{}) {
+	key1 := strings.ToLower(key)
 	this.mutex.Lock()
 	defer this.mutex.Unlock()
-	this.Configs[key] = value
+	this.Configs[key1] = value
 }
 
 func (this *ModuleConfig) GetItems() (value map[string]interface{}) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	return this.Configs
 }
 
 func (this *ModuleConfig) GetGlobalItem(key string) (value string) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	return this.GlobalConfig.GetItem(key)
 }
 
 func (this *ModuleConfig) GetGlobalItems() (value map[string]interface{}) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	return this.GlobalConfig.GetItems()
 }
 
 func (this *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
 	if config == nil {
 		return
 	}
@@ -91,10 +95,10 @@ func (this *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
 }
 
 func (this *ModuleConfig) GetItem(key string) (value string) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
-
-	value, ok := this.Configs[key].(string)
+	key1 := strings.ToLower(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	value, ok := this.Configs[key1].(string)
 	if ok {
 		return value
 	}
@@ -102,10 +106,43 @@ func (this *ModuleConfig) GetItem(key string) (value string) {
 	return ""
 }
 
+func (this *ModuleConfig) GetArrayItem(key string) (value []string) {
+	key1 := strings.ToLower(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	//fmt.Println(this.Configs[key1])
+	values, ok := this.Configs[key1].([]interface{})
+	if !ok {
+		fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+		return nil
+	}
+
+	value = make([]string, 0)
+	for _, val := range values {
+		if r, ok := val.(string); ok {
+			value = append(value, r)
+		}
+	}
+	return value
+}
+
+func (this *ModuleConfig) GetMapItem(key string) (value map[string]string) {
+	key1 := strings.ToLower(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	value, ok := this.Configs[key1].(map[string]string)
+	if ok {
+		return value
+	}
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+	return nil
+}
+
 func (this *ModuleConfig) GetIntItem(key string) int {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
-	value, ok := this.Configs[key].(int)
+	key1 := strings.ToLower(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	value, ok := this.Configs[key1].(int)
 	if ok {
 		return value
 	}
@@ -114,9 +151,10 @@ func (this *ModuleConfig) GetIntItem(key string) int {
 }
 
 func (this *ModuleConfig) GetBoolItem(key string) bool {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
-	value, ok := this.Configs[key].(bool)
+	key1 := strings.ToLower(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	value, ok := this.Configs[key1].(bool)
 	if ok {
 		return value
 	}
@@ -138,4 +176,12 @@ func (this *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool 
 }
 func (this *ModuleConfig) GetModuleType() string {
 	return this.GetItem("type")
+}
+
+func (this *ModuleConfig) GetItemOrDefault(key, defaultval string) string {
+	ret := this.GetItem(key)
+	if ret == "" {
+		return defaultval
+	}
+	return ret
 }

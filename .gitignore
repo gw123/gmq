@@ -38,4 +38,5 @@ erp.log
 main.exe
 resources/assets/
 resources/storage/
-
+gateway.exe
+dist/

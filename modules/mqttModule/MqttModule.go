@@ -113,12 +113,12 @@ func (this *MqttModule) Start() {
 
 		if err != nil {
 			//执行失败
-			//replay := common.NewResultEvent([]byte("失败" + err.Error()))
+			//replay := common_types.NewResultEvent([]byte("失败" + err.Error()))
 			//this.App.Pub(replay)
 			this.Warning("service 执行失败 " + err.Error())
 		} else {
 			////执行成功
-			//replay := common.NewResultEvent([]byte("成功"))
+			//replay := common_types.NewResultEvent([]byte("成功"))
 			//this.App.Pub(replay)
 		}
 		time.Sleep(time.Second)

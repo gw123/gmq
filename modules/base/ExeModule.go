@@ -77,11 +77,11 @@ func (this *ExeModule) Handle(event interfaces.Event) error {
 	runOverFlag = true
 	if string(res) == "0" {
 		//执行成功
-		//replay := common.NewResultEvent([]byte("执行成功"))
+		//replay := common_types.NewResultEvent([]byte("执行成功"))
 		//this.App.Pub(replay)
 		//this.Info(event.GetMsgId() + " " + event.GetEventName() + " 执行成功")
 	} else {
-		//replay := common.NewResultEvent([]byte("执行失败"))
+		//replay := common_types.NewResultEvent([]byte("执行失败"))
 		//this.App.Pub(replay)
 		this.Error(event.GetMsgId() + " " + event.GetEventName() + " 执行失败" + err.Error())
 	}

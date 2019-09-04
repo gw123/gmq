@@ -6,9 +6,9 @@ dbpool:
    default: xyt
    xyt:
       database: "gateway"
-      host: "192.168.30.138"
-      username: "gw"
-      password: "gao123456"
+      host: "xytschool.com"
+      username: "remote_gw"
+      password: "iqojasukk083lwjxw9"
       drive: "mysql"
 
 modules:
@@ -21,9 +21,17 @@ modules:
   web:
       type : inner
       addr: 0.0.0.0
-      port: 88
-      publicPath: "./public"
+      port: 8080
+      staticFileUrl: "http://127.0.0.1:8080"
+      staticFileVersion : "1001"
+      viewsRoot: "./views"
+      publicRoot: "./public"
       sotragePath: "./storage"
+      allowOrigins:
+          - "http://127.0.0.1:8080"
+          - "http://localhost:10086"
+          - "http://127.0.0.1:88"
+
 
   debug:
       type : inner
