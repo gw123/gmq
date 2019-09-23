@@ -16,6 +16,9 @@ type Module interface {
 	//订阅事件 初始化队列
 	Init(app App, config ModuleConfig) error
 
+	//启动前执行事件,模块可以在这里实现自己的方法
+	BeforeStart() error
+
 	//取消事件订阅
 	UnInit() error
 
@@ -44,6 +47,4 @@ type Module interface {
 	Watch(index int)
 
 	GetConfig() ModuleConfig
-
-
 }

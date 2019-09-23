@@ -1,12 +1,11 @@
 package webMiddlewares
 
 import (
-	"github.com/labstack/echo"
 	"github.com/gw123/GMQ/core/interfaces"
-	"time"
-	"strconv"
 	"github.com/gw123/GMQ/modules/webModule/db_models"
-	"fmt"
+	"github.com/labstack/echo"
+	"strconv"
+	"time"
 )
 
 func NewPingMiddleware(app interfaces.App) echo.MiddlewareFunc {
@@ -46,13 +45,11 @@ func NewPingMiddleware(app interfaces.App) echo.MiddlewareFunc {
 			}
 			db, err := app.GetDefaultDb()
 			if err != nil {
-				fmt.Println(err)
 			} else {
 				if err = db.Save(pingLog).Error; err != nil {
-					fmt.Println(err)
 				}
 			}
-			return
+			return nil
 		}
 	}
 }

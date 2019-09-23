@@ -1,8 +1,102 @@
 #GMQ 消息模块组合架构
+##  功能特性
+  - 自动管理channel 实现配置变动后 模块重启
+  - 多模块按需编译,按配置加载
+  - 支持多种消息通信方式(mqtt,http,websocket,grpc)
+  - 模块之间通过消息之间通信相互独立解耦 
+  - 优雅的日志输出方式
+  - 多数据库支持,方便开发
+  
+## 目录结构
+ - bootstarp 引导启动目录, 加载配置, 按需加载需要的module(仅仅编译添加的文件)
+ - common 公共引用路径 
+ - core 框架核心
+ - modules 模块路径
+ - resource 资源路径
+ - storage 上传文件保存路径
 
-## 自动管理channel 实现配置变动后 模块重启
 
-## 模块重启前保存他的消息队列,重启后在消息原来的消息
+## 如何新加一个model, 下面以debugmodel为例
+ - 在modules 添加deubugModel 文件夹
+ - 添加DebugModule.go 文件
+ ```
+import (
+	"github.com/gw123/GMQ/modules/base"
+	"github.com/gw123/GMQ/core/interfaces"
+	"fmt"
+)
+type DebugModule struct {
+	base.BaseModule
+}
+
+func NewDebugModule() *DebugModule {
+	this := new(DebugModule)
+	return this
+}
+
+func (this *DebugModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
+	this.BaseModule.Init(app, this, config)
+	//订阅 debug 消息主题
+	app.Sub("debug", this)
+	return nil
+}
+// 处理消息
+func (this *DebugModule) Handle(event interfaces.Event) error {
+	return nil
+}
+// 定时触发方法
+func (this *DebugModule) Watch(index int) {
+
+	return
+}
+```
+
+- 实现模块提供者 DebugModuleProvider.go
+```
+package debugModule
+
+import "github.com/gw123/GMQ/core/interfaces"
+
+type DebugModuleProvider struct {
+	module interfaces.Module
+}
+
+func NewDebugModuleProvider() *DebugModuleProvider {
+	this := new(DebugModuleProvider)
+	return this
+}
+
+func (this *DebugModuleProvider) GetModuleName() string {
+	return "Debug"
+}
+
+func (this *DebugModuleProvider) Register() {
+
+}
+
+func (this *DebugModuleProvider) GetModule() interfaces.Module {
+	if this.module != nil {
+		return this.module
+	}
+	this.module = NewDebugModule()
+	return this.module
+}
+
+func (this *DebugModuleProvider) GetNewModule() interfaces.Module {
+	this.module = NewDebugModule()
+	return this.module
+}
+
+```
+
+- 在bootstarp/moduleProvider.go 引入debugModuel
+
+```
+func LoadModuleProvider(app interfaces.App) {
+	app.LoadModuleProvider(debugModule.NewDebugModuleProvider())
+	return
+}
+```
 
 ## todo list
 - 模块停止
@@ -53,9 +147,9 @@ dbpool:
 ```
    mqtt:
       type : inner
-      productKey : a1GvAwy4lNt
-      deviceSecret: ulsuWZkXGzOQsR5L5AYUQpQxLKvidmUi
-      deviceName:  PC1219
+      productKey : key
+      deviceSecret: secret
+      deviceName:  name
 ```
 
 # web模块功能

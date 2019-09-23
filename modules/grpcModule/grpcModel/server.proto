@@ -3,13 +3,13 @@ package inf;
 // The greeting service definition.
 
 service conn {
-  // Sends a greeting
-  rpc RWStream(stream Msg) returns (stream Msg) {}
+    // Sends a greeting
+    rpc RWStream(stream Msg) returns (stream Msg) {}
 }
 
 message Msg {
-  string moduleName = 1;
-  string eventName  = 2;
-  string msgId  = 3;
-  string payload  = 4;
+    string moduleName = 1;
+    string eventName  = 2;
+    string msgId  = 3;
+    string payload  = 4;
 }

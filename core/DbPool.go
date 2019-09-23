@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/pkg/errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/pkg/errors"
 )
 
 type DbPool struct {
@@ -18,13 +18,13 @@ func NewDbPool() *DbPool {
 	return this
 }
 
-func (this *DbPool) NewDb(drive ,db_host, db_database, db_username, db_pwd string) (*gorm.DB, error) {
+func (this *DbPool) NewDb(drive, db_host, db_database, db_username, db_pwd string) (*gorm.DB, error) {
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", db_username, db_pwd, db_host, db_database)
 	dbInstance, err := gorm.Open(drive, connStr)
 	if err != nil {
 		return nil, err
 	}
-	this.pool[db_database] = dbInstance
+
 	return dbInstance, nil
 }
 

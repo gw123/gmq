@@ -1,9 +1,9 @@
 package bootstarp
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"os"
-	"fmt"
 )
 
 var Config *viper.Viper
@@ -41,6 +41,10 @@ func GetConfig() *viper.Viper {
 	if Config != nil {
 		return Config
 	}
-	InitConfig()
-	return Config
+	config ,err := InitConfig()
+	if err != nil{
+		fmt.Println(err.Error())
+		os.Exit(2)
+	}
+	return config
 }

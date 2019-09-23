@@ -102,10 +102,7 @@ func (this *LogManager) Debug(category string, format string, a ...interface{}) 
 }
 
 func (this *LogManager) filter(logType, category string, format string, a ...interface{}) {
-	//fmt.Println(this.filter_log_categories)
-	//fmt.Println(this.only_log_categories)
 	var pass = true
-	//fmt.Println("category", len(this.only_log_categories))
 	if len(this.only_log_categories) != 0 {
 		pass = false
 		for _, cate := range this.only_log_categories {

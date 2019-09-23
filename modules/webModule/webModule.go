@@ -1,8 +1,8 @@
 package webModule
 
 import (
-	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/modules/webModule/server"
 )
@@ -39,12 +39,6 @@ func (this *WebModule) Watch(count int) {
 }
 
 func (this *WebModule) Start() {
-	//初始化数据库
-	err := autoMigrate(this.GetApp())
-	if err != nil {
-		this.Error("autoMigrate error %s .", err.Error())
-	}
-
 	port := this.Config.GetIntItem("port")
 	addr := this.Config.GetItem("addr")
 	this.server = server.NewServer(addr, port, this)

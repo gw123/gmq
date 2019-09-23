@@ -1,9 +1,8 @@
 package debugModule
 
 import (
-	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"fmt"
+	"github.com/gw123/GMQ/modules/base"
 )
 
 type DebugModule struct {
@@ -29,12 +28,6 @@ func (this *DebugModule) Handle(event interfaces.Event) error {
 func (this *DebugModule) Watch(index int) {
 
 	return
-}
-
-func (this *DebugModule) Handel(event interfaces.Event) error {
-	str := fmt.Sprintf("msgId:%s,eventName:%s,payload:%s", event.GetMsgId(), event.GetEventName(), event.GetPayload())
-	this.Debug(str)
-	return nil
 }
 
 

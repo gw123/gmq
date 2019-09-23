@@ -3,10 +3,10 @@
 package core
 
 import (
-	"github.com/gw123/GMQ/modules/base"
-	"github.com/gw123/GMQ/core/interfaces"
-	"fmt"
 	"errors"
+	"fmt"
+	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/base"
 	"strings"
 )
 
@@ -14,7 +14,7 @@ import (
  * 模块管理模块
  * 1. 加载模块,卸载模块
  * 2. 管理配置,更新模块配置
-*/
+ */
 type ModuleManager struct {
 	configManager *ConfigManager
 	Modules       map[string]interfaces.Module
@@ -40,10 +40,18 @@ func (this *ModuleManager) LoadModules() {
 		}
 		err := this.LoadModule(moduleName, moduleConfig)
 		if err != nil {
-			this.app.Error("ModuleManager", "模块加载失败 "+moduleName+" "+err.Error())
+			this.app.Error("ModuleManager", "模块加载失败 on init"+moduleName+" "+err.Error())
 		} else {
 			this.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
+
+		err = this.Modules[moduleName].BeforeStart()
+		if err != nil {
+			this.app.Error("ModuleManager", "模块加载失败 on BeforeStart "+moduleName+" "+err.Error())
+		} else {
+			this.app.Info("ModuleManager", "加载成功 "+moduleName)
+		}
+
 	}
 
 	for _, module := range this.Modules {

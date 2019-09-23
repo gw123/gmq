@@ -1,16 +1,16 @@
 package webSocketModule
 
 import (
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/base"
+	"github.com/gw123/GMQ/modules/grpcModule/grpcModel"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"io"
+	"net"
 	"qiniupkg.com/x/errors.v7"
 	"time"
-	"github.com/gw123/GMQ/modules/grpcModule/grpcModel"
-	"net"
-	"google.golang.org/grpc"
-	"golang.org/x/net/context"
-	"io"
-	"github.com/gw123/GMQ/common/common_types"
 )
 
 type Gserver struct {
@@ -107,7 +107,7 @@ func NewGrpcModule() *GrpcModule {
 }
 
 func (this *GrpcModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
-	this.BaseModule.Init(app, config)
+	this.BaseModule.Init(app, this, config)
 	this.Port = config.GetItem("port")
 	this.gServer = &Gserver{}
 	this.Conn = this.gServer
@@ -127,20 +127,13 @@ func (this *GrpcModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *GrpcModule) Start() {
-	for ; ; {
-		event := this.BaseModule.Pop()
-		err := this.service(event)
-		if err != nil {
-			this.Warning("GrpcModule service " + err.Error())
-		}
-		time.Sleep(time.Second)
-	}
-}
-
-func (this *GrpcModule) service(event interfaces.Event) error {
+func (this *GrpcModule) Handle(event interfaces.Event) error {
 	err := this.gServer.Push(event)
 	return err
+}
+
+func (this *GrpcModule) Watch(index int) {
+
 }
 
 func (this *GrpcModule) InitGrpc() error {

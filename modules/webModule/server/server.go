@@ -53,17 +53,6 @@ func (this *Server) Start() error {
 	e.Renderer = NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion)
 
 
-	e.HTTPErrorHandler = func(err error, ctx echo.Context) {
-		if he, ok := err.(*webEvent.WebError); ok {
-			response := he.GetResponse()
-			ctx.JSON(http.StatusOK, response)
-		} else {
-			ctx.JSON(http.StatusInternalServerError, map[string]string{"msg": "内部错误"})
-		}
-	}
-
-	e.Renderer = NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion)
-
 	loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `{"time":"${time_rfc3339}","remote_ip":"${remote_ip}","host":"${host}",` +
 			`"method":"${method}","uri":"${uri}","status":${status},` +
@@ -77,12 +66,14 @@ func (this *Server) Start() error {
 		},
 	})
 
-	controller := controllers.NewIndexController(this.module)
-	e.GET("/ping", controller.Ping,
-		webMiddlewares.NewPingMiddleware(this.module.GetApp()))
+	indexController := controllers.NewIndexController(this.module)
+	taskController := controllers.NewTaskController(this.module)
 
-	e.GET("/status", controller.Status,
-		webMiddlewares.NewPingMiddleware(this.module.GetApp()))
+	normalGroup := e.Group("")
+	normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
+	normalGroup.GET("/ping", indexController.Ping)
+	normalGroup.GET("/status", indexController.Status)
+	normalGroup.GET("/testOrder", taskController.CreateTestOrder)
 
 	authGroup := e.Group("")
 	authGroup.Use(loggerMiddleware)
@@ -97,9 +88,9 @@ func (this *Server) Start() error {
 	authGroup.GET("/favicon.ico", func(i echo.Context) error {
 		return i.String(http.StatusOK, "ico")
 	})
-	authGroup.GET("/index", controller.Index)
-	authGroup.GET("/message", controller.Message)
-	taskController := controllers.NewTaskController(this.module)
+	authGroup.GET("/index", indexController.Index)
+	authGroup.GET("/message", indexController.Message)
+
 	//登录上报节点有那些服务, 服务版本 , 服务端会下发最新版本下载地址
 	authGroup.GET("/login", taskController.Login)
 	//下载

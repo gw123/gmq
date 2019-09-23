@@ -1,12 +1,12 @@
 package base
 
 import (
-	"errors"
-	"sync"
-	"strings"
 	"context"
-	"time"
+	"errors"
 	"github.com/gw123/GMQ/core/interfaces"
+	"strings"
+	"sync"
+	"time"
 )
 
 const FullFlag_DropNew = 0x1
@@ -30,8 +30,8 @@ type BaseModule struct {
 	module      interfaces.Module
 	Handle
 	Watch
-	cancelFun   context.CancelFunc
-	Ctx         context.Context
+	cancelFun context.CancelFunc
+	Ctx       context.Context
 }
 
 func (this *BaseModule) Init(app interfaces.App, module interfaces.Module, config interfaces.ModuleConfig) error {
@@ -67,6 +67,11 @@ func (this *BaseModule) UnInit() error {
 	}
 	this.Debug("BaseModule UnInit :" + this.GetModuleName())
 	this.Stop()
+	return nil
+}
+
+//这里不做处理留给子模块实现
+func (this *BaseModule) BeforeStart() error {
 	return nil
 }
 

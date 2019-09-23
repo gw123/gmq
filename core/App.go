@@ -1,11 +1,11 @@
 package core
 
 import (
+	"encoding/json"
 	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/core/interfaces"
-	"encoding/json"
-	"github.com/spf13/viper"
 	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
 )
 
 type App struct {
@@ -25,7 +25,7 @@ func NewApp(viper2 *viper.Viper) *App {
 	this := &App{}
 	this.configData = viper2
 
-	this.Version = "2.0.0"
+	this.Version = "1.0.0"
 	this.dispatch = NewDispath(this)
 	this.logManager = NewLogManager(this)
 	this.logManager.Start()
@@ -36,11 +36,11 @@ func NewApp(viper2 *viper.Viper) *App {
 	this.middlewareManager = NewMiddlewareManager(this)
 
 	this.DbPool = NewDbPool()
+	this.LoadDb()
 	return this
 }
 
 func (this *App) Start() {
-	this.LoadDb()
 	go this.doWorker()
 }
 
@@ -94,7 +94,7 @@ func (this *App) LoadDb() {
 
 	db, err := this.DbPool.GetDb(defaultDBkey)
 	if err != nil {
-		this.Warning("App", "not found  db  default config :%s", err.Error())
+		this.Warning("App", "cant found db default config :%s", err.Error())
 	} else {
 		this.DbPool.SetDb("default", db)
 	}
