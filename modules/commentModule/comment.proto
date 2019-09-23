@@ -1,0 +1,49 @@
+syntax = "proto3";
+package commentModule;
+
+service CommentService {
+    rpc getComments (RequestGetComments) returns (ResponseGetComments) {
+    }
+    rpc putComment (RequestPutComment) returns (ResponsePutComment) {
+    }
+}
+
+message RequestPutComment {
+    string type = 1;
+    int32 target_id = 2;
+    int32 parent_id = 3;
+    string content = 4;
+    int32 user_id = 5;
+    string client_id = 6;
+}
+
+message ResponsePutComment {
+    int32 code = 1;
+    string msg = 2;
+}
+
+
+message Comment {
+    int32 id = 1;
+    string type = 2;
+    int32 target_id = 3;
+    int32 user_id = 4;
+    int32 parent_id = 5;
+    string content = 6;
+    int32 created_at = 7;
+}
+
+message RequestGetComments {
+    string type = 1;
+    int32 target_id = 2;
+    int32 page_size = 3;
+    int32 current_page = 4;
+    int32 total = 5;
+}
+
+message ResponseGetComments {
+    repeated Comment comments = 1;
+    int32 page_size = 2;
+    int32 current_page = 3;
+    int32 total = 4;
+}

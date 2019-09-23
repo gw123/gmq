@@ -1,0 +1,27 @@
+app:
+  logFilterCategories : "EventQueue,Dispath"
+  debugLevel:  debug
+
+dbpool:
+   default: xyt
+   xyt:
+      database: "gateway"
+      host: "xytschool.com:"
+      username: "gw"
+      password: "gao123456"
+      drive: "mysql"
+
+modules:
+#  mqtt:
+#      type : inner
+#      productKey : a1GvAwy4lNt
+#      deviceSecret: ulsuWZkXGzOQsR5L5AYUQpQxLKvidmUi
+#      deviceName:  PC1219
+
+  serverNode:
+      type: inner
+      serverHost: "http://127.0.0.1:88"
+      nodeName:  xyt001
+      accessToken:  gw123
+      secret:  secret99019
+      load: 100
