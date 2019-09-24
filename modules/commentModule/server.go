@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -44,9 +45,14 @@ func (c *CommentServer) Stop() {
 
 func (c *CommentServer) GetComments(ctx context.Context, param *RequestGetComments) (*ResponseGetComments, error) {
 	c.module.Info("GetComments request: %v", param)
-	var comments []*models.Comment
-	response := ResponseGetComments{
-		Comments: make([]*Comment, 0),
+	if param.TargetId <= 0 {
+		c.module.Error("GetComments 参数错误 TargetId 错误")
+		return nil, errors.New("参数错误1")
+	}
+
+	if !(param.Type == "group" || param.Type == "resource") {
+		c.module.Error("GetComments 参数错误 Type 错误")
+		return nil, errors.New("参数错误2")
 	}
 
 	db, err := c.module.GetApp().GetDefaultDb()
@@ -54,18 +60,27 @@ func (c *CommentServer) GetComments(ctx context.Context, param *RequestGetCommen
 		return nil, err
 	}
 
-	result := db.Find(&comments)
+	var comments []*models.Comment
+	result := db.Where("type = ?", param.Type).
+		Where("target_id = ?", param.TargetId).
+		Find(&comments)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
+	response := ResponseGetComments{
+		Comments: make([]*Comment, 0),
+	}
 	for _, m := range comments {
 		c := &Comment{
-			Id:       m.ID,
-			Type:     m.Type,
-			TargetId: m.TargetId,
-			Content:  m.Content,
-			UserId:   m.UserId,
-			ParentId: m.ParentId,
+			Id:        m.ID,
+			Type:      m.Type,
+			TargetId:  m.TargetId,
+			Content:   m.Content,
+			UserId:    m.UserId,
+			ParentId:  m.ParentId,
+			CreatedAt: int32(m.CreatedAt.Unix()),
 		}
 		response.Comments = append(response.Comments, c)
 	}
