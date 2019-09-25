@@ -1,0 +1,42 @@
+version: '2.2'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    container_name: es-single
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+#    volumes:
+#      - es-single:/usr/share/elasticsearch/data
+    expose:
+       - 9200
+    ports:
+      - 9200:9200
+    networks:
+      - esnet
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.3.2
+    ports: 
+      - 5601:5601
+    links: 
+      - es01
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    environment:
+       SERVER_NAME: kibana.xytschool.com
+       ELASTICSEARCH_HOSTS: http://es-single:9200
+    networks:
+       - esnet
+
+
+volumes:
+  gateway:
+    driver: local
+
+networks:
+  gateway:
