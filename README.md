@@ -137,7 +137,7 @@ dbpool:
  - 通信方式支持 mqtt,http,grpc,websocket方式
  - enable 配置模块是否要启用
  
-# mqtt模块配置 (mqtt 目前使用的是阿里云IOT服务)
+## mqtt模块配置 (mqtt 目前使用的是阿里云IOT服务)
 ```
    mqtt:
       type : inner
@@ -146,10 +146,24 @@ dbpool:
       deviceName:  name
 ```
 
-# web模块功能
+## web模块功能
+```
+  web:
+      type : inner
+      addr: 0.0.0.0
+      port: 8080
+      staticFileUrl: "http://127.0.0.1:8080"
+      staticFileVersion : "1001"
+      viewsRoot: "./views"
+      publicRoot: "./public"
+      sotragePath: "./storage"
+      allowOrigins:
+          - "http://127.0.0.1:8080"
+          - "http://localhost:10086"
+          - "http://127.0.0.1:88"
+```
 
-# docker服务化支持 实现一个评论的服务,具体实现可以参考commentModuel
-# 在线使用案例 httt://m.xyt.xytschool.com 资源组评论和文章评论
+## docker服务化支持实现一个评论的服务,具体实现可以参考commentModuel 
 ```
 docker-compose  up -d
 Starting envoy   ... done
@@ -161,3 +175,5 @@ Starting gateway ... done
 - 清空模块队列中的任务
 - 平滑停止,主程序在所有模块的队列中的任务执行完毕后停止
 - 讲当前模块中的任务做磁盘持久化
+
+## 在线使用案例 httt://m.xyt.xytschool.com 资源组评论和文章评论
