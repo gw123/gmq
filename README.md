@@ -164,8 +164,32 @@ dbpool:
 ```
 
 ## docker服务化支持实现一个评论的服务,具体实现可以参考commentModuel 
+
+### 这里我把编译好多程序命名为gatwway , 下面是gateway的配置文件
 ```
-docker-compose  up -d
+app:
+  logFilterCategories : "EventQueue,Dispath"
+  debugLevel:  debug
+dbpool:
+   default: xyt
+   xyt:
+      database: "gateway"
+      host: "${DB_HOST}"
+      username: "${DB_USER}"
+      password: "${DB_PWD}"
+      drive: "mysql"
+modules:
+   comment:
+     type: inner
+     bindAddr: ${COMMENT_ADDR}
+```
+#### 上面的${var} 的配置是从程序运行的环境变量中读取, 例如 ${DB_HOST}
+
+- mv docker-compose.example.yml docker-compose.yml 修改内容为自己的配置
+- 修改 envoy.yaml 配置
+- 运行 docker-compose  up -d
+ 
+```
 Starting envoy   ... done
 Starting gateway ... done
 ```

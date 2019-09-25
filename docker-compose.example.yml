@@ -20,8 +20,8 @@ services:
     environment:
       COMMENT_ADDR: 0.0.0.0:9090
       DB_HOST: 172.21.0.1
-      DB_USER: gw
-      DB_PWD: gao123456
+      DB_USER: root
+      DB_PWD: root
     networks:
        - gateway-net
 volumes:

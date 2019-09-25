@@ -42,6 +42,7 @@ dist/
 entry/config.client.yml
 entry/config.yml
 entry/config2.yml
+docker-compose.yml
 
 
 

@@ -2,14 +2,6 @@ app:
   logFilterCategories : "EventQueue,Dispath"
   debugLevel:  debug
 
-etcdpool:
-  default: xyt
-  xyt:
-    namespace: "gateway"
-    host: "${DB_HOST}"
-    username: "${DB_USER}"
-    password: "${DB_PWD}"
-
 dbpool:
    default: xyt
    xyt:
@@ -18,15 +10,6 @@ dbpool:
       username: "${DB_USER}"
       password: "${DB_PWD}"
       drive: "mysql"
-
-redispool:
-  default: xyt
-  xyt:
-    database: "gateway"
-    host: "${DB_HOST}"
-    username: "${DB_USER}"
-    password: "${DB_PWD}"
-    drive: "${DB_DRIVE}"
 
 modules:
    comment:
