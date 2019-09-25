@@ -6,6 +6,8 @@ import (
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"os"
+	"regexp"
 )
 
 type App struct {
@@ -47,41 +49,85 @@ func (this *App) Start() {
 //加载数据库配置
 func (this *App) LoadDb() {
 	configs := this.configData.GetStringMap("dbpool")
+	reg := regexp.MustCompile(`^\$\{(.*)\}$`)
 	for key, config := range configs {
 		configMap, ok := config.(map[string]interface{})
-		if ok {
-			drive, ok := configMap["drive"].(string)
-			if !ok {
-				drive = "mysql"
+		if !ok {
+			if key != "default" {
+				this.Info("App", "数据库配置文件 格式不支持")
 			}
-			host, ok := configMap["host"].(string)
-			if !ok {
-				host = "127.0.0.1"
-			}
-			database, ok := configMap["database"].(string)
-			if !ok {
-				database = ""
-			}
-			username, ok := configMap["username"].(string)
-			if !ok {
-				database = "root"
-			}
-			password, ok := configMap["password"].(string)
-			if !ok {
-				password = ""
-			}
-
-			db, err := this.DbPool.NewDb(
-				drive,
-				host,
-				database,
-				username,
-				password);
-			if err != nil {
-				this.Warning("App", "db load error, %s: ", err.Error())
-			}
-			this.DbPool.SetDb(key, db)
+			continue
 		}
+		drive, ok := configMap["drive"].(string)
+		if !ok {
+			drive = "mysql"
+		}
+		if reg.MatchString(drive) {
+			arrs := reg.FindStringSubmatch(drive)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				drive = os.Getenv(arrs[1])
+			}
+		}
+		host, ok := configMap["host"].(string)
+		if !ok {
+			host = "127.0.0.1"
+		}
+		if reg.MatchString(host) {
+			arrs := reg.FindStringSubmatch(host)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				host = os.Getenv(arrs[1])
+			}
+		}
+		database, ok := configMap["database"].(string)
+		if !ok {
+			database = ""
+		}
+		if reg.MatchString(database) {
+			arrs := reg.FindStringSubmatch(database)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				database = os.Getenv(arrs[1])
+			}
+		}
+
+		username, ok := configMap["username"].(string)
+		if !ok {
+			username = "root"
+		}
+		if reg.MatchString(username) {
+			arrs := reg.FindStringSubmatch(username)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				username = os.Getenv(arrs[1])
+			}
+		}
+
+		password, ok := configMap["password"].(string)
+		if !ok {
+			password = ""
+		}
+		if reg.MatchString(password) {
+			arrs := reg.FindStringSubmatch(password)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				password = os.Getenv(arrs[1])
+			}
+		}
+
+		this.Info("App", "load db name:%s ,database:%s", key, database)
+		db, err := this.DbPool.NewDb(
+			drive,
+			host,
+			database,
+			username,
+			password);
+		if err != nil {
+			this.Warning("App", "db load error, %s: ", err.Error())
+		}
+		this.DbPool.SetDb(key, db)
+
 	}
 
 	//set default db
@@ -90,7 +136,7 @@ func (this *App) LoadDb() {
 		return
 	}
 
-	this.Debug("App", "default DB  key", defaultDBkey)
+	this.Debug("App", "default DB: %s", defaultDBkey)
 
 	db, err := this.DbPool.GetDb(defaultDBkey)
 	if err != nil {

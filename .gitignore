@@ -34,7 +34,6 @@ demo/
 web/
 main.ini
 main.ini.gw
-erp.log
 main.exe
 resources/assets/
 resources/storage/
@@ -43,5 +42,6 @@ dist/
 entry/config.client.yml
 entry/config.yml
 entry/config2.yml
+
 
 

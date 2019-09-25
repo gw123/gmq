@@ -16,7 +16,4 @@ FROM envoyproxy/envoy:latest
 
 COPY ./envoy.yaml /etc/envoy/envoy.yaml
 
-COPY dist/gateway /usr/local/bin/gateway
-COPY dist/config.yml /usr/local/bin/config.yml
-
 CMD /usr/local/bin/envoy -c /etc/envoy/envoy.yaml

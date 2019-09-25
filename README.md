@@ -6,6 +6,7 @@
   - 模块之间通过消息之间通信相互独立解耦 
   - 优雅的日志输出方式
   - 多数据库支持,方便开发
+  - 支持读取yml中配置环境变量,方便容器化部署
   
 ## 目录结构
  - bootstarp 引导启动目录, 加载配置, 按需加载需要的module(仅仅编译添加的文件)
@@ -71,7 +72,6 @@ func (this *DebugModuleProvider) GetModuleName() string {
 }
 
 func (this *DebugModuleProvider) Register() {
-
 }
 
 func (this *DebugModuleProvider) GetModule() interfaces.Module {
@@ -98,12 +98,6 @@ func LoadModuleProvider(app interfaces.App) {
 }
 ```
 
-## todo list
-- 模块停止
-- 清空模块队列中的任务
-- 模块停止后启动
-- 平滑停止,主程序在所有模块的队列中的任务执行完毕后停止
-- 讲当前模块中的任务做磁盘持久化
 
 
 #数据库配置 支持多数据库配置
@@ -143,7 +137,7 @@ dbpool:
  - 通信方式支持 mqtt,http,grpc,websocket方式
  - enable 配置模块是否要启用
  
-# mqtt模块配置
+# mqtt模块配置 (mqtt 目前使用的是阿里云IOT服务)
 ```
    mqtt:
       type : inner
@@ -153,3 +147,17 @@ dbpool:
 ```
 
 # web模块功能
+
+# docker服务化支持 实现一个评论的服务,具体实现可以参考commentModuel
+# 在线使用案例 httt://m.xyt.xytschool.com 资源组评论和文章评论
+```
+docker-compose  up -d
+Starting envoy   ... done
+Starting gateway ... done
+```
+
+## todo list
+- 模块停止
+- 清空模块队列中的任务
+- 平滑停止,主程序在所有模块的队列中的任务执行完毕后停止
+- 讲当前模块中的任务做磁盘持久化

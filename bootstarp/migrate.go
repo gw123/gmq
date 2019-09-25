@@ -6,11 +6,11 @@ import (
 )
 
 func AutoMigrate(app interfaces.App) error {
-	app.Info("App", "迁移数据库")
 	db, err := app.GetDefaultDb()
 	if err != nil {
 		return err
 	}
+	app.Info("App", "迁移数据库")
 	db.AutoMigrate(&db_models.Task{})
 	db.AutoMigrate(&db_models.TaskDetail{})
 	db.AutoMigrate(&db_models.Client{})

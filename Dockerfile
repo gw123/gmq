@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM envoyproxy/envoy:latest
+FROM debian
 
-COPY ./envoy.yaml /etc/envoy/envoy.yaml
+COPY dist/gateway /usr/local/bin/gateway
+COPY config.docker.yml /usr/local/bin/config/config.yml
 
-CMD /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
+CMD /usr/local/bin/gateway -c /usr/local/bin/config/config.yml

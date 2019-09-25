@@ -2,19 +2,36 @@ app:
   logFilterCategories : "EventQueue,Dispath"
   debugLevel:  debug
 
+etcdpool:
+  default: xyt
+  xyt:
+    namespace: "gateway"
+    host: "${DB_HOST}"
+    username: "${DB_USER}"
+    password: "${DB_PWD}"
+
 dbpool:
    default: xyt
    xyt:
       database: "gateway"
-      host: "m1.laravelschool.xyt"
-      username: "gw"
-      password: "gao123456"
+      host: "${DB_HOST}"
+      username: "${DB_USER}"
+      password: "${DB_PWD}"
       drive: "mysql"
+
+redispool:
+  default: xyt
+  xyt:
+    database: "gateway"
+    host: "${DB_HOST}"
+    username: "${DB_USER}"
+    password: "${DB_PWD}"
+    drive: "${DB_DRIVE}"
 
 modules:
    comment:
      type: inner
-     bindAddr: "0.0.0.0:9090"
+     bindAddr: ${COMMENT_ADDR}
 
 #   debug:
 #     type: inner
