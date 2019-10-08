@@ -41,22 +41,28 @@ replace golang.org/x/mobile => github.com/golang/mobile v0.0.0-20190806162312-59
 replace gopkg.in/jcmturner/gokrb5.v7 => github.com/jcmturner/gokrb5 v7.2.4-0.20190413090910-7b6b2f54b7fd+incompatible
 
 require (
+	github.com/SermoDigital/jose v0.9.1
+	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190929091402-5711055976b5
 	github.com/aymerick/raymond v2.0.2+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
+	github.com/fatedier/frp v0.29.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0 // indirect
 	github.com/go-ini/ini v1.46.0
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/go-playground/validator v9.29.1+incompatible
+	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/gogap/ali_mns v0.0.0-20181213103836-1dc35142ede5
 	github.com/gogap/errors v0.0.0-20160523102334-149c546090d0
 	github.com/gogap/logs v0.0.0-20150329044033-31c6d1e28b2c
 	github.com/gogap/stack v0.0.0-20150131034635-fef68dddd4f8 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/gw123/ghelper v0.0.0-20190820012917-9c859392e188
+	github.com/gw123/glog v0.0.0-20190903123404-474813a701bd
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jinzhu/gorm v1.9.10
 	github.com/json-iterator/go v1.1.7 // indirect

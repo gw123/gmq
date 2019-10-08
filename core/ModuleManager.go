@@ -95,15 +95,23 @@ func (this *ModuleManager) UnLoadModule(moduleName string) (err error) {
 	return
 }
 
-func (this *ModuleManager) loadDll(muduleName string, config interfaces.ModuleConfig) (err error) {
+func (this *ModuleManager) loadDll(moduleName string, config interfaces.ModuleConfig) (err error) {
 	module := base.NewDllModule()
 	err = module.Init(this.app, config)
+
+	if err == nil {
+		this.Modules[moduleName] = module
+	}
+
 	return err
 }
 
-func (this *ModuleManager) loadExe(muduleName string, config interfaces.ModuleConfig) (err error) {
+func (this *ModuleManager) loadExe(moduleName string, config interfaces.ModuleConfig) (err error) {
 	module := base.NewExeModule()
 	err = module.Init(this.app, config)
+	if err == nil {
+		this.Modules[moduleName] = module
+	}
 	return
 }
 
@@ -118,8 +126,11 @@ func (this *ModuleManager) LoadModuleProvider(provider interfaces.ModuleProvider
 func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
 	provider, ok := this.providers[moduleName]
 	if ok {
-		this.Modules[moduleName] = provider.GetModule()
-		err = this.Modules[moduleName].Init(this.app, config)
+		newModule := provider.GetModule()
+		err = newModule.Init(this.app, config)
+		if err == nil {
+			this.Modules[moduleName] = newModule
+		}
 	} else {
 		err = errors.New("没有这样的模块")
 	}

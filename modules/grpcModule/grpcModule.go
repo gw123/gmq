@@ -108,7 +108,7 @@ func NewGrpcModule() *GrpcModule {
 
 func (this *GrpcModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, this, config)
-	this.Port = config.GetItem("port")
+	this.Port = config.GetStringItem("port")
 	this.gServer = &Gserver{}
 	this.Conn = this.gServer
 	this.gServer.module = this

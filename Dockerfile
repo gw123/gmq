@@ -1,20 +1,9 @@
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-FROM debian
+FROM alpine:3.10
 
 COPY dist/gateway /usr/local/bin/gateway
+COPY resources/public /usr/local/bin/resources/public
+COPY resources/views /usr/local/bin/resources/views
 COPY config.docker.yml /usr/local/bin/config/config.yml
-
-CMD /usr/local/bin/gateway -c /usr/local/bin/config/config.yml
+COPY docker-entrypoint /usr/local/bin/docker-entrypoint
+WORKDIR /usr/local/bin
+CMD ["/usr/local/bin/gateway" ,"-c" ,"/usr/local/bin/config/config.yml"]

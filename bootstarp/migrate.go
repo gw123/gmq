@@ -11,12 +11,12 @@ func AutoMigrate(app interfaces.App) error {
 		return err
 	}
 	app.Info("App", "迁移数据库")
-	db.AutoMigrate(&db_models.Task{})
-	db.AutoMigrate(&db_models.TaskDetail{})
-	db.AutoMigrate(&db_models.Client{})
-	db.AutoMigrate(&db_models.ClientTask{})
-	db.AutoMigrate(&db_models.PingLog{})
-	db.AutoMigrate(&db_models.Comment{})
+	//db.AutoMigrate(&db_models.Task{})
+	//db.AutoMigrate(&db_models.TaskDetail{})
+	//db.AutoMigrate(&db_models.Client{})
+	//db.AutoMigrate(&db_models.ClientTask{})
+	//db.AutoMigrate(&db_models.PingLog{})
+	//db.AutoMigrate(&db_models.Comment{})
 
 	c := db_models.Comment{
 		Ip: "127.0.0.1",

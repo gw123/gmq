@@ -18,7 +18,7 @@ func NewCommentModule() *CommentModule {
 
 func (this *CommentModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, this, config)
-	this.bindAddr = config.GetItem("bindAddr")
+	this.bindAddr = config.GetStringItem("bindAddr")
 	this.server = NewCommentServer(this, this.bindAddr)
 	return nil
 }

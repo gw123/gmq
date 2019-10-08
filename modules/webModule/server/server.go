@@ -1,30 +1,27 @@
 package server
 
 import (
-	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/labstack/echo"
-	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"github.com/go-playground/validator"
-	"github.com/labstack/echo/middleware"
-	"os"
+	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/webModule/controllers"
-	"fmt"
-	"net/http"
+	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
 	"github.com/gw123/GMQ/modules/webModule/webMiddlewares"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"net/http"
+	"os"
 )
 
 type Server struct {
 	addr   string
-	port   int
 	module interfaces.Module
 	echo   *echo.Echo
 }
 
-func NewServer(addr string, port int, module interfaces.Module) *Server {
+func NewServer(addr string, module interfaces.Module) *Server {
 	this := new(Server)
 	this.addr = addr
-	this.port = port
 	this.module = module
 	return this
 }
@@ -38,63 +35,82 @@ func (this *Server) Start() error {
 			response := he.GetResponse()
 			ctx.JSON(http.StatusOK, response)
 		} else {
-			ctx.JSON(http.StatusInternalServerError, map[string]string{"msg": "内部错误"})
+			ctx.JSON(http.StatusInternalServerError, map[string]string{"msg": err.Error()})
 		}
 	}
 
-	publicRoot := this.module.GetConfig().GetItem("publicRoot")
+	publicRoot := this.module.GetConfig().GetStringItem("publicRoot")
 	if publicRoot != "" {
 		e.Static("/", publicRoot)
 	}
 
-	staticFileUrl := this.module.GetConfig().GetItem("staticFileUrl")
-	staticFileVersion := this.module.GetConfig().GetItem("staticFileVersion")
-	viewsRoot := this.module.GetConfig().GetItem("viewsRoot")
-	e.Renderer = NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion)
+	staticHost := this.module.GetConfig().GetStringItem("staticHost")
+	version := this.module.GetConfig().GetStringItem("staticVersion")
+	viewsRoot := this.module.GetConfig().GetStringItem("viewsRoot")
+	e.Renderer = NewTemplateRenderer(viewsRoot, staticHost, version)
 
+	origins := this.module.GetConfig().GetArrayItem("allowOrigins")
+	if len(origins) > 0 {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: origins,
+			//authorization,x-csrf-token,x-requested-with
+			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType,
+				echo.HeaderAccept, "x-requested-with", "authorization", "x-csrf-token"},
+		}))
+	}
 
 	loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `{"time":"${time_rfc3339}","remote_ip":"${remote_ip}","host":"${host}",` +
 			`"method":"${method}","uri":"${uri}","status":${status},` +
 			`"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
 			`"bytes_out":${bytes_out},"User-Agent":"${header:User-Agent}",` +
-			`"Origin":"${header:Origin}","Content-Type":"${header:Content-Type}","error":"${error}"}` + "\n",
+			`"Origin":"${header:Origin}","X-Request-ID":"${header:X-Request-ID}","Content-Type":"${header:Content-Type}","error":"${error}"}` + "\n",
 		Output: os.Stdout,
 		Skipper: func(ctx echo.Context) bool {
 			req := ctx.Request()
 			return (req.RequestURI == "/" && req.Method == "HEAD") || (req.RequestURI == "/favicon.ico" && req.Method == "GET")
 		},
 	})
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		StackSize:  1 << 10, // 1 KB
+	}))
+	e.Use(middleware.RequestID())
+	e.Use(loggerMiddleware)
 
 	indexController := controllers.NewIndexController(this.module)
 	taskController := controllers.NewTaskController(this.module)
+	commentController := controllers.NewCommentController(this.module)
+	resourceController := controllers.NewResourceController(this.module)
+	userController := controllers.NewUserController(this.module)
 
-	normalGroup := e.Group("")
-	normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
-	normalGroup.GET("/ping", indexController.Ping)
-	normalGroup.GET("/status", indexController.Status)
-	normalGroup.GET("/testOrder", taskController.CreateTestOrder)
+	normalGroup := e.Group("/gapi")
+	//normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
+	normalGroup.GET("/getResource", resourceController.GetResource)
 
-	authGroup := e.Group("")
-	authGroup.Use(loggerMiddleware)
-	origins := this.module.GetConfig().GetArrayItem("allowOrigins")
-	if len(origins) > 0 {
-		authGroup.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: origins,
-			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "x-requested-with", "authorization"},
-		}))
-	}
+	normalGroup.GET("/getGroup", resourceController.GetGroup)
 
-	authGroup.GET("/favicon.ico", func(i echo.Context) error {
-		return i.String(http.StatusOK, "ico")
-	})
-	authGroup.GET("/index", indexController.Index)
-	authGroup.GET("/message", indexController.Message)
+	normalGroup.GET("/getChapter", resourceController.GetChapter)
+	normalGroup.GET("/getCategories", resourceController.GetCategories)
+	normalGroup.GET("/getIndexList", resourceController.GetIndexList)
 
-	//登录上报节点有那些服务, 服务版本 , 服务端会下发最新版本下载地址
-	authGroup.GET("/login", taskController.Login)
-	//下载
-	//e.GET("download", taskController.Download)
+	//GetCategoryCtrl
+	normalGroup.GET("/getCategoryCtrl/:category_id/:tag_id", resourceController.GetCategoryCtrl)
+	normalGroup.GET("/getCategoryCtrl/:category_id", resourceController.GetCategoryCtrl)
+
+	//登录注册
+	normalGroup.POST("/sendMessage", userController.SendMessage)
+	normalGroup.POST("/login", userController.Login)
+	normalGroup.POST("/register", userController.Register)
+	normalGroup.POST("/comments", commentController.CommentList)
+
+	authGroup := e.Group("/gapi")
+	authGroup.Use(webMiddlewares.NewAuthMiddleware(this.module))
+	authGroup.GET("/getUser", userController.GetUser)
+	authGroup.GET("/getUserCollection", userController.GetUserCollection)
+	authGroup.POST("/changeCollecton", userController.ChangeUserCollection)
+
+	authGroup.POST("/comment", commentController.Comment)
+
 	authGroup.POST("/addTask", taskController.AddTask)
 	authGroup.GET("queryTasksByName", taskController.QueryTasksByName)
 	authGroup.POST("/addClientTask", taskController.AddClientTask)
@@ -104,8 +120,21 @@ func (this *Server) Start() error {
 	authGroup.GET("/clientList", clientController.ClientList)
 	authGroup.GET("/client/:client_id", clientController.ClientInfo)
 
-	addr := fmt.Sprintf("%s:%d", this.addr, this.port)
-	this.module.Info("端口监听在:  %s", addr)
+
+	//静态页面
+	e.GET("/login", indexController.Login)
+	e.GET("/register", indexController.Register)
+	e.GET("/", indexController.Index)
+	e.GET("group/:id", indexController.Index)
+	e.GET("resource/:id", indexController.Index)
+	e.GET("chapter/:id", indexController.Index)
+	e.GET("news", indexController.Index)
+	e.GET("home", indexController.Index)
+	e.GET("userCollection", indexController.Index)
+	e.GET("news/:gid/:tid", indexController.Index)
+	e.GET("tagnews/:gid/:gtitle/:tid/:title", indexController.Index)
+
+	this.module.Info("端口监听在:  %s", this.addr)
 	this.echo = e
-	return e.Start(addr)
+	return e.Start(this.addr)
 }

@@ -47,11 +47,11 @@ func (this *MnsModule) GetStatus() uint64 {
 }
 
 func (this *MnsModule) Watch() {
-	client := ali_mns.NewAliMNSClient(this.Config.GetItem("Url"),
-		this.Config.GetItem("AccessKeyId"),
-		this.Config.GetItem("AccessKeySecret"))
+	client := ali_mns.NewAliMNSClient(this.Config.GetStringItem("Url"),
+		this.Config.GetStringItem("AccessKeyId"),
+		this.Config.GetStringItem("AccessKeySecret"))
 
-	queue := ali_mns.NewMNSQueue(this.Config.GetItem("Queue"), client)
+	queue := ali_mns.NewMNSQueue(this.Config.GetStringItem("Queue"), client)
 
 	respChan := make(chan ali_mns.MessageReceiveResponse)
 	errChan := make(chan error)

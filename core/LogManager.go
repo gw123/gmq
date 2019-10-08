@@ -36,19 +36,19 @@ func NewLogManager(app interfaces.App) *LogManager {
 	this.interval = 1
 	var err error
 
-	filter_categories, err := this.app.GetDefaultConfigItem("logFilterCategories")
+	filter_categories, err := this.app.GetAppConfigItem("logFilterCategories")
 	if err != nil {
-		fmt.Println("LogManager GetDefaultConfigItem", err)
+		fmt.Println("LogManager GetAppConfigItem", err)
 	}
 
-	log_only_categories, err := this.app.GetDefaultConfigItem("logOnlyCategories")
+	log_only_categories, err := this.app.GetAppConfigItem("logOnlyCategories")
 	if err != nil {
-		fmt.Println("LogManager GetDefaultConfigItem", err)
+		fmt.Println("LogManager GetAppConfigItem", err)
 	}
 
-	log_interval, err := this.app.GetDefaultConfigItem("logInterval")
+	log_interval, err := this.app.GetAppConfigItem("logInterval")
 	if err != nil {
-		fmt.Println("LogManager GetDefaultConfigItem", err)
+		fmt.Println("LogManager GetAppConfigItem", err)
 	}
 	if filter_categories != "" {
 		this.filter_log_categories = strings.Split(filter_categories, ",")

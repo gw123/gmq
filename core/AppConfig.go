@@ -6,7 +6,7 @@ import (
 )
 
 type AppConfig struct {
-	mutex   sync.Mutex
+	mutex   sync.RWMutex
 	Configs map[string]interface{}
 }
 
@@ -17,8 +17,8 @@ func NewAppConfig() *AppConfig {
 }
 
 func (this *AppConfig) GetItem(key string) (value string) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	value, ok := this.Configs[key].(string)
 	if ok {
 		return value
@@ -28,8 +28,8 @@ func (this *AppConfig) GetItem(key string) (value string) {
 }
 
 func (this *AppConfig) GetIntItem(key string) int {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	value, ok := this.Configs[key].(int)
 	if ok {
 		return value
@@ -39,8 +39,8 @@ func (this *AppConfig) GetIntItem(key string) int {
 }
 
 func (this *AppConfig) GetBoolItem(key string) bool {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	value, ok := this.Configs[key].(bool)
 	if ok {
 		return value
@@ -56,7 +56,7 @@ func (this *AppConfig) SetItem(key, value string) {
 }
 
 func (this *AppConfig) GetItems() (value map[string]interface{}) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 	return this.Configs
 }

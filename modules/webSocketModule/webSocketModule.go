@@ -30,8 +30,8 @@ func NewWebSocketModule() *WebSocketModule {
 
 func (this *WebSocketModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, config)
-	this.originUrl = config.GetItem("originUrl")
-	this.websocketUrl = config.GetItem("websocketUrl")
+	this.originUrl = config.GetStringItem("originUrl")
+	this.websocketUrl = config.GetStringItem("websocketUrl")
 	go this.InitWebSocket()
 	return nil
 }

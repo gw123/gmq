@@ -54,12 +54,12 @@ func (this *ClientController) ClientInfo(ctx echo.Context) error {
 	//db.LogMode(true)
 	err = db.First(client, map[string]interface{}{"id": client_id}).Error
 	if err != nil {
-		return this.Fail(ctx, Error_DBError, "find client err", err)
+		return this.Fail(ctx, ErrorDb, "find client err", err)
 	}
 
 	res := db.Find(&client.ClientTasks, map[string]interface{}{"client_id": client_id})
 	if res.Error != nil && !res.RecordNotFound() {
-		return this.Fail(ctx, Error_DBError, "find client_task err", err)
+		return this.Fail(ctx, ErrorDb, "find client_task err", err)
 	}
 
 	return this.Success(ctx, client)

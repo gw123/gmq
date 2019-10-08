@@ -1,0 +1,5 @@
+#docker build -t golang:gcc  -f Dockerfile_build .
+#这个镜像是为了编译 golang代码
+FROM golang:1.12.9-alpine3.10
+
+RUN apk add  gcc&& apk add libc-dev

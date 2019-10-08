@@ -21,9 +21,9 @@ func NewServerNodeModule() *ServerNodeModule {
 
 func (this *ServerNodeModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, this, config)
-	this.serverHost = this.Config.GetItem("serverHost")
-	this.nodeName = this.Config.GetItem("nodeName")
-	//this.addr = this.Config.GetItem("nodeName")
+	this.serverHost = this.Config.GetStringItem("serverHost")
+	this.nodeName = this.Config.GetStringItem("nodeName")
+	//this.addr = this.Config.GetStringItem("nodeName")
 	return nil
 }
 

@@ -43,7 +43,7 @@ func (this *BaseModule) Init(app interfaces.App, module interfaces.Module, confi
 	this.module = module
 	this.Handle = module.Handle
 	this.Watch = module.Watch
-	evnetsStr := config.GetItem("subs")
+	evnetsStr := config.GetStringItem("subs")
 	events := strings.Split(evnetsStr, ",")
 
 	this.eventNames = events
@@ -114,9 +114,10 @@ func (this *BaseModule) startDaemon() {
 		case _ = <-this.Ctx.Done():
 			this.Info("Stop Module  start goroutine " + this.GetModuleName())
 			return
+		default:
+			break
 		}
-
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Second)
 		this.Watch(index)
 		index++
 		if index > 1000000 {
@@ -189,7 +190,7 @@ func (this *BaseModule) Pub(event interfaces.Event) {
 }
 
 //订阅消息
-func (this *BaseModule) Sub(eventName string) {
+func (this *BaseModule) Sub(eventName string, filter ...func(interface{}) bool) {
 	if eventName == "" {
 		return
 	}

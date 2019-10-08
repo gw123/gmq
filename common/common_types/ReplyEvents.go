@@ -4,7 +4,7 @@ package common_types
 //payload 是 Lhmsg 的字符串
 type ResultEvent struct {
 	Event
-	Payload      string
+	Payload string
 }
 
 func NewResultEvent(result []byte) *ResultEvent {
@@ -25,4 +25,8 @@ func (this *ResultEvent) GetEventName() string {
 
 func (this *ResultEvent) GetPayload() []byte {
 	return []byte(this.Payload)
+}
+
+func (this *ResultEvent) GetInterface() interface{} {
+	return this.Payload
 }

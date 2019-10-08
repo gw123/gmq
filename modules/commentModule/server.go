@@ -63,6 +63,7 @@ func (c *CommentServer) GetComments(ctx context.Context, param *RequestGetCommen
 	var comments []*models.Comment
 	result := db.Where("type = ?", param.Type).
 		Where("target_id = ?", param.TargetId).
+		Limit(param.PageSize).Offset(param.CurrentPage * param.PageSize).
 		Find(&comments)
 
 	if result.Error != nil {
@@ -89,6 +90,8 @@ func (c *CommentServer) GetComments(ctx context.Context, param *RequestGetCommen
 
 func (c *CommentServer) PutComment(ctx context.Context, comment *RequestPutComment) (*ResponsePutComment, error) {
 	c.module.Info("PutComment , request: %v", comment)
+
+
 	commentModel := &models.Comment{
 		Type:     comment.Type,
 		TargetId: comment.TargetId,
@@ -110,3 +113,5 @@ func (c *CommentServer) PutComment(ctx context.Context, comment *RequestPutComme
 	response := &ResponsePutComment{Code: 0}
 	return response, nil
 }
+
+

@@ -31,8 +31,8 @@ type Module interface {
 	//发布消息
 	Pub(event Event)
 
-	//订阅消息
-	Sub(eventName string)
+	//订阅消息, filter 过滤函数从接收到的消息中过滤不合法的消息
+	Sub(eventName string, filter ...func(interface{}) bool)
 
 	//获取模块版本
 	GetVersion() string

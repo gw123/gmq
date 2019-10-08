@@ -16,22 +16,21 @@ const handlebarsExtension = "handlebars"
 
 // TemplateRenderer 自定义模板渲染器
 type TemplateRenderer struct {
-	staticFileUrl     string
-	staticFileVersion string
-	viewsRoot         string
-	templates         *sync.Map
+	StaticHost string
+	Version    string
+	viewsRoot  string
+	templates  *sync.Map
 }
 
-// NewTemplateRenderer 创建新的模板渲染器
-// root是模板文件的根路径
 func NewTemplateRenderer(viewsRoot, staticFileUrl, staticFileVersion string) echo.Renderer {
 	t := &TemplateRenderer{
-		viewsRoot:         viewsRoot,
-		staticFileUrl:     staticFileUrl,
-		templates:         new(sync.Map),
-		staticFileVersion: staticFileVersion,
+		viewsRoot:  viewsRoot,
+		StaticHost: staticFileUrl,
+		templates:  new(sync.Map),
+		Version:    staticFileVersion,
 	}
-	raymond.RegisterHelper("static",  t.StaticFileURL)
+	raymond.RegisterHelper("static", t.StaticFileURL)
+	raymond.RegisterHelper("staticWithVersion", t.StaticFileURLWithVersion)
 	if viewsRoot != "" {
 		t.registerGlobalPartials()
 	}
@@ -102,10 +101,15 @@ func (t *TemplateRenderer) registerGlobalPartials() error {
 }
 
 // staticFileURL 拼接静态文件路径
-func (this *TemplateRenderer) StaticFileURL(tp, uri string) string {
-	if tp == "" {
-		return this.staticFileUrl + "/" + uri + "?v=" + this.staticFileVersion
-	} else {
-		return this.staticFileUrl + "/" + tp + "/" + uri + "?v=" + this.staticFileVersion
+func (this *TemplateRenderer) StaticFileURL(uri string) string {
+	return this.StaticHost + "/" + uri
+}
+
+// staticFileURL 拼接静态文件路径
+func (this *TemplateRenderer) StaticFileURLWithVersion(root, uri string) string {
+	version := this.Version
+	if root == "" {
+		return this.StaticHost + "/" + version + "/" + uri
 	}
+	return this.StaticHost + "/" + root + "/" + version + "/" + uri
 }

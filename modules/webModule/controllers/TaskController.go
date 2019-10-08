@@ -109,10 +109,10 @@ func (t *TaskController) QueryTasksByName(ctx echo.Context) error {
 	}
 	var tasks []db_models.Task
 
-	db.LogMode(true)
+	//db.LogMode(true)
 	res := db.Where("name like ?", "%"+key+"%").Find(&tasks)
 	if res.Error != nil && !res.RecordNotFound() {
-		return t.Fail(ctx, Error_DBError, "查找失败 002", err)
+		return t.Fail(ctx, ErrorDb, "查找失败 002", err)
 	}
 	return t.Success(ctx, tasks)
 }

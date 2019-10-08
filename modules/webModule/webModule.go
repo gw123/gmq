@@ -5,6 +5,7 @@ import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/modules/webModule/server"
+	"github.com/pkg/errors"
 )
 
 type WebModule struct {
@@ -12,10 +13,9 @@ type WebModule struct {
 	eventNames []string
 	authToken  string
 	clientName string
-	port       int
-	addr       string
 	controller *controllers.WsController
 	server     *server.Server
+	addr       string
 }
 
 func NewWebModule() *WebModule {
@@ -25,8 +25,10 @@ func NewWebModule() *WebModule {
 
 func (this *WebModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
 	this.BaseModule.Init(app, this, config)
-	this.port = this.Config.GetIntItem("port")
-	this.addr = this.Config.GetItem("addr")
+	this.addr = this.Config.GetStringItem("bindAddr")
+	if this.addr == "" {
+		return errors.New("加载失败,bindAddr")
+	}
 	return nil
 }
 
@@ -39,9 +41,7 @@ func (this *WebModule) Watch(count int) {
 }
 
 func (this *WebModule) Start() {
-	port := this.Config.GetIntItem("port")
-	addr := this.Config.GetItem("addr")
-	this.server = server.NewServer(addr, port, this)
+	this.server = server.NewServer(this.addr, this)
 	go this.server.Start()
 	this.BaseModule.Start()
 }

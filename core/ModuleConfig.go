@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/gw123/GMQ/core/interfaces"
-	"sync"
 	"fmt"
+	"github.com/gw123/GMQ/core/interfaces"
 	"strings"
+	"sync"
 )
 
 type ModuleConfig struct {
@@ -53,6 +53,7 @@ func (this *ModuleConfig) IsEnable() bool {
 	return this.Configs["enable"] == "true" ||
 		this.Configs["enable"] == "1" ||
 		this.Configs["enable"] == "" ||
+		this.Configs["enable"] == "yes" ||
 		this.Configs["enable"] == nil
 }
 
@@ -71,6 +72,12 @@ func (this *ModuleConfig) GetItems() (value map[string]interface{}) {
 	this.mutex.RLock()
 	defer this.mutex.RUnlock()
 	return this.Configs
+}
+
+func (this *ModuleConfig) GetItem(key string) (value interface{}) {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	return this.Configs[key]
 }
 
 func (this *ModuleConfig) GetGlobalItem(key string) (value string) {
@@ -94,7 +101,7 @@ func (this *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
 	this.GlobalConfig = config
 }
 
-func (this *ModuleConfig) GetItem(key string) (value string) {
+func (this *ModuleConfig) GetStringItem(key string) (value string) {
 	key1 := strings.ToLower(key)
 	this.mutex.RLock()
 	defer this.mutex.RUnlock()
@@ -126,17 +133,19 @@ func (this *ModuleConfig) GetArrayItem(key string) (value []string) {
 	return value
 }
 
-func (this *ModuleConfig) GetMapItem(key string) (value map[string]string) {
+func (this *ModuleConfig) GetMapItem(key string) (value map[string]interface{}) {
 	key1 := strings.ToLower(key)
 	this.mutex.RLock()
 	defer this.mutex.RUnlock()
-	value, ok := this.Configs[key1].(map[string]string)
+	value, ok := this.Configs[key1].(map[string]interface{})
 	if ok {
 		return value
 	}
 	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
 	return nil
 }
+
+
 
 func (this *ModuleConfig) GetIntItem(key string) int {
 	key1 := strings.ToLower(key)
@@ -166,7 +175,7 @@ func (this *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool 
 	newConfigItems := newCofig.GetGlobalItems()
 	isChange := false
 	for key, newConfigItem := range newConfigItems {
-		oldConfig := this.GetItem(key)
+		oldConfig := this.GetStringItem(key)
 		if newConfigItem != oldConfig {
 			this.SetItem(key, newConfigItem)
 			isChange = true
@@ -175,11 +184,15 @@ func (this *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool 
 	return isChange
 }
 func (this *ModuleConfig) GetModuleType() string {
-	return this.GetItem("type")
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	return this.GetStringItem("type")
 }
 
 func (this *ModuleConfig) GetItemOrDefault(key, defaultval string) string {
-	ret := this.GetItem(key)
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+	ret := this.GetStringItem(key)
 	if ret == "" {
 		return defaultval
 	}

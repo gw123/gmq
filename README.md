@@ -7,15 +7,26 @@
   - 优雅的日志输出方式
   - 多数据库支持,方便开发
   - 支持读取yml中配置环境变量,方便容器化部署
+  - 全局的service获取方式,模块调用更加灵活
   
 ## 目录结构
- - bootstarp 引导启动目录, 加载配置, 按需加载需要的module(仅仅编译添加的文件)
+ - bootstarp 引导启动目录, 加载配置, 按需加载需要的module(仅仅编译添加的文件) ,加载全局service
  - common 公共引用路径 
  - core 框架核心
  - modules 模块路径
  - resource 资源路径
  - storage 上传文件保存路径
 
+## 模块配置说明
+```
+   moduleName:
+      type : inner/exe/dll/so
+      enable: 1/ture
+```
+ moduleName 模块名称
+ - type 模块类型目前支持 内部模块(golang),可执行程序, dll/so windows,linux动态库方式
+ - 通信方式支持 mqtt,http,grpc,websocket方式
+ - enable 配置模块是否要启用
 
 ## 如何新加一个model, 下面以debugmodel为例
  - 在modules 添加deubugModel 文件夹
@@ -72,6 +83,7 @@ func (this *DebugModuleProvider) GetModuleName() string {
 }
 
 func (this *DebugModuleProvider) Register() {
+
 }
 
 func (this *DebugModuleProvider) GetModule() interfaces.Module {
@@ -124,18 +136,6 @@ dbpool:
   -	//获取默认数据库
 	GetDefaultDb() (*gorm.DB, error)
 	
-	
-
-## 模块使用
-```
-   moduleName:
-      type : inner/exe/dll/so
-      enable: 1/ture
-```
- moduleName 模块名称
- - type 模块类型目前支持 内部模块(golang),可执行程序, dll/so windows,linux动态库方式
- - 通信方式支持 mqtt,http,grpc,websocket方式
- - enable 配置模块是否要启用
  
 ## mqtt模块配置 (mqtt 目前使用的是阿里云IOT服务)
 ```

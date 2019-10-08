@@ -1,18 +1,18 @@
 package controllers
 
 import (
-	"github.com/gw123/GMQ/modules/webModule/models"
+	"fmt"
+	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/core/interfaces"
-	"golang.org/x/net/websocket"
+	"github.com/gw123/GMQ/modules/webModule/models"
+	"github.com/gw123/GMQ/modules/webModule/webEvent"
 	"github.com/labstack/echo"
 	context2 "golang.org/x/net/context"
-	"sync"
-	"github.com/gw123/GMQ/common/common_types"
-	"time"
-	"github.com/gw123/GMQ/modules/webModule/webEvent"
+	"golang.org/x/net/websocket"
 	"net/http"
 	"strconv"
-	"fmt"
+	"sync"
+	"time"
 )
 
 type WsController struct {
@@ -22,7 +22,7 @@ type WsController struct {
 	webModule          interfaces.Module
 }
 
-func NewIndexController(module interfaces.Module) *WsController {
+func NewWsController(module interfaces.Module) *WsController {
 	temp := new(WsController)
 	temp.webModule = module
 	temp.WebSocketClientMap = make(map[string]*models.WsClientModel, 10)
@@ -55,7 +55,7 @@ func (c *WsController) Message(ctx echo.Context) error {
 			//c.webModule.Debug("ws handel ->")
 			client, ok := c.WebSocketClientMap[moduleName]
 			if ok {
-				stopEvent := common_types.NewEvent("stop", []byte("新的同名模块连接到来"))
+				stopEvent := common_types.NewEvent("stop", "新的同名模块连接到来")
 				client.SendMsg(stopEvent)
 				client.Stop()
 			}

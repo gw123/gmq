@@ -1,6 +1,10 @@
 package interfaces
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/go-redis/redis"
+	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
+)
 
 type App interface {
 	Logger
@@ -12,10 +16,10 @@ type App interface {
 	Sub(eventName string, module Module)
 	//取消订阅
 	UnSub(eventName string, module Module)
-	//获取配置信息
-	GetConfigItem(section, key string) (val string, err error)
-	//获取全局配置信息
-	GetDefaultConfigItem(key string) (val string, err error)
+	//获取全局app配置信息
+	GetAppConfigItem(key string) (val string, err error)
+	//获取Viper对象
+	GetConfig() *viper.Viper
 	//处理消息
 	Handel(event Event)
 	//加载模块提供者
@@ -24,4 +28,15 @@ type App interface {
 	GetDb(dnname string) (*gorm.DB, error)
 	//获取默认数据库
 	GetDefaultDb() (*gorm.DB, error)
+	//获取reids
+	GetRedis(dnname string) (*redis.Client, error)
+	//获取默认reids
+	GetDefaultRedis() (*redis.Client, error)
+	RegisterService(name string, s Service)
+	//RegisterServiceProvider(name string, s Service)
+	GetService(name string) Service
+}
+
+type Service interface {
+	GetServiceName() string
 }

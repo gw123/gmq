@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"github.com/go-redis/redis"
 	"github.com/gw123/GMQ/common/common_types"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/jinzhu/gorm"
@@ -21,6 +22,8 @@ type App struct {
 	Version           string
 	configData        *viper.Viper
 	DbPool            interfaces.DbPool
+	RedisPool         interfaces.RedisPool
+	Services          map[string]interfaces.Service
 }
 
 func NewApp(viper2 *viper.Viper) *App {
@@ -31,13 +34,14 @@ func NewApp(viper2 *viper.Viper) *App {
 	this.dispatch = NewDispath(this)
 	this.logManager = NewLogManager(this)
 	this.logManager.Start()
-
+	this.Services = make(map[string]interfaces.Service)
 	this.configManager = NewConfigManager(this, viper2)
 	this.moduleManager = NewModuleManager(this, this.configManager)
 	this.errorManager = NewErrorManager(this)
 	this.middlewareManager = NewMiddlewareManager(this)
 
 	this.DbPool = NewDbPool()
+	this.RedisPool = NewRedisPool(this.configData.GetStringMap("redisPool"), this)
 	this.LoadDb()
 	return this
 }
@@ -80,6 +84,19 @@ func (this *App) LoadDb() {
 				host = os.Getenv(arrs[1])
 			}
 		}
+
+		port, ok := configMap["port"].(string)
+		if !ok || port == "" {
+			port = "3306"
+		}
+		if reg.MatchString(port) {
+			arrs := reg.FindStringSubmatch(port)
+			if len(arrs) > 1 {
+				this.Debug("app", "读取环境变量 %s", arrs[1])
+				port = os.Getenv(arrs[1])
+			}
+		}
+
 		database, ok := configMap["database"].(string)
 		if !ok {
 			database = ""
@@ -120,6 +137,7 @@ func (this *App) LoadDb() {
 		db, err := this.DbPool.NewDb(
 			drive,
 			host,
+			port,
 			database,
 			username,
 			password);
@@ -250,7 +268,11 @@ func (this *App) GetConfigItem(section, key string) (string, error) {
 	return val, nil
 }
 
-func (this *App) GetDefaultConfigItem(key string) (string, error) {
+func (this *App) GetConfig() *viper.Viper {
+	return this.configData
+}
+
+func (this *App) GetAppConfigItem(key string) (string, error) {
 	return this.GetConfigItem("app", key)
 }
 
@@ -271,4 +293,28 @@ func (this *App) GetDb(dbname string) (*gorm.DB, error) {
 func (this *App) GetDefaultDb() (*gorm.DB, error) {
 	dbname := "default"
 	return this.GetDb(dbname)
+}
+
+func (this *App) RegisterService(name string, service interfaces.Service) {
+	if name == "" {
+		name = service.GetServiceName()
+	}
+	if service == nil {
+		this.Warning("App", "service is nil")
+		return
+	}
+	this.Services[name] = service
+	return
+}
+
+func (this *App) GetService(name string) interfaces.Service {
+	return this.Services[name]
+}
+
+func (this *App) GetRedis(name string) (*redis.Client, error) {
+	return this.RedisPool.GetDb(name)
+}
+
+func (this *App) GetDefaultRedis() (*redis.Client, error) {
+	return this.RedisPool.GetDb("default")
 }

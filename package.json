@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "scripts": {
+    "dev-m": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/m.mix.js",
+    "dev-pc": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/pc.mix.js",
+    "dev-login": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/login.mix.js",
+    "watch-m": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/m.mix.js",
+    "watch-pc": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/pc.mix.js",
+    "watch-login": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/login.mix.js",
+    "hot-m": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/m.mix.js",
+    "hot-pc": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/pc.mix.js",
+    "prod-m": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/m.mix.js",
+    "prod-pc": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/pc.mix.js",
+    "prod-login": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/login.mix.js",
+
+    "dev-game":"cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/game.mix.js",
+    "watch-game":"cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/game.mix.js",
+    "prod-game":"cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --env.mixfile=mixfiles/game.mix.js"
+  },
+  "devDependencies": {
+    "axios": "^0.18",
+    "bootstrap": "^4.0.0",
+    "cross-env": "^5.1",
+    "jquery": "^3.2",
+    "laravel-mix": "^2.0",
+    "lodash": "^4.17.4",
+    "popper.js": "^1.12",
+    "vue": "^2.5.7",
+    "vue-html5-editor": "^1.1.1",
+    "@grpc/proto-loader": "^0.3.0",
+    "async": "^1.5.2",
+    "google-protobuf": "^3.6.1",
+    "grpc": "^1.15.0",
+    "grpc-web": "^1.0.0"
+  },
+  "dependencies": {
+    "babel-plugin-component": "^1.1.0",
+    "babel-preset-es2015": "^6.24.1",
+    "element-ui": "^2.3.3",
+    "mockjs": "^1.0.1-beta3",
+    "vue-awesome-swiper": "^3.1.3",
+    "vue-router": "^3.0.1",
+    "vue-video-player": "^5.0.2",
+    "vuex": "^3.0.1"
+  }
+}

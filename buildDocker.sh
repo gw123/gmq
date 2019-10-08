@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-dockerImage=golang
+dockerImage=golang:gcc
 srcDist=entry/server.go
 export dstExe=dist/gateway
-tagName='ccr.ccs.tencentyun.com/g-docker/gateway'
+tagName='ccr.ccs.tencentyun.com/g-docker/gateway:2.1.1'
 
 runStr="docker run -it  --rm -v $GOPATH:/go \
 -v $HOME/.ssh:/root/.ssh \

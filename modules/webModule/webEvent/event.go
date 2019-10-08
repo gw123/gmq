@@ -1,8 +1,8 @@
 package webEvent
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 type Event struct {
@@ -32,6 +32,11 @@ func (this *Event) GetEventName() string {
 func (this *Event) GetPayload() []byte {
 	return []byte(this.Payload)
 }
+
+func (this *Event) GetInterface() interface{} {
+	return this.Payload
+}
+
 
 func (this *Event) GetSourceModule() string {
 	return this.SourcModuleName

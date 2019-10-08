@@ -26,7 +26,7 @@ vendor/
 
 # config file
 config.yaml
-
+config.yml
 # sqlite3
 *.db
 logs
@@ -37,12 +37,18 @@ main.ini.gw
 main.exe
 resources/assets/
 resources/storage/
+resources/public/
 gateway.exe
 dist/
 entry/config.client.yml
 entry/config.yml
 entry/config2.yml
 docker-compose.yml
+qiniu.conf
+qiniuUpload.sh
+main
+upload
+node_modules/
 
 
 

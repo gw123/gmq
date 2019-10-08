@@ -32,9 +32,9 @@ func (this *MqttModule) Init(app interfaces.App, config interfaces.ModuleConfig)
 
 func (this *MqttModule) initAliIot(app interfaces.App, config interfaces.ModuleConfig) {
 	params := Params{}
-	params.ProductKey = config.GetItem("productKey")
+	params.ProductKey = config.GetStringItem("productKey")
 	params.DeviceName = config.GetGlobalItem("deviceName")
-	params.DeviceSecret = config.GetItem("deviceSecret")
+	params.DeviceSecret = config.GetStringItem("deviceSecret")
 	//this.Debug(fmt.Sprintf("PK:%s ,DN:%s ,DS:%s", params.ProductKey, params.DeviceName, params.DeviceSecret))
 	params.OnConnectHandler = func(client mqtt.Client) {
 		this.Info("连接阿里云成功")

@@ -21,5 +21,9 @@ func (this *LogEvent) GetEventName() string {
 }
 
 func (this *LogEvent) GetPayload() []byte {
-	return []byte(this.Payload)
+	return this.Payload.([]byte)
+}
+
+func (this *LogEvent) GetInterface() interface{} {
+	return this.Payload
 }
