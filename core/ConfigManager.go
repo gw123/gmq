@@ -29,7 +29,7 @@ func NewConfigManager(app interfaces.App, configData *viper.Viper) *ConfigManage
 	this.ConfigData = configData
 	err := this.ParseConfig()
 	if err != nil {
-		this.app.Warning("ConfigManger", "配置文件解析失败 "+err.Error())
+		this.app.Warn("ConfigManger", "配置文件解析失败 "+err.Error())
 	}
 	return this
 }

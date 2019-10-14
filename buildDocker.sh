@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 dockerImage=golang:gcc
 srcDist=entry/server.go
 export dstExe=dist/gateway

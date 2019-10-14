@@ -166,7 +166,7 @@ func (this *BaseModule) Info(content string, a ...interface{}) {
 }
 
 func (this *BaseModule) Warning(content string, a ...interface{}) {
-	this.App.Warning(this.GetModuleName(), content, a ...)
+	this.App.Warn(this.GetModuleName(), content, a ...)
 }
 
 func (this *BaseModule) Error(content string, a ...interface{}) {

@@ -37,14 +37,14 @@ func (this *Dispatch) Start() {
 			if err.Error() == "队列为空" {
 
 			} else {
-				this.app.Warning("app", "出队异常:"+err.Error())
+				this.app.Warn("app", "出队异常:"+err.Error())
 			}
 			time.Sleep(time.Millisecond)
 			continue
 		}
 
 		if event == nil {
-			this.app.Warning("app", "出队异常:event为nil")
+			this.app.Warn("app", "出队异常:event为nil")
 			continue
 		}
 
@@ -56,7 +56,7 @@ func (this *Dispatch) Start() {
 			//this.app.Debug("Dispatch",fmt.Sprintf("Bingding moduleName %s", module.GetModuleName()))
 			err := module.Push(event)
 			if err != nil {
-				this.app.Warning(module.GetModuleName(), "模块队列异常Push失败"+err.Error())
+				this.app.Warn(module.GetModuleName(), "模块队列异常Push失败"+err.Error())
 			}
 		}
 	}
@@ -70,7 +70,7 @@ func (this *Dispatch) PushToModule(event interfaces.Event) {
 		//this.app.Debug("Dispatch",fmt.Sprintf("Bingding moduleName %s", module.GetModuleName()))
 		err := module.Push(event)
 		if err != nil {
-			this.app.Warning(module.GetModuleName(), "模块队列异常Push失败"+err.Error())
+			this.app.Warn(module.GetModuleName(), "模块队列异常Push失败"+err.Error())
 		}
 	}
 }
@@ -84,7 +84,7 @@ func (this *Dispatch) handel(event interfaces.Event) {
 
 func (this *Dispatch) Sub(eventName string, module interfaces.Module) {
 	if eventName == "" || eventName == " " {
-		this.app.Warning("Dispatch", "Sub eventName 为空,"+" moduleName: "+module.GetModuleName())
+		this.app.Warn("Dispatch", "Sub eventName 为空,"+" moduleName: "+module.GetModuleName())
 		return
 	}
 
@@ -93,7 +93,7 @@ func (this *Dispatch) Sub(eventName string, module interfaces.Module) {
 	modules := this.EventQueueBinds[eventName]
 	for _, m := range modules {
 		if m.GetModuleName() == module.GetModuleName() {
-			this.app.Warning("sub", m.GetModuleName()+"已经订阅"+eventName)
+			this.app.Warn("sub", m.GetModuleName()+"已经订阅"+eventName)
 			return
 		}
 	}
@@ -102,7 +102,7 @@ func (this *Dispatch) Sub(eventName string, module interfaces.Module) {
 
 func (this *Dispatch) UnSub(eventName string, module interfaces.Module) {
 	if eventName == "" {
-		this.app.Warning("Dispatch", "UnSub eventName 为空")
+		this.app.Warn("Dispatch", "UnSub eventName 为空")
 		return
 	}
 
@@ -120,7 +120,7 @@ func (this *Dispatch) UnSub(eventName string, module interfaces.Module) {
 
 func (this *Dispatch) Pub(event interfaces.Event) {
 	if event.GetEventName() == "" {
-		this.app.Warning("Dispatch", "Pub eventName 为空"+"moduleName:"+event.GetEventName()+"srouceModule"+event.GetSourceModule())
+		this.app.Warn("Dispatch", "Pub eventName 为空"+"moduleName:"+event.GetEventName()+"srouceModule"+event.GetSourceModule())
 		return
 	}
 	//this.app.Debug("Dispath", event.GetMsgId()+" : "+event.GetEventName())

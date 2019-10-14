@@ -10,10 +10,8 @@ import (
 var serviceContent = `package services
 
 import (
-	"github.com/go-redis/redis"
-	"github.com/gw123/GMQ/common/redisKeys"
-	"github.com/gw123/GMQ/common/utils"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 )
 
@@ -66,7 +64,7 @@ func MakeService(moduleName string, distDir string) error {
 	}
 
 	fmt.Println("Mkdir :" + filePath)
-	err = os.MkdirAll(filePath, 0660)
+	err = os.MkdirAll(filePath, 0750)
 	if err != nil {
 		return err
 	}

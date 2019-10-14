@@ -26,6 +26,8 @@ type App struct {
 	Services          map[string]interfaces.Service
 }
 
+
+
 func NewApp(viper2 *viper.Viper) *App {
 	this := &App{}
 	this.configData = viper2
@@ -142,7 +144,7 @@ func (this *App) LoadDb() {
 			username,
 			password);
 		if err != nil {
-			this.Warning("App", "db load error, %s: ", err.Error())
+			this.Warn("App", "db load error, %s: ", err.Error())
 		}
 		this.DbPool.SetDb(key, db)
 
@@ -158,7 +160,7 @@ func (this *App) LoadDb() {
 
 	db, err := this.DbPool.GetDb(defaultDBkey)
 	if err != nil {
-		this.Warning("App", "cant found db default config :%s", err.Error())
+		this.Warn("App", "cant found db default config :%s", err.Error())
 	} else {
 		this.DbPool.SetDb("default", db)
 	}
@@ -231,11 +233,11 @@ func (this *App) Info(category string, format string, a ...interface{}) {
 	this.logManager.Info(category, format, a...)
 }
 
-func (this *App) Warning(category string, format string, a ...interface{}) {
+func (this *App) Warn(category string, format string, a ...interface{}) {
 	if format == "" {
 		return
 	}
-	this.logManager.Waring(category, format, a...)
+	this.logManager.Warn(category, format, a...)
 }
 
 func (this *App) Error(category string, format string, a ...interface{}) {
@@ -300,7 +302,7 @@ func (this *App) RegisterService(name string, service interfaces.Service) {
 		name = service.GetServiceName()
 	}
 	if service == nil {
-		this.Warning("App", "service is nil")
+		this.Warn("App", "service is nil")
 		return
 	}
 	this.Services[name] = service
@@ -317,4 +319,12 @@ func (this *App) GetRedis(name string) (*redis.Client, error) {
 
 func (this *App) GetDefaultRedis() (*redis.Client, error) {
 	return this.RedisPool.GetDb("default")
+}
+
+func (this *App) GetLogger() (interfaces.Logger)  {
+	return this.logManager
+}
+
+func (this *App) Write(buf []byte)(int,error) {
+	return this.logManager.Write(buf)
 }

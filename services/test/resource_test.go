@@ -92,14 +92,13 @@ func TestGetCateogries(t *testing.T) {
 	}
 }
 
-
 func TestGetIndexCtrl(t *testing.T) {
 	app := test.GetAppFroTest()
 	s, err := services.NewResourceService(app)
 	if err != nil {
 		t.Error(err)
 	}
-	g, err := s.GetIndexCtrl()
+	g, err := s.GetIndexCtrl(0, 0)
 	if err != nil {
 		t.Error(err)
 	}

@@ -35,6 +35,7 @@ type App interface {
 	RegisterService(name string, s Service)
 	//RegisterServiceProvider(name string, s Service)
 	GetService(name string) Service
+	GetLogger() (Logger)
 }
 
 type Service interface {

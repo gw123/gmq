@@ -293,7 +293,7 @@ func (s *ResourceService) GetGroup(id int32) (*GroupItem, error) {
 		var covers []string
 		err := json.Unmarshal([]byte(item.Covers.([]uint8)), &covers)
 		if err != nil {
-			s.app.Warning("ResourceService", "json.Unmarshal([]byte(item.Covers.(string)) "+err.Error())
+			s.app.Warn("ResourceService", "json.Unmarshal([]byte(item.Covers.(string)) "+err.Error())
 		}
 		item.Covers = covers
 
@@ -305,7 +305,7 @@ func (s *ResourceService) GetGroup(id int32) (*GroupItem, error) {
 
 		category, err := s.GetGroupCategory(id)
 		if err != nil {
-			s.app.Warning("ResourceService", "GetGroupCategory err "+err.Error())
+			s.app.Warn("ResourceService", "GetGroupCategory err "+err.Error())
 			category = &Category{}
 		}
 		item.Category = *category

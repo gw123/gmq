@@ -67,7 +67,7 @@ func (this *RedisPool) loadConfig() {
 			password,
 			database)
 		if err != nil {
-			this.app.Warning("App", "redis  load error, %d: ", err.Error())
+			this.app.Warn("App", "redis  load error, %d: ", err.Error())
 		}
 		this.SetDb(key, db)
 	}
@@ -81,7 +81,7 @@ func (this *RedisPool) loadConfig() {
 
 	db, err := this.GetDb(defaultDBkey)
 	if err != nil {
-		this.app.Warning("App", "cant found redis default config :%s", err.Error())
+		this.app.Warn("App", "cant found redis default config :%s", err.Error())
 	} else {
 		this.SetDb("default", db)
 	}

@@ -28,18 +28,19 @@ redisPool:
     password: "gao123456"
     drive: "mysql"
 
-modules:
-#   comment:
-#     type: inner
-#     bindAddr: "0.0.0.0:9090"
+es:
+  Address:
+    - http://127.0.0.1:9200
 
-#   debug:
-#     type: inner
-#  mqtt:
-#      type : inner
-#      productKey : a1GvAwy4lNt
-#      deviceSecret: ulsuWZkXGzOQsR5L5AYUQpQxLKvidmUi
-#      deviceName:  PC1219
+logger:
+  #logrus|simple|es
+  logDriver: "logrus"
+  timestampFormat: "2006-01-02 15:04:05"
+  level: "debug"
+  formatter: "json"
+  forceColors: false
+
+modules:
 
 
 

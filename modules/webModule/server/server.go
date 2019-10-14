@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"net/http"
-	"os"
 )
 
 type Server struct {
@@ -59,23 +58,32 @@ func (this *Server) Start() error {
 		}))
 	}
 
+	e.Use(webMiddlewares.RequestID())
+	timestampFormat := this.module.GetApp().GetConfig().GetString("logger.timestampFormat")
+	if timestampFormat == "" {
+		timestampFormat = "2006-01-02 15:04:05"
+	}
+
 	loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: `{"time":"${time_rfc3339}","remote_ip":"${remote_ip}","host":"${host}",` +
+		Format: `{"time":"${time_custom}","remote_ip":"${remote_ip}","host":"${host}",` +
 			`"method":"${method}","uri":"${uri}","status":${status},` +
 			`"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
 			`"bytes_out":${bytes_out},"User-Agent":"${header:User-Agent}",` +
-			`"Origin":"${header:Origin}","X-Request-ID":"${header:X-Request-ID}","Content-Type":"${header:Content-Type}","error":"${error}"}` + "\n",
-		Output: os.Stdout,
+			`"Origin":"${header:Origin}","X-Request-ID":"${header:X-Request-ID}","error":"${error}"}` + "\n",
+		//Output: os.Stdout,
+		Output: this.module.GetApp(),
 		Skipper: func(ctx echo.Context) bool {
 			req := ctx.Request()
 			return (req.RequestURI == "/" && req.Method == "HEAD") || (req.RequestURI == "/favicon.ico" && req.Method == "GET")
 		},
+		CustomTimeFormat:timestampFormat,
 	})
 	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
 		StackSize:  1 << 10, // 1 KB
 	}))
-	e.Use(middleware.RequestID())
+
 	e.Use(loggerMiddleware)
+	//e.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
 
 	indexController := controllers.NewIndexController(this.module)
 	taskController := controllers.NewTaskController(this.module)
@@ -86,9 +94,7 @@ func (this *Server) Start() error {
 	normalGroup := e.Group("/gapi")
 	//normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
 	normalGroup.GET("/getResource", resourceController.GetResource)
-
 	normalGroup.GET("/getGroup", resourceController.GetGroup)
-
 	normalGroup.GET("/getChapter", resourceController.GetChapter)
 	normalGroup.GET("/getCategories", resourceController.GetCategories)
 	normalGroup.GET("/getIndexList", resourceController.GetIndexList)

@@ -10,6 +10,7 @@ import (
 
 
 func main() {
+
 	moduleName := flag.String("newModule", "", "模块名称  eg:RedisModule")
 	serviceName := flag.String("newService", "", "service名称  eg:UserService")
 	configFile := flag.String("c", "config.yml", "配置文件")
