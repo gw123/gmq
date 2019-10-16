@@ -43,9 +43,8 @@ type LogManager struct {
 	mutex               sync.Mutex
 	logger              *logrus.Logger
 	logDriver           string
-	timestampFormat string
+	timestampFormat     string
 }
-
 
 func NewLogManager(app interfaces.App) *LogManager {
 	this := new(LogManager)
@@ -58,7 +57,7 @@ func NewLogManager(app interfaces.App) *LogManager {
 	logOnlyCategories, _ := this.app.GetAppConfigItem("logOnlyCategories")
 	logInterval, _ := this.app.GetAppConfigItem("logInterval")
 	this.timestampFormat = this.app.GetConfig().GetString("logger.timestampFormat")
-	if this.timestampFormat == ""{
+	if this.timestampFormat == "" {
 		this.timestampFormat = "2006-01-02 15:04:05"
 	}
 
@@ -142,7 +141,6 @@ func (this *LogManager) Warn(category string, format string, a ...interface{}) {
 	this.filter("Warn", category, format, a...)
 }
 
-
 func (this *LogManager) Error(category string, format string, a ...interface{}) {
 	this.filter("Error", category, format, a...)
 }
@@ -225,15 +223,14 @@ func (this *LogManager) Write(data []byte) (n int, err error) {
 
 func (this *LogManager) Start() {
 	go func() {
-		//var buffer = make([]byte, 4096)
 		for ; ; {
 			line, err := this.buffer.ReadString('\n')
 			if err != nil {
-				if err == io.EOF{
+				if err == io.EOF {
 					time.Sleep(time.Second * time.Duration(this.interval))
 					continue
 				}
-				logrus.Error("this.buffer.Read(buffer): "+err.Error())
+				logrus.Error("this.buffer.Read(buffer): " + err.Error())
 				break
 			}
 			if line == "" {
@@ -241,12 +238,18 @@ func (this *LogManager) Start() {
 				continue
 			}
 			fmt.Print(line)
-
-			var val interface{}
-			err = json.Unmarshal([]byte(line),val)
-			fmt.Println(err,val)
-
-
+			if this.app.GetConfig().GetBool("logger.enable") {
+				esService, ok := this.app.GetService("EsService").(*services.EsService)
+				if !ok {
+					fmt.Println("es 服务错误")
+					continue
+				}
+				es := esService.GetEs()
+				_, err = es.Index(EsLogIndex, strings.NewReader(line))
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
 			//_, err = this.fileHandel.Write(buffer[0:readLen])
 			//if err != nil {
 			//	logrus.Error("this.fileHandel.Write(buffer[0:readLen]): "+err.Error())

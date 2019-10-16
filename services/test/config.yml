@@ -35,7 +35,7 @@ es:
 logger:
   #logrus|simple|es
   logDriver: "logrus"
-  timestampFormat: "2006-01-02 15:04:05"
+  timestampFormat: "2006/01/02 15:04:05"
   level: "debug"
   formatter: "json"
   forceColors: false

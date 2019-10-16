@@ -23,13 +23,11 @@ vendor/
 
 # log file
 *.log
-
 # config file
 config.yaml
 config.yml
 # sqlite3
 *.db
-logs
 demo/
 web/
 main.ini

@@ -37,6 +37,21 @@ redisPool:
     password: "gao123456"
     drive: "mysql"
 
+#Elasticsearch 配置
+es:
+  Address:
+    -  http://localhost:9200
+
+logger:
+  #logrus|simple
+  #是否将日志推送到es
+  enabelEs: true
+  logDriver: "logrus"
+  timestampFormat: "2006/01/02 15:04:05"
+  level: "debug"
+  formatter: "json"
+  forceColors: false
+
 modules:
   #   comment:
   #     type: inner
