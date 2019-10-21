@@ -1,14 +1,5 @@
 let mix = require('laravel-mix');
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
+
 mix.webpackConfig({
     resolve: {
         alias: {
@@ -20,7 +11,8 @@ mix.webpackConfig({
 
 // =======================
 // global
-let vendors = ['vue', 'axios', 'vuex', 'vue-awesome-swiper'];
+//let vendors = ['vue', 'axios', 'vuex'];
+let vendors = ['vue', 'axios'];
 if (mix.inProduction()) {
     //vendors.push('raven-js');
 }
@@ -30,6 +22,7 @@ mix.extract(vendors);
 
 mix.babelConfig({
     "presets": [["es2015", {"modules": false}]],
+
     // "plugins": [
     //     [
     //         "component",
@@ -39,24 +32,37 @@ mix.babelConfig({
     //         }
     //     ]
     // ]
-})
+});
 
-var path = './resources/public';
+
+var path = './public';
 if (!mix.inProduction()) {
-    path = './resources/public/dev';
+    path = './public/dev';
 } else {
     //vendors.push('raven-js')
 }
 
 // =======================
 // m
-var version = "v6"
+var srcPath = './assets/m';
+var version = "v7";
 mix.styles([
-    'resources/assets/m/sass/iconfont.css',
-    'resources/assets/m/sass/app.scss',
+    srcPath + '/sass/iconfont.css',
+    srcPath + '/sass/app.scss',
 ], path + '/m/css/' + version + '/app.css');
 
-mix.js('resources/assets/m/js/app.js', path + '/m/js/'+version);
+mix.js(srcPath + '/js/app.js', path + '/m/js/' + version);
+mix.js(srcPath + '/js/news.js', path + '/m/js/' + version);
+mix.js(srcPath + '/js/group.js', path + '/m/js/' + version);
+mix.js(srcPath + '/js/home.js', path + '/m/js/' + version);
+mix.js(srcPath + '/js/tagNews.js', path + '/m/js/' + version);
 
-mix.setPublicPath(path + '/m')
-mix.setResourceRoot('/m/')
+//登录页面
+mix.styles([
+    srcPath + '/sass/login.css',
+], path + '/m/css/' + version + '/login.css');
+
+mix.js(srcPath + '/js/login.js', path + '/m/js/'+version);
+
+mix.setPublicPath(path + '/m');
+mix.setResourceRoot('/m/');

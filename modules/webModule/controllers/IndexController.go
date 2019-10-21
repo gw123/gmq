@@ -28,6 +28,22 @@ func (c *IndexController) Index(ctx echo.Context) error {
 	return ctx.Render(http.StatusOK, "index", nil)
 }
 
+func (c *IndexController) Group(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "group", nil)
+}
+
+func (c *IndexController) Home(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "home", nil)
+}
+
+func (c *IndexController) News(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "news", nil)
+}
+
+func (c *IndexController) TagNews(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "tagNews", nil)
+}
+
 func (c *IndexController) Login(ctx echo.Context) error {
 	return ctx.Render(http.StatusOK, "login", nil)
 }

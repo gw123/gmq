@@ -42,7 +42,7 @@ type LogManager struct {
 	buffer              *bytes.Buffer
 	mutex               sync.Mutex
 	logger              *logrus.Logger
-	logDriver           string
+	//logDriver           string
 	timestampFormat     string
 }
 
@@ -73,15 +73,9 @@ func NewLogManager(app interfaces.App) *LogManager {
 		this.interval = 1
 	}
 
-	this.logDriver = this.app.GetConfig().GetString("logger.logDriver")
-	switch this.logDriver {
-	case DriverLogrus:
-		this.initLogrus()
-	case DriverEs:
-
-	default:
-	}
-	this.CreatedLogFile()
+	//this.logDriver = this.app.GetConfig().GetString("logger.logDriver")
+	this.initLogrus()
+	//this.CreatedLogFile()
 	return this
 }
 
@@ -96,7 +90,6 @@ func (this LogManager) CreatedLogFile() {
 
 func (this *LogManager) initLogrus() {
 	cfg := this.app.GetConfig()
-
 	level := cfg.GetString("logger.level")
 	forceColors := cfg.GetBool("logger.forceColors")
 	formatter := cfg.GetString("logger.formatter")
@@ -169,30 +162,16 @@ func (this *LogManager) filter(logLevel, category string, format string, a ...in
 	if !pass {
 		return
 	}
-	switch this.logDriver {
-	case DriverLogrus:
-		logLevel = strings.ToLower(logLevel)
-		lvl, err := logrus.ParseLevel(logLevel)
-		if err != nil {
-			lvl = logrus.WarnLevel
-		}
 
-		this.logger.WithFields(logrus.Fields{
-			"module": category,
-		}).Logf(lvl, format, a...)
-
-	case DriverEs:
-		date := time.Now().Format(this.timestampFormat)
-		msg := fmt.Sprintf(format, a...)
-		this.PushEs(logLevel, category, date, msg)
-
-	default:
-		tpl := "[%s,%s,%s] %s"
-		msg := fmt.Sprintf(format, a...)
-		date := time.Now().Format("2006-01-02 15:04:05")
-		data := fmt.Sprintf(tpl, date, logLevel, category, msg)
-		this.Write([]byte(data))
+	logLevel = strings.ToLower(logLevel)
+	lvl, err := logrus.ParseLevel(logLevel)
+	if err != nil {
+		lvl = logrus.WarnLevel
 	}
+
+	this.logger.WithFields(logrus.Fields{
+		"module": category,
+	}).Logf(lvl, format, a...)
 }
 
 func (this *LogManager) PushEs(level, category, date, msg string) {
@@ -216,8 +195,6 @@ func (this *LogManager) PushEs(level, category, date, msg string) {
 }
 
 func (this *LogManager) Write(data []byte) (n int, err error) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
 	return this.buffer.Write([]byte(data))
 }
 
@@ -255,6 +232,5 @@ func (this *LogManager) Start() {
 			//	logrus.Error("this.fileHandel.Write(buffer[0:readLen]): "+err.Error())
 			//}
 		}
-		logrus.Error("this.buffer.")
 	}()
 }

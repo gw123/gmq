@@ -18,22 +18,19 @@
     <meta property="og:title" content="页面标题">
     <meta property="og:description" content="页面描述">
     <meta property="og:image" content="http://data.xytschool.com/img/default.jpg">
-    <meta property="og:url" content="http://m.xyt.xytschool.com/">
+    <meta property="og:url" content="http://xytschool.com/">
     <!-- Styles -->
     <link href="{{staticWithVersion "m/css" "app.css"}}" rel="stylesheet">
     <link href="{{static  "highlight/styles/tomorrow-night.css"}}" rel="stylesheet">
 </head>
 <body style="font-size: 14px;">
 <div id="app" style="max-width:800px;margin: 0 auto">
-{{!--     <router-view></router-view> --}}
-    <index-page-slot>
-        <index-page></index-page>
-    </index-page-slot>
-
+    <router-view></router-view>
 </div>
 </body>
 
 <script type="text/javascript" src="{{staticWithVersion "m/js" "manifest.js"}}"></script>
 <script type="text/javascript" src="{{staticWithVersion "m/js" "vendor.js"}}"></script>
-<script type="text/javascript" src="{{staticWithVersion "m/js" "app.js"}}"></script>
+<script type="text/javascript" src="{{staticWithVersion "m/js" "group.js"}}"></script>
+<script type="text/javascript" src="{{static  "highlight/highlight.pack.js"}}"></script>
 </html>

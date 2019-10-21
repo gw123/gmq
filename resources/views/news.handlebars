@@ -27,13 +27,18 @@
 <div id="app" style="max-width:800px;margin: 0 auto">
 {{!--     <router-view></router-view> --}}
     <index-page-slot>
-        <index-page></index-page>
+        <news></news>
     </index-page-slot>
 
 </div>
 </body>
-
 <script type="text/javascript" src="{{staticWithVersion "m/js" "manifest.js"}}"></script>
 <script type="text/javascript" src="{{staticWithVersion "m/js" "vendor.js"}}"></script>
-<script type="text/javascript" src="{{staticWithVersion "m/js" "app.js"}}"></script>
+<script type="text/javascript" src="{{staticWithVersion "m/js" "news.js"}}"></script>
 </html>
+<script>
+    import News from "../assets/m/js/pages/News";
+    export default {
+        components: {News}
+    }
+</script>
