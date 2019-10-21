@@ -200,4 +200,4 @@ Starting gateway ... done
 - 平滑停止,主程序在所有模块的队列中的任务执行完毕后停止
 - 讲当前模块中的任务做磁盘持久化
 
-## 在线使用案例 httt://m.xyt.xytschool.com 资源组评论和文章评论
+## 在线使用案例 httt://xytschool.com
