@@ -11,6 +11,8 @@ dbpool:
     username: "${DB_USER}"
     password: "${DB_PWD}"
     drive: "mysql"
+    max_idles: 3
+    max_opens: 20
 
 redisPool:
   default: xyt

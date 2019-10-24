@@ -143,6 +143,7 @@ func (this *Server) Start() error {
 	e.GET("home", indexController.Home)
 	e.GET("userCollection", indexController.Home)
 
+	e.GET("testpaper", indexController.Testpaper)
 
 	this.module.Info("端口监听在:  %s", this.addr)
 	this.echo = e

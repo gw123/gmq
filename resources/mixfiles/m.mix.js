@@ -23,15 +23,15 @@ mix.extract(vendors);
 mix.babelConfig({
     "presets": [["es2015", {"modules": false}]],
 
-    // "plugins": [
-    //     [
-    //         "component",
-    //         {
-    //             "libraryName": "element-ui",
-    //             "styleLibraryName": "theme-chalk"
-    //         }
-    //     ]
-    // ]
+    "plugins": [
+        [
+            "component",
+            {
+                "libraryName": "element-ui",
+                "styleLibraryName": "theme-chalk"
+            }
+        ]
+    ]
 });
 
 
@@ -45,17 +45,25 @@ if (!mix.inProduction()) {
 // =======================
 // m
 var srcPath = './assets/m';
-var version = "v7";
+var version = "v8";
 mix.styles([
     srcPath + '/sass/iconfont.css',
     srcPath + '/sass/app.scss',
 ], path + '/m/css/' + version + '/app.css');
+
+mix.styles([
+    srcPath + '/sass/iconfont.css',
+    srcPath + '/sass/testpaper.scss',
+], path + '/m/css/' + version + '/testpaper.css');
 
 mix.js(srcPath + '/js/app.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/news.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/group.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/home.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/tagNews.js', path + '/m/js/' + version);
+//mix.js(srcPath + '/js/edit.js', path + '/m/js/' + version);
+
+mix.js(srcPath + '/modules/testpaper/testpaper.js', path + '/m/js/' + version);
 
 //登录页面
 mix.styles([

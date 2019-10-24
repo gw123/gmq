@@ -1,28 +1,4 @@
-<!DOCTYPE html>
-<html style="font-size: 40px">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="x5-fullscreen" content="true"/>
-    <meta name="full-screen" content="true"/>
-    <!-- 是否删除默认的苹果工具栏和菜单栏 -->
-    <meta name="apple-mobile-web-app-capable" content="false">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,minimum-scale=1.0">
-    <!-- CSRF Token -->
-    <title>学用通</title>
-    <meta property="og:type" content="website"/>
-    <meta property="og:title" content="页面标题">
-    <meta property="og:description" content="页面描述">
-    <meta property="og:image" content="http://data.xytschool.com/img/default.jpg">
-    <meta property="og:url" content="http://xytschool.com/">
-    <!-- Styles -->
-    <link href="{{staticWithVersion "m/css" "app.css"}}" rel="stylesheet">
-    <link href="{{static  "highlight/styles/tomorrow-night.css"}}" rel="stylesheet">
-</head>
+{{> header}}
 <body style="font-size: 14px;">
 <div id="app" style="max-width:800px;margin: 0 auto">
     <router-view></router-view>

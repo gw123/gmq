@@ -12,6 +12,9 @@ dbpool:
     port: "3306"
     password: "root"
     drive: "mysql"
+    max_idles: 3
+    max_opens: 20
+
   xyt:
     database: "laravelschool"
     host: "m1.laravelschool.xyt"
@@ -19,6 +22,8 @@ dbpool:
     port: "3306"
     password: "root"
     drive: "mysql"
+    max_idles: 3
+    max_opens: 20
 
   xyt_prod:
     database: "laravelschool"
@@ -27,6 +32,8 @@ dbpool:
     port: "30336"
     password: "root"
     drive: "mysql"
+    max_idles: 3
+    max_opens: 20
 
 redisPool:
   default: xyt

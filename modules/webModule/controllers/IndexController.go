@@ -51,3 +51,7 @@ func (c *IndexController) Login(ctx echo.Context) error {
 func (c *IndexController) Register(ctx echo.Context) error {
 	return ctx.Render(http.StatusOK, "register", nil)
 }
+
+func (c *IndexController) Testpaper(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "testpaper", nil)
+}

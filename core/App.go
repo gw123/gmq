@@ -26,8 +26,6 @@ type App struct {
 	Services          map[string]interfaces.Service
 }
 
-
-
 func NewApp(viper2 *viper.Viper) *App {
 	this := &App{}
 	this.configData = viper2
@@ -146,8 +144,21 @@ func (this *App) LoadDb() {
 		if err != nil {
 			this.Warn("App", "db load error, %s: ", err.Error())
 		}
-		this.DbPool.SetDb(key, db)
 
+		maxIdles := this.configData.GetInt("dbpool." + key + ".max_idles")
+		if maxIdles == 0 {
+			maxIdles = 3
+		}
+		db.DB().SetMaxIdleConns(maxIdles)
+
+		maxOpens := this.configData.GetInt("dbpool." + key + ".max_opens")
+		if maxOpens == 0 {
+			maxOpens = 30
+		}
+		this.Debug("Db", "set maxOpens %d,set maxIdles %d", maxOpens,maxIdles)
+		db.DB().SetMaxIdleConns(maxOpens)
+
+		this.DbPool.SetDb(key, db)
 	}
 
 	//set default db
@@ -321,10 +332,10 @@ func (this *App) GetDefaultRedis() (*redis.Client, error) {
 	return this.RedisPool.GetDb("default")
 }
 
-func (this *App) GetLogger() (interfaces.Logger)  {
+func (this *App) GetLogger() (interfaces.Logger) {
 	return this.logManager
 }
 
-func (this *App) Write(buf []byte)(int,error) {
+func (this *App) Write(buf []byte) (int, error) {
 	return this.logManager.Write(buf)
 }
