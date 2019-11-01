@@ -1,12 +1,157 @@
 {{> header}}
+<style xmlns="">
+    .wrap-title {
+        padding-left: 5px;
+        width: 100%;
+        border-left: solid 2px #5aaeaa;
+        font-weight: 600;
+    }
+
+    .cover-wrap {
+        width: 100%;
+    }
+
+    .cover-wrap img {
+        width: 100%;
+        max-height: 300px
+    }
+
+    .group-wrap {
+        box-sizing: border-box;
+        padding: 8px 10px 10px 10px;
+    }
+
+    .group-wrap .title {
+        font-size: 25px;
+        font-weight: 600;
+        position: relative;
+        text-align: center;
+        margin-bottom: 15px
+    }
+
+    .group-wrap .info-item-wrap {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .info-item-wrap .avatar {
+        padding: 0px 5px;
+        width: 50px;
+        float: left;
+    }
+
+    .info-item-wrap .avatar img {
+        width: 100%;
+        border-radius: 50%;
+    }
+
+    .info-item-wrap .info {
+        float: left;
+        padding-left: 10px;
+    }
+
+    .info-item-wrap .info .username {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .info-item-wrap .info .category {
+        font-size: 14px;
+        color: #737476;
+    }
+
+    .info-item-wrap .info .tags {
+        font-size: 13px;
+        color: #737476;
+    }
+
+    .info-item-wrap .care {
+        font-weight: 100;
+        position: absolute;
+        font-size: 10px;
+        top: 2px;
+        right: 20px;
+    }
+
+    .desc {
+        margin-top: 5px;
+        margin-bottom: 15px;
+    }
+
+    .desc-content {
+        margin-top: 15px;
+    }
+
+    .chapter-row{
+        margin-top: 12px;
+    }
+</style>
+
 <body style="font-size: 14px;">
-<div id="app" style="max-width:800px;margin: 0 auto">
-    <router-view></router-view>
+<div class="page">
+    <div class="cover-wrap">
+        <img src="{{group.covers.[0]}}">
+    </div>
+    <div class="group-wrap">
+        <div class="title"> {{group.title}}</div>
+        <div class="info-item-wrap">
+            <div class="avatar">
+                <img src="http://data.xyt.xytschool.com/img/default_head.jpg"/>
+            </div>
+            <div class="info">
+                <div class="category">  {{group.category.title}}</div>
+                <div class="tags">
+                    {{#each group.tags}}
+                        <span>{{this.title}}</span>
+                    {{/each}}
+                </div>
+                <div class="care">
+                    <a href="/">返回首页</a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="desc">
+            <div class="wrap-title">内容简介</div>
+            <div class="desc-content">{{group.desc}}</div>
+        </div>
+        <div class="wrap-title">全部章节</div>
+
+        <div class="chapter-wrap">
+            {{#each group.chapters}}
+                <div class="chapter-row">
+                    <div class="left">
+                        <span style="font-weight: bold">{{this.title}}</span>
+                        <!--<span @click="getChapterResources(index)" class="iconfont icon-fenlei"></span>-->
+                    </div>
+                    {{#equal this.type  "resource"}}
+                        <span class="right">
+                        <a href="/resource/{{this.resource_id}}.html" class="iconfont icon-more"></a>
+                            <span class="right iconfont icon-zuji"></span>
+                    </span>
+                    {{/equal}}
+                    <div style="clear: both"></div>
+                    {{#each this.resources}}
+                        <div style="padding-top: 10px;padding-left: 15px">
+                            <a href="/resource/{{this.id}}.html">
+                                <li> {{this.title}}</li>
+                            </a>
+                        </div>
+                    {{/each}}
+                    <!--                    <div v-if="chapter.resources.length>4" style="padding-top: 10px;padding-left: 15px">-->
+                    <!--                        <router-link :to="'/chapter/'+chapter.id +'.html'">.....更多 >></router-link>-->
+                    <!--                    </div>-->
+                </div>
+            {{/each}}
+        </div>
+    </div>
+    <div style="height: 15px"></div>
 </div>
 </body>
 
 <script type="text/javascript" src="{{staticWithVersion "m/js" "manifest.js"}}"></script>
 <script type="text/javascript" src="{{staticWithVersion "m/js" "vendor.js"}}"></script>
-<script type="text/javascript" src="{{staticWithVersion "m/js" "group.js"}}"></script>
-<script type="text/javascript" src="{{static  "highlight/highlight.pack.js"}}"></script>
+<!--<script type="text/javascript" src="{{staticWithVersion "m/js" "group.js"}}"></script>-->
+<!--<script type="text/javascript" src="{{static  "highlight/highlight.pack.js"}}"></script>-->
 </html>

@@ -141,18 +141,14 @@ func (s *ResourceService) GetServiceName() string {
 }
 
 func (s *ResourceService) GetResource(id int) (*ResourceItem, error) {
-	db, err := s.app.GetDefaultDb()
-	if err != nil {
-		return nil, err
-	}
-
+	s.db.LogMode(true)
 	var item ResourceItem
-	_, err = utils.GetCache(s.redis, redisKeys.Resource+strconv.Itoa(id), &item, func() (interface{}, error) {
+	_, err := utils.GetCache(s.redis, redisKeys.Resource+strconv.Itoa(id), &item, func() (interface{}, error) {
 		//db.LogMode(true)
-		result := db.Table("resource as r").
-			Select("r.id,r.user_id,a.content,r.type,r.title,c.title as chapter_title,c.id as chapter_id ,g.id as group_id,g.title as group_title, r.created_at,users.name,users.avatar").
+		result := s.db.Table("resource as r").
+			Select("r.id,r.user_id,r.type,r.title,c.title as chapter_title,c.id as chapter_id ,g.id as group_id,g.title as group_title, r.created_at,users.name,users.avatar").
 			Joins("left join users  on r.user_id = users.id").
-			Joins("left join type_article as a on a.rid = r.id").
+			//Joins("left join type_article as a on a.rid = r.id").
 			Joins("left join chapter as c on c.id = r.chapter_id").
 			Joins("left join `group` as g on g.id = r.group_id").
 			Where("r.id = ?", id).
@@ -160,6 +156,19 @@ func (s *ResourceService) GetResource(id int) (*ResourceItem, error) {
 		if result.Error != nil {
 			return nil, result.Error
 		}
+		var tempItem ResourceItem
+		if item.Type == "article" {
+			result = s.db.Select("content").Table("type_article").Where("rid = ?", id).Find(&tempItem)
+			if result.Error != nil {
+				return nil, result.Error
+			}
+		}else if item.Type == "testpaper" {
+			result = s.db.Select("content").Table("testpaper").Where("rid = ?", id).Find(&tempItem)
+			if result.Error != nil {
+				return nil, result.Error
+			}
+		}
+		item.Content = tempItem.Content
 		return item, nil
 	})
 
@@ -511,4 +520,28 @@ func (s *ResourceService) GetCategoryTagCtrl(categoryId, tagId, maxId, currentId
 	}
 
 	return items, nil
+}
+
+func (s *ResourceService) GetQuestions(id int) (*ResourceItem, error) {
+	var item ResourceItem
+	_, err := utils.GetCache(s.redis, redisKeys.Resource+strconv.Itoa(id), &item, func() (interface{}, error) {
+		//db.LogMode(true)
+		result := s.db.Table("resource as r").
+			Select("r.id,r.user_id,t.content,r.type,r.title,c.title as chapter_title,c.id as chapter_id ,g.id as group_id,g.title as group_title, r.created_at,users.name,users.avatar").
+			Joins("left join users  on r.user_id = users.id").
+			Joins("left join testpaper as t on t.rid = r.id").
+			Joins("left join chapter as c on c.id = r.chapter_id").
+			Joins("left join `group` as g on g.id = r.group_id").
+			Where("r.id = ?", id).
+			Find(&item)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		return item, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &item, nil
 }

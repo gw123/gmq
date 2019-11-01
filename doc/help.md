@@ -1,16 +1,4 @@
 # grpc 配置代码分析
-``` 
-ServerOption 默认 server 配置
-// 设置默认的各种buffer 大小
-var defaultServerOptions = serverOptions{
-	maxReceiveMessageSize: defaultServerMaxReceiveMessageSize,
-	maxSendMessageSize:    defaultServerMaxSendMessageSize,
-	connectionTimeout:     120 * time.Second,
-	writeBufferSize:       defaultWriteBufSize,
-	readBufferSize:        defaultReadBufSize,
-}
-```
-
 grpc server 所有配置项目
 ``` 
 type serverOptions struct {
@@ -35,9 +23,18 @@ type serverOptions struct {
 	connectionTimeout     time.Duration
 	maxHeaderListSize     *uint32
 }
+
+//ServerOption 默认 server 配置
+var defaultServerOptions = serverOptions{
+	maxReceiveMessageSize: defaultServerMaxReceiveMessageSize,
+	maxSendMessageSize:    defaultServerMaxSendMessageSize,
+	connectionTimeout:     120 * time.Second,
+	writeBufferSize:       defaultWriteBufSize,
+	readBufferSize:        defaultReadBufSize,
+}
 ```
 
-# 工厂设计模式
+
 ## ServerOption 接口
 ```go
 // ServerOption 接口 ,可以理解为一个包装类,用来包装 serverOptions
@@ -134,18 +131,13 @@ type UnaryClientInterceptor
 
 ## 配置日志中间件
 ```go
-s := grpc.NewServer(
+grpcServer := grpc.NewServer(
     grpc_middleware.WithUnaryServerChain(
         grpc_logrus.UnaryServerInterceptor(entry),
-        interceptors.Request(),
         grpc_ctxtags.UnaryServerInterceptor(
             grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
             grpc_ctxtags.WithFieldExtractor(func(fullMethod string, req interface{}) map[string]interface{} {
-                reqData, _ := json.Marshal(req)
-                fields := map[string]interface{}{
-                    "requestData": string(reqData),
-                }
-                return fields
+                return map[string]interface{}{ "requestData": req}
             }),
         ),
 ))
@@ -171,11 +163,8 @@ type ctxLogger struct {
 var (
 	ctxLoggerKey = &ctxLoggerMarker{}
 )
-```
 
--  添加logrus.Entry到context, 这个操作添加的logrus.Entry在后面AddFields和Extract都会使用到
-
-```go 
+// 添加logrus.Entry到context, 这个操作添加的logrus.Entry在后面AddFields和Extract都会使用到
 func ToContext(ctx context.Context, entry *logrus.Entry) context.Context {
 	l := &ctxLogger{
 		logger: entry,
@@ -184,10 +173,7 @@ func ToContext(ctx context.Context, entry *logrus.Entry) context.Context {
 	return context.WithValue(ctx, ctxLoggerKey, l)
 }
 
-```
-
-- 添加日志字段到日志中间件(ctx_logrus)
-```go
+//添加日志字段到日志中间件(ctx_logrus)
 func AddFields(ctx context.Context, fields logrus.Fields) {
 	l, ok := ctx.Value(ctxLoggerKey).(*ctxLogger)
 	if !ok || l == nil {
@@ -197,10 +183,7 @@ func AddFields(ctx context.Context, fields logrus.Fields) {
 		l.fields[k] = v
 	}
 }
-```
-
-- 导出 ctx_logrus和grpc_ctxtags中记录的日志内容
-```go
+//导出ctx_logrus日志库和grpc_ctxtags中间件在中记录的日志内容
 // Extract takes the call-scoped logrus.Entry from ctx_logrus middleware.
 // If the ctx_logrus middleware wasn't used, a no-op `logrus.Entry` is returned. This makes it safe to
 // use regardless.
@@ -227,46 +210,6 @@ func Extract(ctx context.Context) *logrus.Entry {
 }
 ```
 
-### 实用实例在 request中间中将requestid 记录到日志中去
-```go
-func request(ctx context.Context) (context.Context, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-
-	var requestId string
-
-	if val, ok := md[constants.RequestId]; ok {
-		requestId = val[0]
-	} else {
-		return ctx, status.Errorf(codes.Unauthenticated, "no metadata %s", constants.RequestId)
-	}
-
-	ctx = context.WithValue(ctx, constants.RequestId, requestId)
-    //将请求的request_id 记录到日志中间件ctxlogrus中
-	ctxlogrus.AddFields(ctx, logrus.Fields{
-		constants.RequestId: requestId,
-	})
-	return ctx, nil
-}
-
-func Request() grpc.UnaryServerInterceptor {
-	interceptor := func(ctx context.Context,
-		req interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler) (resp interface{}, err error) {
-
-		ctx, err = request(ctx)
-		if err != nil {
-			return
-		}
-		// 继续处理请求
-		return handler(ctx, req)
-	}
-	return interceptor
-}
-
-```
-
-
 ### grpc_logrus.UnaryServerInterceptor() 如何将 ctxlogrus context 导入到 context
 ```go
 package grpc_logrus
@@ -274,7 +217,6 @@ package grpc_logrus
 import (
 	"path"
 	"time"
-
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags/logrus"
@@ -339,7 +281,8 @@ func levelLogf(entry *logrus.Entry, level logrus.Level, format string, args ...i
 		entry.Panicf(format, args...)
 	}
 }
-
+// 下面是关键地方,调用上面ctxlogrus.ToContext 将用户配置的entry *logrus.Entry
+//导入到 ctxlogrus context中
 func newLoggerForCall(ctx context.Context, entry *logrus.Entry, 
         fullMethodString string, start time.Time) context.Context {
 	service := path.Dir(fullMethodString)[1:]
@@ -363,4 +306,48 @@ func newLoggerForCall(ctx context.Context, entry *logrus.Entry,
 	callLog = callLog.WithFields(ctx_logrus.Extract(ctx).Data)
 	return ctxlogrus.ToContext(ctx, callLog)
 }
+```
+
+
+### 代码实例在request中间中将requestid 记录到日志中去
+```go
+//request中间件 将request_id 记录到请求日志中日志中
+func request(ctx context.Context) (context.Context, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	var requestId string
+	if val, ok := md[constants.RequestId]; ok {
+		requestId = val[0]
+	} else {
+		return ctx, status.Errorf(codes.Unauthenticated, "no metadata %s", constants.RequestId)
+	}
+
+	ctx = context.WithValue(ctx, constants.RequestId, requestId)
+    //将请求的request_id 记录到日志中间件ctxlogrus中
+    //这样在本次请求的其他的日志都可以获取到RequestId,方便日志跟踪
+	ctxlogrus.AddFields(ctx, logrus.Fields{
+		constants.RequestId: requestId,
+	})
+	return ctx, nil
+}
+
+func Request() grpc.UnaryServerInterceptor {
+	interceptor := func(ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (resp interface{}, err error) {
+		ctx, err = request(ctx)
+		if err != nil {
+			return
+		}
+		return handler(ctx, req)
+	}
+	return interceptor
+}
+
+```
+
+```go
+// 在请求的其他地方可以使用ctxlogrus.Extract(ctx)导出*logrus.Entry来记录日志
+// ctx保存了request_id 下面的日志会输出request_id
+ctxlogrus.Extract(ctx).Errorf("数据库错误: %s", err.Error())
 ```

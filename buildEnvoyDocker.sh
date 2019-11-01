@@ -2,7 +2,7 @@
 tagName='ccr.ccs.tencentyun.com/g-docker/envoy'
 
 echo "制作镜像..."${tagName}
-docker build -t  ${tagName} -f envoy.Dockerfile --no-cache .
+docker build -t  ${tagName} -f envoy.Dockerfile --no-dec-cache .
 
 if [[ $? != 0 ]]; then
   echo "制作镜像失败"

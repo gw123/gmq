@@ -1,5 +1,5 @@
 {{> header}}
-<link href="{{static  "highlight/styles/solarized-light.css"}}" rel="stylesheet">
+<link href="{{static  "highlight/styles/tomorrow-night.css"}}" rel="stylesheet">
 <style>
     .header {
         height: 50px;
@@ -16,7 +16,6 @@
 
     .header .right {
         float: left;
-        max-width: 320px;
         overflow: hidden;
         color: #555569;
         font-weight: 500;
@@ -27,34 +26,58 @@
         display: inline-block;
         width: auto;
     }
+
+
+    .wrap-body {
+        padding: 2px 10px;
+    }
+
     .resource-title {
         text-align: center;
         margin-bottom: 15px;
         font-size: 18px;
         font-weight: 500;
     }
+    .article {
+        line-height: 24px;
+    }
+
+    .article p{
+        line-height: 24px;
+    }
+
 </style>
 <body style="font-size: 14px;">
-<div id="app" >
-    <script>
-        var questions = {{{resource.content}}}
-    </script>
 
-    <div class="header">
-        <span class="left iconfont icon-back" onclick=""></span>
-        <div class="right">
-            <a href="/group/{{resource.groupId }}.html"> {{resource.groupTitle}}</a> >
-            <a href="/chapter/{{resource.chapterId}}.html"> {{resource.chapterTitle}} </a>
-        </div>
-        <div class="clearfix"></div>
+<div class="header">
+    <span class="left iconfont icon-back" onclick=""></span>
+    <div class="right">
+        <a href="/group/{{resource.groupId }}.html"> {{resource.groupTitle}}</a> >
+        <a href="/chapter/{{resource.chapterId}}.html"> {{resource.chapterTitle}} </a>
     </div>
-    <testpaper :title="'{{resource.title}}'" :questions="questions"></testpaper>
+    <div class="clearfix"></div>
+
+</div>
+<div class="wrap-body">
+    <div style="clear: both"></div>
+    <div class="resource-wrap">
+        <div class="resource-title">{{resource.title}}</div>
+        <div class="article">
+            {{{resource.content}}}
+        </div>
+    </div>
+</div>
+
+<div id="app" style="max-width:800px;margin: 0 auto">
+    <router-view></router-view>
 </div>
 </body>
+
 <script type="text/javascript" src="{{staticWithVersion "m/js" "manifest.js"}}"></script>
 <script type="text/javascript" src="{{staticWithVersion "m/js" "vendor.js"}}"></script>
-<script type="text/javascript" src="{{staticWithVersion "m/js" "testpaper.js"}}"></script>
+<script type="text/javascript" src="{{staticWithVersion "m/js" "group.js"}}"></script>
 <script type="text/javascript" src="{{static  "highlight/highlight.pack.js"}}"></script>
+
 <script type="text/javascript">
     setTimeout(function () {
         document.querySelectorAll('pre code').forEach((block) => {
@@ -70,3 +93,4 @@
     }, 500)
 </script>
 </html>
+

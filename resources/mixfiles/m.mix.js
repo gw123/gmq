@@ -45,7 +45,7 @@ if (!mix.inProduction()) {
 // =======================
 // m
 var srcPath = './assets/m';
-var version = "v8";
+var version = "v11";
 mix.styles([
     srcPath + '/sass/iconfont.css',
     srcPath + '/sass/app.scss',

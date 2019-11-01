@@ -126,15 +126,15 @@ func (this *Server) Start() error {
 	authGroup.GET("/clientList", clientController.ClientList)
 	authGroup.GET("/client/:client_id", clientController.ClientInfo)
 
-
 	//静态页面
 	e.GET("/login", indexController.Login)
 	e.GET("/register", indexController.Register)
 	e.GET("/", indexController.Index)
+	e.GET("/index", indexController.Index)
 
 	e.GET("group/:id", indexController.Group)
-	e.GET("resource/:id", indexController.Group)
-	e.GET("chapter/:id", indexController.Group)
+	e.GET("resource/:id", indexController.Resource)
+	e.GET("chapter/:id", indexController.Chapter)
 
 	e.GET("news", indexController.News)
 	e.GET("tagnews/:gid/:gtitle/:tid/:title", indexController.TagNews)
@@ -143,7 +143,7 @@ func (this *Server) Start() error {
 	e.GET("home", indexController.Home)
 	e.GET("userCollection", indexController.Home)
 
-	e.GET("testpaper", indexController.Testpaper)
+	e.GET("testpaper/:id", indexController.Testpaper)
 
 	this.module.Info("端口监听在:  %s", this.addr)
 	this.echo = e

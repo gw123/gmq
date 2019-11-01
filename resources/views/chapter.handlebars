@@ -1,0 +1,55 @@
+{{> header}}
+<style>
+    .header-wrap {
+        height: 40px;
+        line-height: 40px;
+        border-bottom: solid 1px #e5e2d8;
+    }
+
+    .header-wrap span {
+        float: left;
+        width: 15px;
+        text-align: center;
+    }
+
+    .header-wrap .title {
+        float: left;
+        width: 90%;
+        text-align: center;
+        font-weight: 600;
+        font-size: 20px;
+    }
+
+    .body-wrap {
+        padding: 15px 10px;
+    }
+
+    .body-wrap .chapter-row {
+        font-size: 17px;
+        margin: 10px 8px;
+    }
+</style>
+<body style="font-size: 14px;">
+
+<div class="page">
+    <div class="header-wrap">
+        <span onclick="window.history.back()" class="iconfont icon-back"></span>
+        <div class="title">{{chapter.title}}</div>
+    </div>
+    <div class="body-wrap">
+        <div class="chapter-wrap">
+            <wrap-title title="资源列表"></wrap-title>
+            {{#each chapter.resources}}
+                <div class="chapter-row">
+                    <a href="/resource/{{this.id }}.html"> {{this.title}}</a>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="{{staticWithVersion "m/js" "manifest.js"}}"></script>
+<script type="text/javascript" src="{{staticWithVersion "m/js" "vendor.js"}}"></script>
+</html>
+

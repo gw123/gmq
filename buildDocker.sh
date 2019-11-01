@@ -23,7 +23,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo "制作镜像........."
-docker build -t  ${tagName}  --no-cache .
+docker build -t  ${tagName}  --no-dec-cache .
 
 if [[ $? != 0 ]]; then
   echo "制作镜像失败"
