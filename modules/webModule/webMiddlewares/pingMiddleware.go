@@ -2,7 +2,7 @@ package webMiddlewares
 
 import (
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/modules/webModule/db_models"
+	"github.com/gw123/GMQ/models"
 	"github.com/labstack/echo"
 	"strconv"
 	"time"
@@ -32,7 +32,7 @@ func NewPingMiddleware(app interfaces.App) echo.MiddlewareFunc {
 			}
 
 			byteIn, _ := strconv.Atoi(req.Header.Get(echo.HeaderContentLength))
-			pingLog := &db_models.PingLog{
+			pingLog := &models.PingLog{
 
 				Ip:           c.RealIP(),
 				ClientSendAt: sendAtTIme,

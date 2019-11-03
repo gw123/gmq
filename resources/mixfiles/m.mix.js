@@ -64,6 +64,7 @@ mix.js(srcPath + '/js/tagNews.js', path + '/m/js/' + version);
 //mix.js(srcPath + '/js/edit.js', path + '/m/js/' + version);
 
 mix.js(srcPath + '/modules/testpaper/testpaper.js', path + '/m/js/' + version);
+mix.js(srcPath + '/modules/create/create.js', path + '/m/js/' + version);
 
 //登录页面
 mix.styles([

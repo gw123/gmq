@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/models"
 	"github.com/labstack/echo"
-	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"strconv"
 )
 
@@ -26,7 +26,7 @@ func (this *ClientController) ClientList(ctx echo.Context) error {
 		return this.Fail(ctx, 0, "获取列表失败1", err)
 	}
 
-	clients := &[]db_models.Client{}
+	clients := &[]models.Client{}
 	res := db.Find(clients)
 	if res.Error != nil && !res.RecordNotFound() {
 		return this.Fail(ctx, 0, "获取列表失败2", err)
@@ -38,7 +38,6 @@ func (this *ClientController) ClientList(ctx echo.Context) error {
 /***
   获取服务端配置的客户端信息,任务列表
  */
-
 func (this *ClientController) ClientInfo(ctx echo.Context) error {
 	db, err := this.module.GetApp().GetDefaultDb()
 	client_id_r := ctx.Param("client_id")
@@ -47,9 +46,9 @@ func (this *ClientController) ClientInfo(ctx echo.Context) error {
 		return this.Fail(ctx, 0, "client_id err", err)
 	}
 
-	client := &db_models.Client{}
+	client := &models.Client{}
 	client.ID = uint(client_id)
-	//clientTasks := &[]db_models.ClientTask{}
+	//clientTasks := &[]models.ClientTask{}
 
 	//db.LogMode(true)
 	err = db.First(client, map[string]interface{}{"id": client_id}).Error

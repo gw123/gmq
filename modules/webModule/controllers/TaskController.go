@@ -3,7 +3,7 @@ package controllers
 import (
 	"errors"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/modules/webModule/db_models"
+	"github.com/gw123/GMQ/models"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func (t *TaskController) Login(ctx echo.Context) error {
  * 上传新的版本
  */
 func (t *TaskController) AddTask(ctx echo.Context) error {
-	reqServer := new(db_models.TaskDetail)
+	reqServer := new(models.TaskDetail)
 
 	if err := ctx.Bind(reqServer); err != nil {
 		return t.Fail(ctx, 0, "参数解析失败", err)
@@ -43,7 +43,7 @@ func (t *TaskController) AddTask(ctx echo.Context) error {
 		return t.Fail(ctx, 0, "参数验证失败", err)
 	}
 
-	task := new(db_models.Task)
+	task := new(models.Task)
 
 	db, err := t.module.GetApp().GetDefaultDb()
 	if err != nil {
@@ -68,7 +68,7 @@ func (t *TaskController) AddTask(ctx echo.Context) error {
 }
 
 func (t *TaskController) AddClientTask(ctx echo.Context) error {
-	reqServer := new(db_models.ClientTask)
+	reqServer := new(models.ClientTask)
 
 	if err := ctx.Bind(reqServer); err != nil {
 		return t.Fail(ctx, 0, "参数解析失败", err)
@@ -78,7 +78,7 @@ func (t *TaskController) AddClientTask(ctx echo.Context) error {
 		return t.Fail(ctx, 0, "参数验证失败", err)
 	}
 
-	task := new(db_models.ClientTask)
+	task := new(models.ClientTask)
 
 	db, err := t.module.GetApp().GetDefaultDb()
 	if err != nil {
@@ -107,7 +107,7 @@ func (t *TaskController) QueryTasksByName(ctx echo.Context) error {
 	if err != nil {
 		return t.Fail(ctx, 0, "查找失败 001", err)
 	}
-	var tasks []db_models.Task
+	var tasks []models.Task
 
 	//db.LogMode(true)
 	res := db.Where("name like ?", "%"+key+"%").Find(&tasks)

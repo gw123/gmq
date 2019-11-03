@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/go-playground/validator"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/models"
 	"github.com/gw123/GMQ/modules/webModule/controllers"
-	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
 	"github.com/gw123/GMQ/modules/webModule/webMiddlewares"
 	"github.com/labstack/echo"
@@ -27,7 +27,7 @@ func NewServer(addr string, module interfaces.Module) *Server {
 
 func (this *Server) Start() error {
 	e := echo.New()
-	e.Validator = &db_models.CustomValidator{Validator: validator.New()}
+	e.Validator = &models.CustomValidator{Validator: validator.New()}
 
 	e.HTTPErrorHandler = func(err error, ctx echo.Context) {
 		if he, ok := err.(*webEvent.WebError); ok {
