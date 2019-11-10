@@ -62,7 +62,7 @@ func (this *Dispatch) Start() {
 	}
 }
 
-func (this *Dispatch) PushToModule(event interfaces.Event) {
+func (this *Dispatch) PushToModule(event interfaces.Msg) {
 	eventName := event.GetEventName()
 	modules := this.EventQueueBinds[eventName]
 	//this.app.Debug("Dispatch",fmt.Sprintf("Bingdings modules len %d", len(modules)))
@@ -75,7 +75,7 @@ func (this *Dispatch) PushToModule(event interfaces.Event) {
 	}
 }
 
-func (this *Dispatch) handel(event interfaces.Event) {
+func (this *Dispatch) handel(event interfaces.Msg) {
 	app, ok := this.app.(*App)
 	if ok {
 		app.Handel(event)
@@ -118,7 +118,7 @@ func (this *Dispatch) UnSub(eventName string, module interfaces.Module) {
 	}
 }
 
-func (this *Dispatch) Pub(event interfaces.Event) {
+func (this *Dispatch) Pub(event interfaces.Msg) {
 	if event.GetEventName() == "" {
 		this.app.Warn("Dispatch", "Pub eventName 为空"+"moduleName:"+event.GetEventName()+"srouceModule"+event.GetSourceModule())
 		return

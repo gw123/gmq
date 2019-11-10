@@ -32,7 +32,7 @@ func (this *WebModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 	return nil
 }
 
-func (this *WebModule) Handle(event interfaces.Event) error {
+func (this *WebModule) Handle(event interfaces.Msg) error {
 	return nil
 }
 

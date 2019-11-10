@@ -11,7 +11,7 @@ type App interface {
 	//获取版本号
 	GetVersion() string
 	//发布消息
-	Pub(event Event)
+	Pub(event Msg)
 	//订阅消息
 	Sub(eventName string, module Module)
 	//取消订阅
@@ -21,7 +21,7 @@ type App interface {
 	//获取Viper对象
 	GetConfig() *viper.Viper
 	//处理消息
-	Handel(event Event)
+	Handel(event Msg)
 	//加载模块提供者
 	LoadModuleProvider(provider ModuleProvider)
 	//获取数据库信息
@@ -30,6 +30,9 @@ type App interface {
 	GetDefaultDb() (*gorm.DB, error)
 	//获取reids
 	GetRedis(dnname string) (*redis.Client, error)
+	//获取CacheManager
+	GetCacheManager() (CacheManager, error)
+
 	//获取默认reids
 	GetDefaultRedis() (*redis.Client, error)
 	RegisterService(name string, s Service)

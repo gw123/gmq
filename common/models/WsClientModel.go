@@ -112,7 +112,7 @@ func (this *WsClientModel) ReadMsg() (*webEvent.RequestEvent, error) {
 	return event, nil
 }
 
-func (this *WsClientModel) SendMsg(event interfaces.Event) error {
+func (this *WsClientModel) SendMsg(event interfaces.Msg) error {
 	event2 := &webEvent.Event{}
 	event2.EventName = event.GetEventName()
 	event2.Payload = string(event.GetPayload())

@@ -12,7 +12,7 @@ import (
 	"os"
 	"sync"
 	interfaces "github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 )
 
 const MaxMsgLen = 100
@@ -164,7 +164,7 @@ func (this *Iot) SubscribeGetCallback(client mqtt.Client, message mqtt.Message) 
 		this.writeLog("warning", "msgId "+msg.MsgId+" Topic"+topic+" 重复消息")
 		return
 	}
-	event := common_types.NewEvent(msg.MsgId ,message.Payload())
+	event := gmsg.NewEvent(msg.MsgId ,message.Payload())
 	this.App.Pub(event)
 }
 
@@ -197,7 +197,7 @@ func (this *Iot) PublishSubRegister(subProductKey, subDeviceName string) {
 func (this *Iot) SubscribeSubRegisterReply() {
 	topic_reply := "/sys/" + this.ProductKey + "/" + this.DeviceName + "/thing/sub/register_reply"
 	this.Subscribe(topic_reply, 1, func(client mqtt.Client, message mqtt.Message) {
-		msg, err := common_types.ParseAliMsg(message.Payload())
+		msg, err := gmsg.ParseAliMsg(message.Payload())
 		if err != nil {
 			this.writeLog("error", "SubRegister_reply json内容解析失败 "+string(message.Payload()))
 			return
@@ -250,7 +250,7 @@ func (this *Iot) PublishSubAdd(subProductKey, subDeviceName, subDeviceSecret str
 func (this *Iot) SubscribeSubAddReply() {
 	topic_reply := "/sys/" + this.ProductKey + "/" + this.DeviceName + "/thing/topo/add_reply"
 	this.Subscribe(topic_reply, 0, func(client mqtt.Client, message mqtt.Message) {
-		msg, err := common_types.ParseAliMsg(message.Payload())
+		msg, err := gmsg.ParseAliMsg(message.Payload())
 		if err != nil {
 			this.writeLog("error", "PublishSubAdd "+"JSON解析失败")
 			return
@@ -283,7 +283,7 @@ func (this *Iot) SubscribeUpgrade() {
 
 func (this *Iot) SubscribeUpgradeCallback(client mqtt.Client, message mqtt.Message) {
 	//fmt.Println("SubscribeUpgradeCallback", message.Topic(), string(message.Payload()))
-	update := common_types.UpdateResponse{}
+	update := gmsg.UpdateResponse{}
 	err := json.Unmarshal(message.Payload(), &update)
 	if err != nil {
 		this.writeLog("error", "SubscribeUpgrade"+"Json fail "+err.Error())
@@ -323,7 +323,7 @@ func (this *Iot) PublishSubLogin(subProductKey, subDeviceName, subDeviceSecret s
 func (this *Iot) SubscribeSubLoginReply() {
 	topic_reply := "/ext/session/" + this.ProductKey + "/" + this.DeviceName + "/combine/login_reply"
 	this.Subscribe(topic_reply, 1, func(client mqtt.Client, message mqtt.Message) {
-		msg := common_types.LoginResponse{}
+		msg := gmsg.LoginResponse{}
 		err := json.Unmarshal(message.Payload(), &msg)
 		if err != nil {
 			this.writeLog("error", "SubLogin_reply Json 解析失败"+string(message.Payload()))
@@ -351,7 +351,7 @@ func (this *Iot) PublishSubLoginOut(subProductKey, subDeviceName string) {
 	topci_reply := "/" + this.ProductKey + "/" + this.DeviceName + "/combine/logout_reply"
 	this.Publish(topci, 1, false, []byte(data))
 	this.Subscribe(topci_reply, 1, func(client mqtt.Client, message mqtt.Message) {
-		msg, err := common_types.ParseAliMsg(message.Payload())
+		msg, err := gmsg.ParseAliMsg(message.Payload())
 		if err != nil {
 			this.writeLog("error", "SubLoginOut :"+subDeviceName+" "+err.Error())
 			return
@@ -457,7 +457,7 @@ func (this *Iot) PublishLog(log []byte) {
 	this.Publish(topic, 1, false, data)
 }
 
-func (this *Iot) SyncUpgradeFile(data common_types.UpdateResponse) {
+func (this *Iot) SyncUpgradeFile(data gmsg.UpdateResponse) {
 	fileContent := `%s
 %s
 %s`

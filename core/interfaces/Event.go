@@ -1,6 +1,6 @@
 package interfaces
 
-type Event interface {
+type Msg interface {
 	GetMsgId() string
 	GetEventName() string
 	GetPayload() []byte

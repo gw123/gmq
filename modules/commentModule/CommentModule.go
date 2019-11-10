@@ -33,7 +33,7 @@ func (this *CommentModule) UnInit() error {
 	return nil
 }
 
-func (this *CommentModule) Handle(event interfaces.Event) error {
+func (this *CommentModule) Handle(event interfaces.Msg) error {
 	//
 	return nil
 }

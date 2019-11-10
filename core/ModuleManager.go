@@ -40,7 +40,8 @@ func (this *ModuleManager) LoadModules() {
 		}
 		err := this.LoadModule(moduleName, moduleConfig)
 		if err != nil {
-			this.app.Error("ModuleManager", "模块加载失败 on init"+moduleName+" "+err.Error())
+			this.app.Error("ModuleManager", "模块加载失败 "+moduleName+" "+err.Error())
+			continue
 		} else {
 			this.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
@@ -48,10 +49,10 @@ func (this *ModuleManager) LoadModules() {
 		err = this.Modules[moduleName].BeforeStart()
 		if err != nil {
 			this.app.Error("ModuleManager", "模块加载失败 on BeforeStart "+moduleName+" "+err.Error())
+			continue
 		} else {
 			this.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
-
 	}
 
 	for _, module := range this.Modules {

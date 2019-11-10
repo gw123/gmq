@@ -1,7 +1,7 @@
 package webSocketModule
 
 import (
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
 	"golang.org/x/net/websocket"
@@ -65,7 +65,7 @@ func (this *WebSocketModule) Start() {
 	}
 }
 
-func (this *WebSocketModule) Handel(event interfaces.Event) error {
+func (this *WebSocketModule) Handel(event interfaces.Msg) error {
 	this.Info(event.GetEventName() + ", " + event.GetMsgId() + " ," + string(event.GetPayload()))
 	if this.Conn == nil {
 		return errors.New("WebSocket 连接未建立")
@@ -107,7 +107,7 @@ func (this *WebSocketModule) InitWebSocket() error {
 				this.Error("InitWebSocket " + err.Error())
 				continue
 			}
-			event := &common_types.Event{}
+			event := &gmsg.Msg{}
 			err = json.Unmarshal(msg[0:length], event)
 			if err != nil {
 				this.Error("InitWebSocket " + err.Error())

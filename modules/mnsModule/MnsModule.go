@@ -33,7 +33,7 @@ func (this *MnsModule) UnInit() error {
 	return nil
 }
 
-func (this *MnsModule) Push(event interfaces.Event) (err error) {
+func (this *MnsModule) Push(event interfaces.Msg) (err error) {
 	err = this.BaseModule.Push(event)
 	return
 }

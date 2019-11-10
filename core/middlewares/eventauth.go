@@ -11,7 +11,7 @@ func NewEventAuth(app interfaces.App) *EventAuth {
 	this.app = app
 	return this
 }
-func (this *EventAuth) Handel(event interfaces.Event) bool {
+func (this *EventAuth) Handel(event interfaces.Msg) bool {
 	//this.app.Debug("eventAuth", event.GetMsgId()+" : "+event.GetEventName())
 	return true
 }

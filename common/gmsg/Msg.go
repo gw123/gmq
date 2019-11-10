@@ -1,4 +1,4 @@
-package common_types
+package gmsg
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Event struct {
+type Msg struct {
 	MsgId            string
 	EventName        string
 	Payload          interface{}
@@ -15,23 +15,23 @@ type Event struct {
 	dstModuleName    string
 }
 
-func NewEvent(eventType string, payload interface{}) *Event {
-	this := new(Event)
+func NewEvent(eventType string, payload interface{}) *Msg {
+	this := new(Msg)
 	this.MsgId = this.CreateMsgId()
 	this.Payload = payload
 	this.EventName = eventType
 	return this
 }
 
-func (this *Event) GetMsgId() string {
+func (this *Msg) GetMsgId() string {
 	return this.MsgId
 }
 
-func (this *Event) GetEventName() string {
+func (this *Msg) GetEventName() string {
 	return this.EventName
 }
 
-func (this *Event) GetPayload() []byte {
+func (this *Msg) GetPayload() []byte {
 	ret, err := json.Marshal(this.Payload)
 	if err != nil {
 		return []byte{}
@@ -39,29 +39,30 @@ func (this *Event) GetPayload() []byte {
 	return ret
 }
 
-func (this *Event) GetInterface() interface{} {
+func (this *Msg) GetInterface() interface{} {
 	return this.Payload
 }
 
-func (this *Event) GetSourceModule() string {
+func (this *Msg) GetSourceModule() string {
 	return this.sourceModuleName
 }
 
-func (this *Event) GetDstModule() string {
+func (this *Msg) GetDstModule() string {
 	if this.dstModuleName == "" {
 		return "*"
 	}
 	return this.dstModuleName
 }
 
-func (this *Event) SetSourceModule(name string) {
+func (this *Msg) SetSourceModule(name string) {
 	this.sourceModuleName = name
 }
-func (this *Event) SetDstModule(string2 string) {
+
+func (this *Msg) SetDstModule(string2 string) {
 	this.dstModuleName = string2
 }
 
-func (this *Event) CreateMsgId() string {
+func (this *Msg) CreateMsgId() string {
 	now := time.Now()
 	rand := rand.Int31n(100000)
 	minute := now.Minute()

@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/gw123/GMQ/common/statusCode"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
 	"io"
 	"math/rand"
 	"net/http"
@@ -95,6 +97,15 @@ func (this *BaseController) Fail(ctx echo.Context, code int, msg string, err err
 	}
 	err2 := webEvent.NewWebError(response, err)
 	return err2
+}
+
+func (this *BaseController) FailCode(ctx echo.Context, code codes.Code) error {
+	response := webEvent.Response{
+		Code: int(code),
+		Msg:  statusCode.Code2StrMap[code],
+		Data: nil,
+	}
+	return ctx.JSON(http.StatusOK, response)
 }
 
 func (this *BaseController) uploadFile(ctx echo.Context, formname, cate string) (path string, err error) {

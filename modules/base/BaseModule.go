@@ -12,12 +12,12 @@ import (
 const FullFlag_DropNew = 0x1
 const FullFlag_DropOld = 0x0
 
-type Handle func(e interfaces.Event) (err error)
+type Handle func(e interfaces.Msg) (err error)
 type Watch func(index int)
 
 type BaseModule struct {
 	Config      interfaces.ModuleConfig
-	queue       chan interfaces.Event
+	queue       chan interfaces.Msg
 	App         interfaces.App
 	isBusyMutex sync.Mutex
 	muduleNmae  string
@@ -86,14 +86,14 @@ func (this *BaseModule) GetVersion() string {
 func (this *BaseModule) InitQueue(length int) {
 	this.length = length
 	this.fullFlag = FullFlag_DropOld
-	this.queue = make(chan interfaces.Event, length)
+	this.queue = make(chan interfaces.Msg, length)
 }
 
 func (this *BaseModule) SetFullFlag(flag int) {
 	this.fullFlag = flag
 }
 
-func (this *BaseModule) Push(event interfaces.Event) (err error) {
+func (this *BaseModule) Push(event interfaces.Msg) (err error) {
 	this.isBusyMutex.Lock()
 	defer this.isBusyMutex.Unlock()
 	if len(this.queue) >= this.length {
@@ -177,12 +177,12 @@ func (this *BaseModule) Debug(content string, a ...interface{}) {
 	this.App.Debug(this.GetModuleName(), content, a ...)
 }
 
-func (this *BaseModule) Pop() interfaces.Event {
+func (this *BaseModule) Pop() interfaces.Msg {
 	return <-this.queue
 }
 
 //发布消息
-func (this *BaseModule) Pub(event interfaces.Event) {
+func (this *BaseModule) Pub(event interfaces.Msg) {
 	if event == nil {
 		return
 	}

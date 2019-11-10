@@ -10,6 +10,7 @@
         height: 120px;
         margin-top: 5px;
         padding: 5px;
+        position: relative;
     }
 
     .news-item1-wrap .left {
@@ -20,11 +21,22 @@
 
     .news-item1-wrap .left p {
         font-size: 18px;
-        height: 80px;
+        height: 50px;
+    }
+
+    .news-item1-wrap .left .latest-item {
+        font-size: 14px;
+        height: 28px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
     }
 
     .news-item1-wrap .left span {
         font-size: 12px;
+        position: absolute;
+        bottom: 10px;
     }
 
     .news-item1-wrap .right {
@@ -43,15 +55,19 @@
     <index-page-slot>
         {{#each items}}
             <div class="news-item1-wrap">
-                <a href="/group/{{this.content.data.id}}.html">
-                    <div class="left">
-                        <p>{{this.title}}</p>
-                        <span>{{this.content.data.created_at}}</span>
-                    </div>
-                    <div class="right">
-                        <img class="cover" src="{{this.content.data.covers.[0]}}"/>
-                    </div>
-                </a>
+
+                <div class="left">
+                    <a href="/group/{{this.content.data.id}}.html"><p>{{this.title}}</p></a>
+                    {{#each this.content.data.latest as |group id|}}
+                        <div class="latest-item"><a href="/resource/{{group.ID}}.html">
+                            {{group.title}}</a></div>
+                    {{/each}}
+                    <span>{{this.content.data.created_at}}</span>
+                </div>
+                <div class="right">
+                    <img class="cover" src="{{this.content.data.covers.[0]}}"/>
+                </div>
+
             </div>
         {{/each}}
     </index-page-slot>

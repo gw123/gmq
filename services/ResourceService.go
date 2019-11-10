@@ -2,35 +2,42 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-redis/redis"
+	"github.com/gw123/GMQ/caches"
+	"github.com/gw123/GMQ/common"
+	"github.com/gw123/GMQ/common/ctxdata"
+	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/common/redisKeys"
 	"github.com/gw123/GMQ/common/utils"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 	"strconv"
 	"time"
 )
 
 type ResourceItem struct {
-	Id           int32     `json:"id"`
-	UserId       int32     `json:"user_id"`
+	Id           uint      `json:"id"`
+	UserId       uint      `json:"user_id"`
 	Content      string    `json:"content"`
 	Name         string    `json:"name"`
 	Title        string    `json:"title"`
 	Avatar       string    `json:"avatar"`
 	ChapterTitle string    `json:"chapter_title"`
 	GroupTitle   string    `json:"group_title"`
-	GroupId      int32     `json:"group_id"`
-	ChapterId    int32     `json:"chapter_id"`
+	GroupId      uint      `json:"group_id"`
+	ChapterId    uint      `json:"chapter_id"`
 	CreatedAt    time.Time `json:"created_at"`
 	Type         string    `json:"type"`
 }
 
 type GroupItem struct {
-	Id       int32       `json:"id"`
-	UserId   int32       `json:"user_id"`
-	Title    string      `json:"title"`
-	Desc     string      `json:"desc"`
+	Id     uint   `json:"id"`
+	UserId uint   `json:"user_id"`
+	Title  string `json:"title"`
+	Desc   string `json:"desc"`
+	//Covers   []string `json:"covers"`
 	Covers   interface{} `json:"covers"`
 	Chapters []*Chapter  `json:"chapters"`
 	Tags     []*Tag      `json:"tags"`
@@ -40,15 +47,15 @@ type GroupItem struct {
 }
 
 type Chapter struct {
-	Id        int32              `json:"id"`
+	Id        uint               `json:"id"`
 	Title     string             `json:"title"`
 	Resources []*ChapterResource `json:"resources"`
 }
 
 type Tag struct {
-	Id         int32  `json:"id"`
+	Id         uint   `json:"id"`
 	Title      string `json:"title"`
-	CategoryId int32  `json:"category_id"`
+	CategoryId uint   `json:"category_id"`
 }
 
 func (Tag) TableName() string {
@@ -56,7 +63,7 @@ func (Tag) TableName() string {
 }
 
 type Category struct {
-	Id    int32  `json:"id"`
+	Id    uint   `json:"id"`
 	Title string `json:"title"`
 	Tags  []Tag  `json:"tags" gorm:"ForeignKey:category_id"`
 }
@@ -66,12 +73,13 @@ func (Category) TableName() string {
 }
 
 type ChapterResource struct {
-	Id    int32  `json:"id"`
+	Id    uint   `json:"id"`
 	Title string `json:"title"`
+	Type  string `json:"type"`
 }
 
 type IndexCtl struct {
-	Id      int32       `json:"id"`
+	Id      uint        `json:"id"`
 	Title   string      `json:"title"`
 	Content interface{} `json:"content"`
 }
@@ -100,23 +108,34 @@ type Block struct {
 	Tpl  string `json:"tpl"`
 	Type string `json:"type"`
 	Data struct {
-		Id        int      `json:"id"`
-		Title     string   `json:"title"`
-		Covers    []string `json:"covers"`
-		CreatedAt string   `json:"created_at"`
-		Type      string   `json:"type"`
-		Url       string   `json:"url"`
-		Links     []struct {
-			Link  string `json:"link"`
-			Title string `json:"title"`
-		} `json:"links"`
+		Id        uint              `json:"id"`
+		Title     string            `json:"title"`
+		Covers    []string          `json:"covers"`
+		CreatedAt string            `json:"created_at"`
+		Type      string            `json:"type"`
+		Url       string            `json:"url"`
+		Links     []LinkItem        `json:"links"`
+		Latest    []LatestGroupItem `json:"latest"`
 	} `json:"data"`
 }
 
+type LinkItem struct {
+	Link  string `json:"link"`
+	Title string `json:"title"`
+}
+
+type LatestGroupItem struct {
+	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint      `json:"id"`
+	Type      string    `json:"type"`
+	Title     string    `json:"title"`
+}
+
 type ResourceService struct {
-	app   interfaces.App
-	db    *gorm.DB
-	redis *redis.Client
+	app          interfaces.App
+	db           *gorm.DB
+	redis        *redis.Client
+	cacheManager interfaces.CacheManager
 }
 
 func NewResourceService(app interfaces.App) (*ResourceService, error) {
@@ -129,11 +148,41 @@ func NewResourceService(app interfaces.App) (*ResourceService, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ResourceService{
-		app:   app,
-		db:    db,
-		redis: redisClient,
-	}, nil
+
+	cacheManager, err := app.GetCacheManager()
+	if err != nil {
+		return nil, err
+	}
+
+	s := &ResourceService{
+		app:          app,
+		db:           db,
+		redis:        redisClient,
+		cacheManager: cacheManager,
+	}
+	s.LoadCacheRule()
+	return s, nil
+}
+
+func (s *ResourceService) LoadCacheRule() {
+	rule := caches.NewCacheRule(
+		caches.GroupLatestNews,
+		func(args ...interface{}) (i interface{}, e error) {
+			if len(args) < 1 {
+				return nil, errors.New("参数必须大于一个")
+			}
+			groupId, ok := args[0].(uint)
+			if !ok {
+				return nil, errors.New("类型必须为uint")
+			}
+
+			latestItems, err := s.GetGroupLatestResource(groupId)
+
+			return latestItems, err
+		},
+		s.redis,
+	)
+	s.cacheManager.AddCacheRule(rule)
 }
 
 func (s *ResourceService) GetServiceName() string {
@@ -141,7 +190,7 @@ func (s *ResourceService) GetServiceName() string {
 }
 
 func (s *ResourceService) GetResource(id int) (*ResourceItem, error) {
-	s.db.LogMode(true)
+	//s.db.LogMode(true)
 	var item ResourceItem
 	_, err := utils.GetCache(s.redis, redisKeys.Resource+strconv.Itoa(id), &item, func() (interface{}, error) {
 		//db.LogMode(true)
@@ -162,7 +211,7 @@ func (s *ResourceService) GetResource(id int) (*ResourceItem, error) {
 			if result.Error != nil {
 				return nil, result.Error
 			}
-		}else if item.Type == "testpaper" {
+		} else if item.Type == "testpaper" {
 			result = s.db.Select("content").Table("testpaper").Where("rid = ?", id).Find(&tempItem)
 			if result.Error != nil {
 				return nil, result.Error
@@ -178,33 +227,29 @@ func (s *ResourceService) GetResource(id int) (*ResourceItem, error) {
 	return &item, nil
 }
 
-func (s *ResourceService) GetGroupTags(id int32) ([]*Tag, error) {
+func (s *ResourceService) GetGroupTags(id uint) ([]*Tag, error) {
 	db, err := s.app.GetDefaultDb()
 	if err != nil {
 		return nil, err
 	}
 
 	var item []*Tag
-	_, err = utils.GetCache(s.redis, redisKeys.GroupTag+strconv.Itoa(int(id)), &item, func() (interface{}, error) {
-		var fields = []string{"t.id", "t.title"}
-		result := db.Table("`tag` as t").
-			Select(fields).
-			Joins("left join tag_group as tg  on tg.tag_id = t.id ").
-			Joins("left join `group`   as g   on tg.group_id = g.id").
-			Where("g.id = ?", id).
-			Find(&item)
-		if result.Error != nil {
-			return nil, result.Error
-		}
-		return &item, nil
-	})
-	if err != nil {
-		return nil, err
+
+	var fields = []string{"t.id", "t.title"}
+	result := db.Table("`tag` as t").
+		Select(fields).
+		Joins("left join tag_group as tg  on tg.tag_id = t.id ").
+		Joins("left join `group`   as g   on tg.group_id = g.id").
+		Where("g.id = ?", id).
+		Find(&item)
+	if result.Error != nil {
+		return nil, result.Error
 	}
+
 	return item, nil
 }
 
-func (s *ResourceService) GetGroupCategory(id int32) (*Category, error) {
+func (s *ResourceService) GetGroupCategory(id uint) (*Category, error) {
 	db, err := s.app.GetDefaultDb()
 	if err != nil {
 		return nil, err
@@ -228,67 +273,49 @@ func (s *ResourceService) GetGroupCategory(id int32) (*Category, error) {
 	return &item, nil
 }
 
-func (s *ResourceService) GetGroupChapter(id int32) ([]*Chapter, error) {
+func (s *ResourceService) GetGroupChapter(id uint) ([]*Chapter, error) {
 	db, err := s.app.GetDefaultDb()
 	if err != nil {
 		return nil, err
 	}
 
 	var items []*Chapter
-	_, err = utils.GetCache(s.redis, redisKeys.GroupChapter+strconv.Itoa(int(id)), &items, func() (interface{}, error) {
-		var fields = []string{"c.id", "c.title"}
-		result := db.Table("`chapter` as c").
-			Select(fields).
-			Where("c.group_id = ?", id).
-			Find(&items)
-		if result.Error != nil {
-			return nil, result.Error
+
+	var fields = []string{"c.id", "c.title"}
+	result := db.Table("`chapter` as c").
+		Select(fields).
+		Where("c.group_id = ? and deleted_at is null", id).
+		Find(&items)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	for i := 0; i < len(items); i++ {
+		resources, err := s.GetChapterResource(items[i].Id)
+		if err != nil {
+			resources = []*ChapterResource{}
 		}
-		for i := 0; i < len(items); i++ {
-			resources, err := s.GetChapterResource(items[i].Id)
-			if err != nil {
-				resources = []*ChapterResource{}
-			}
-			items[i].Resources = resources
-		}
-		return &items, nil
-	})
-	if err != nil {
-		return nil, err
+		items[i].Resources = resources
 	}
 	return items, nil
 }
 
-func (s *ResourceService) GetChapterResource(id int32) ([]*ChapterResource, error) {
-	db, err := s.app.GetDefaultDb()
-	if err != nil {
-		return nil, err
-	}
-
+func (s *ResourceService) GetChapterResource(id uint) ([]*ChapterResource, error) {
+	db := s.db
 	var item []*ChapterResource
-	_, err = utils.GetCache(s.redis, redisKeys.ChapterResource+strconv.Itoa(int(id)), &item, func() (interface{}, error) {
-		var fields = []string{"id", "title"}
-		result := db.Table("resource").
-			Select(fields).
-			Where("chapter_id = ?", id).
-			Find(&item)
-		if result.Error != nil {
-			return item, result.Error
-		}
-		return &item, nil
-	})
-
-	if err != nil {
-		return nil, err
+	var fields = []string{"id", "title", "type"}
+	result := db.Table("resource").
+		Select(fields).
+		Where("chapter_id = ?", id).
+		Find(&item)
+	if result.Error != nil {
+		return item, result.Error
 	}
 	return item, nil
 }
 
-func (s *ResourceService) GetGroup(id int32) (*GroupItem, error) {
+func (s *ResourceService) GetGroup(id uint) (*GroupItem, error) {
 	db := s.db
-
 	var item GroupItem
-	//db.LogMode(true)
 	_, err := utils.GetCache(s.redis, redisKeys.Group+strconv.Itoa(int(id)), &item, func() (interface{}, error) {
 		var fields = []string{"g.id", "title", "user_id", "`desc`", "covers", "u.name as user_name", "u.avatar"}
 		result := db.Table("`group` as g").
@@ -329,7 +356,7 @@ func (s *ResourceService) GetGroup(id int32) (*GroupItem, error) {
 	return &item, nil
 }
 
-func (s *ResourceService) GetChapter(id int32) (*Chapter, error) {
+func (s *ResourceService) GetChapter(id uint) (*Chapter, error) {
 	var item Chapter
 
 	_, err := utils.GetCache(s.redis, redisKeys.Chapter+strconv.Itoa(int(id)), &item, func() (interface{}, error) {
@@ -378,6 +405,51 @@ func (s *ResourceService) GetCategories() ([]*Category, error) {
 	return items, nil
 }
 
+func (s *ResourceService) GetRawIndexCtrl(maxId, currentId int) ([]*IndexCtl, error) {
+	var items []*IndexCtl
+	var fields = []string{"i.id", "b.title", "b.content"}
+	query := s.db
+	if maxId != 0 {
+		query.Where("i.id > ?", maxId)
+	}
+	if currentId != 0 {
+		query.Where("i.id < ?", currentId)
+	}
+	res := query.Table("index_ctrl as i").Select(fields).
+		Joins("left join block as b on i.block_id=b.id").
+		Order("id desc").
+		Find(&items).Error
+
+	if res != nil {
+		return nil, res
+	}
+
+	for i := 0; i < len(items); i++ {
+		var block Block
+		err := json.Unmarshal([]byte(items[i].Content.([]uint8)), &block)
+		if err != nil {
+			return nil, err
+		}
+
+		if block.Data.Type == common.GROUP {
+			latestItem := []LatestGroupItem{}
+			err := s.cacheManager.GetCache(caches.GroupLatestNews, &latestItem, block.Data.Id)
+			block.Data.Latest = make([]LatestGroupItem, 0)
+			if err == nil {
+				block.Data.Latest = append(block.Data.Latest, latestItem...)
+			} else {
+				s.app.Error("ResourceService",
+					"line 432: Key:%s, error: %s",
+					interfaces.MakeCacheKey(caches.GroupLatestNews, block.Data.Id),
+					err.Error())
+			}
+		}
+		items[i].Content = block
+	}
+
+	return items, nil
+}
+
 func (s *ResourceService) GetIndexCtrl(maxId, currentId int) ([]*IndexCtl, error) {
 	var items []*IndexCtl
 	//s.db.LogMode(true)
@@ -407,22 +479,13 @@ func (s *ResourceService) GetIndexCtrl(maxId, currentId int) ([]*IndexCtl, error
 				return nil, err
 			}
 			items[i].Content = block
-		}
 
+		}
 		return &items, nil
 	})
 
 	//for i := 0; i < len(items); i++ {
-	//	var block Block
-	//	buf, err := base64.StdEncoding.DecodeString(items[i].Content.(string))
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	err = json.Unmarshal(buf, &block)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	items[i].Content = block
+	//	items
 	//}
 
 	if err != nil {
@@ -439,7 +502,7 @@ func (s *ResourceService) GetCategoryCtrl(categoryId, maxId, currentId int) ([]*
 		Where("category_id = ?", categoryId).
 		Order("id desc").
 		Limit(10)
-	query.LogMode(true)
+	//query.LogMode(true)
 	if maxId != 0 {
 		query = query.Where("i.id > ?", maxId)
 	}
@@ -544,4 +607,196 @@ func (s *ResourceService) GetQuestions(id int) (*ResourceItem, error) {
 		return nil, err
 	}
 	return &item, nil
+}
+
+func (s *ResourceService) SaveGroup(ctx echo.Context, group *models.Group) (err error) {
+	for _, chapter := range group.Chapters {
+		if chapter.Title == "" {
+			return errors.New("章节标题不能为空")
+		}
+	}
+
+	db := s.db.Begin()
+	db.LogMode(true)
+	defer func() {
+		if err != nil {
+			db.Rollback()
+		}
+	}()
+	if err := db.Save(group).Error; err != nil {
+		return err
+	}
+
+	for index, tagId := range group.TagIds {
+		//限制最多5个标签
+		if index > 5 {
+			break
+		}
+
+		tagGroup := &models.TagGroup{GroupId: group.ID, TagId: tagId}
+		if db.Where("group_id = ? and tag_id = ?", group.ID, tagId).Find(tagGroup).RecordNotFound() {
+			if err := db.Save(tagGroup).Error; err != nil {
+				return err
+			}
+		}
+	}
+	db.Commit()
+	return nil
+}
+
+func (s *ResourceService) GetRawGroup(id uint) (*models.Group, error) {
+	db := s.db
+	var item GroupItem
+	var fields = []string{"g.id", "title", "user_id", "`desc`", "covers", "u.name as user_name", "u.avatar"}
+	result := db.Table("`group` as g").
+		Select(fields).
+		Joins("left join users as u on u.id=g.user_id").
+		Where("g.id = ?", id).
+		Find(&item)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	var covers []string
+	err := json.Unmarshal([]byte(item.Covers.([]uint8)), &covers)
+	if err != nil {
+		s.app.Warn("ResourceService", "json.Unmarshal([]byte(item.Covers.(string)) "+err.Error())
+	}
+	item.Covers = covers
+
+	chapters, _ := s.GetGroupChapter(id)
+	item.Chapters = chapters
+
+	tags, _ := s.GetGroupTags(id)
+	item.Tags = tags
+
+	category, err := s.GetGroupCategory(id)
+	if err != nil {
+		s.app.Warn("ResourceService", "GetGroupCategory err "+err.Error())
+		category = &Category{}
+	}
+	item.Category = *category
+	return s.ConvertGroupItem2Group(&item), nil
+}
+
+func (s *ResourceService) ConvertGroupItem2Group(groupItem *GroupItem) *models.Group {
+	group := &models.Group{
+		Model: models.Model{
+			ID: uint(groupItem.Id),
+		},
+		Title:      groupItem.Title,
+		UserId:     groupItem.UserId,
+		CategoryId: groupItem.Category.Id,
+		Desc:       groupItem.Desc,
+	}
+
+	for _, tag := range groupItem.Tags {
+		group.TagIds = append(group.TagIds, tag.Id)
+	}
+
+	for _, chapterItem := range groupItem.Chapters {
+		chapter := models.Chapter{Model: models.Model{ID: chapterItem.Id}, Title: chapterItem.Title}
+		for _, resource := range chapterItem.Resources {
+			chapter.Resources = append(chapter.Resources, models.Resource{ID: resource.Id, Title: resource.Title, Type: resource.Type})
+		}
+		group.Chapters = append(group.Chapters, chapter)
+	}
+
+	return group
+}
+
+func (s *ResourceService) DeleteChapter(id uint) error {
+	s.db.LogMode(true)
+	chapter := &models.Chapter{}
+	return s.db.Delete(chapter, "id = ?", id).Error
+}
+
+func (s *ResourceService) SaveResource(ctx echo.Context, resource *models.Resource) (err error) {
+	db := s.db.Begin()
+	defer func() {
+		if err != nil {
+			db.Rollback()
+		}
+	}()
+	if err := db.Save(resource).Error; err != nil {
+		return err
+	}
+	db.Commit()
+	return nil
+}
+
+func (s *ResourceService) GetRawResource(id uint) (*models.Resource, error) {
+	resource := &models.Resource{}
+	if err := s.db.Where("id = ?", id).First(resource).Error; err != nil {
+		return nil, err
+	}
+
+	switch resource.Type {
+	case "article":
+		article := &models.Article{}
+		if err := s.db.Where("rid = ?", resource.ID).First(article).Error; err != nil {
+			return nil, err
+		}
+		resource.Article = article
+	case "testpaper":
+		testpaper := &models.Testpaper{}
+		if err := s.db.Where("rid = ?", resource.ID).First(testpaper).Error; err != nil {
+			return nil, err
+		}
+		resource.Testpaper = testpaper
+	}
+
+	return resource, nil
+}
+
+func (s *ResourceService) CheckGroupAuth(ctx echo.Context, groupId uint) bool {
+	userId := ctxdata.GetUserId(ctx)
+	if userId == 0 {
+		return false
+	}
+	group := &models.Group{}
+	if err := s.db.Select("id").Where("id = ? and user_id = ?", groupId, userId).First(group).Error; err != nil {
+		return false
+	}
+	return true
+}
+
+func (s *ResourceService) CheckChapterAuth(ctx echo.Context, chapterId uint) bool {
+	userId := ctxdata.GetUserId(ctx)
+	if userId == 0 {
+		return false
+	}
+	chapter := &models.Chapter{}
+	if err := s.db.Select("group_id").Where("id = ?", chapterId).First(chapter).Error; err != nil {
+		return false
+	}
+
+	return s.CheckGroupAuth(ctx, chapter.GroupId)
+}
+
+func (s *ResourceService) GetUserGroups(ctx echo.Context) ([]models.Group, error) {
+	userId := ctxdata.GetUserId(ctx)
+	if userId == 0 {
+		return nil, errors.New("用户未登录")
+	}
+
+	groups := []models.Group{}
+
+	if err := s.db.Where("user_id = ?", userId).Find(&groups).Error; err != nil {
+		if !gorm.IsRecordNotFoundError(err) {
+			return nil, err
+		}
+	}
+	return groups, nil
+}
+
+func (s *ResourceService) GetGroupLatestResource(groupId uint) ([]LatestGroupItem, error) {
+	var latestItems []LatestGroupItem
+
+	s.db.Table("resource").
+		Where("group_id = ?", groupId).
+		Order("updated_at desc").
+		Limit(2).
+		Find(&latestItems)
+
+	return latestItems, nil
 }

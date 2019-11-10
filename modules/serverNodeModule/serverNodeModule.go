@@ -27,7 +27,7 @@ func (this *ServerNodeModule) Init(app interfaces.App, config interfaces.ModuleC
 	return nil
 }
 
-func (this *ServerNodeModule) Handle(event interfaces.Event) error {
+func (this *ServerNodeModule) Handle(event interfaces.Msg) error {
 	return nil
 }
 
