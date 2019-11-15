@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/webModule/models"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
@@ -55,7 +55,7 @@ func (c *WsController) Message(ctx echo.Context) error {
 			//c.webModule.Debug("ws handel ->")
 			client, ok := c.WebSocketClientMap[moduleName]
 			if ok {
-				stopEvent := common_types.NewEvent("stop", "新的同名模块连接到来")
+				stopEvent := gmsg.NewEvent("stop", "新的同名模块连接到来")
 				client.SendMsg(stopEvent)
 				client.Stop()
 			}
@@ -78,7 +78,7 @@ func (c *WsController) Message(ctx echo.Context) error {
 	return nil
 }
 
-func (c *WsController) SendClientMessage(msg interfaces.Event) {
+func (c *WsController) SendClientMessage(msg interfaces.Msg) {
 	var flag = false
 	for !flag {
 		for _, client := range c.WebSocketClientMap {

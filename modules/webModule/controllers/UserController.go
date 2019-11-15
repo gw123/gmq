@@ -2,11 +2,10 @@ package controllers
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/gw123/GMQ/common/redisKeys"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/services"
-	"github.com/gw123/glog"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"math/rand"
@@ -69,7 +68,7 @@ func (this *UserController) SendMessage(ctx echo.Context) error {
 		return this.Fail(ctx, ErrorDb, "请稍等1分钟后尝试", errors.New("请稍等1分钟后尝试"))
 	}
 	this.module.Info("发送短信:" + param.Mobile)
-	event := common_types.NewMobileMessageEvent(rand, param.Mobile)
+	event := gmsg.NewMobileMessageEvent(rand, param.Mobile)
 	this.module.Pub(event)
 	return this.BaseController.Success(ctx, nil)
 }
@@ -91,7 +90,6 @@ func (this *UserController) Register(ctx echo.Context) error {
 func (this *UserController) Login(ctx echo.Context) error {
 	params := &services.LoginParam{}
 	err := ctx.Bind(params)
-	glog.Dump(params)
 	if err != nil {
 		return this.Fail(ctx, ErrorArgument, err.Error(), err)
 	}
@@ -101,7 +99,6 @@ func (this *UserController) Login(ctx echo.Context) error {
 		return this.Fail(ctx, ErrorDb, err.Error(), err)
 	}
 	data := map[string]string{"api_token": jwtToken}
-	glog.Dump(data)
 	return this.Success(ctx, data)
 }
 
@@ -123,7 +120,6 @@ func (this *UserController) ChangeUserCollection(ctx echo.Context) error {
 		return this.Fail(ctx, ErrorArgument, "授权失败", errors.New("jwtToken 解析失败"))
 	}
 	usrId, _ := strconv.Atoi(jwtToken.Id)
-	glog.Dump(params)
 	if params.IsCollection == 1 {
 		err = this.UserService.AddUserCollection(usrId, params.TargetType, params.TargetId)
 		if err != nil {

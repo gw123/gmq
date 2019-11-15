@@ -40,6 +40,8 @@ replace golang.org/x/mobile => github.com/golang/mobile v0.0.0-20190806162312-59
 
 replace gopkg.in/jcmturner/gokrb5.v7 => github.com/jcmturner/gokrb5 v7.2.4-0.20190413090910-7b6b2f54b7fd+incompatible
 
+replace golang.org/x/image/font => github.com/golang/image v0.0.0-20191009234506-e7c1f5e7dbb8
+
 require (
 	github.com/SermoDigital/jose v0.9.1
 	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190929091402-5711055976b5
@@ -77,11 +79,11 @@ require (
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
+	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.2.1
-	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271 // indirect
 	github.com/tebeka/strftime v0.1.3 // indirect
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297

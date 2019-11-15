@@ -4,7 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/modules/webModule/services"
+	"github.com/gw123/GMQ/services"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"strconv"

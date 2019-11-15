@@ -33,7 +33,6 @@ func NewPingMiddleware(app interfaces.App) echo.MiddlewareFunc {
 
 			byteIn, _ := strconv.Atoi(req.Header.Get(echo.HeaderContentLength))
 			pingLog := &db_models.PingLog{
-
 				Ip:           c.RealIP(),
 				ClientSendAt: sendAtTIme,
 				CreatedAt:    time.Now(),

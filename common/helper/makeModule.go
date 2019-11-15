@@ -30,7 +30,7 @@ func (this *DebugModule) Init(app interfaces.App, config interfaces.ModuleConfig
 	return nil
 }
 
-func (this *DebugModule) Handle(event interfaces.Event) error {
+func (this *DebugModule) Handle(event interfaces.Msg) error {
 	return nil
 }
 

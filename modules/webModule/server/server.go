@@ -64,25 +64,25 @@ func (this *Server) Start() error {
 		timestampFormat = "2006-01-02 15:04:05"
 	}
 
-	loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: `{"time":"${time_custom}","remote_ip":"${remote_ip}","host":"${host}",` +
-			`"method":"${method}","uri":"${uri}","status":${status},` +
-			`"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
-			`"bytes_out":${bytes_out},"User-Agent":"${header:User-Agent}",` +
-			`"Origin":"${header:Origin}","X-Request-ID":"${header:X-Request-ID}","error":"${error}"}` + "\n",
-		//Output: os.Stdout,
-		Output: this.module.GetApp(),
-		Skipper: func(ctx echo.Context) bool {
-			req := ctx.Request()
-			return (req.RequestURI == "/" && req.Method == "HEAD") || (req.RequestURI == "/favicon.ico" && req.Method == "GET")
-		},
-		CustomTimeFormat:timestampFormat,
-	})
-	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
-		StackSize:  1 << 10, // 1 KB
-	}))
+	//loggerMiddleware := middleware.LoggerWithConfig(middleware.LoggerConfig{
+	//	Format: `{"time":"${time_custom}","remote_ip":"${remote_ip}","host":"${host}",` +
+	//		`"method":"${method}","uri":"${uri}","status":${status},` +
+	//		`"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
+	//		`"bytes_out":${bytes_out},"User-Agent":"${header:User-Agent}",` +
+	//		`"Origin":"${header:Origin}","X-Request-ID":"${header:X-Request-ID}","error":"${error}"}` + "\n",
+	//	//Output: os.Stdout,
+	//	Output: this.module.GetApp(),
+	//	Skipper: func(ctx echo.Context) bool {
+	//		req := ctx.Request()
+	//		return (req.RequestURI == "/" && req.Method == "HEAD") || (req.RequestURI == "/favicon.ico" && req.Method == "GET")
+	//	},
+	//	CustomTimeFormat: timestampFormat,
+	//})
+	//e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+	//	StackSize: 1 << 10, // 1 KB
+	//}))
 
-	e.Use(loggerMiddleware)
+	//e.Use(loggerMiddleware)
 	//e.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
 
 	indexController := controllers.NewIndexController(this.module)
@@ -93,7 +93,7 @@ func (this *Server) Start() error {
 
 	normalGroup := e.Group("/gapi")
 	//normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
-	normalGroup.GET("/getResource", resourceController.GetResource)
+	//normalGroup.GET("/getResource", resourceController.GetResource)
 	normalGroup.GET("/getGroup", resourceController.GetGroup)
 	normalGroup.GET("/getChapter", resourceController.GetChapter)
 	normalGroup.GET("/getCategories", resourceController.GetCategories)
@@ -109,8 +109,25 @@ func (this *Server) Start() error {
 	normalGroup.POST("/register", userController.Register)
 	normalGroup.POST("/comments", commentController.CommentList)
 
+
+	//需要授权
 	authGroup := e.Group("/gapi")
 	authGroup.Use(webMiddlewares.NewAuthMiddleware(this.module))
+	//编辑资源
+	e.GET("edit/:id", indexController.Edit)
+	e.GET("edit/:group_id/:chapter_id/:resource_id/article", indexController.Edit)
+	e.GET("edit/:group_id/:chapter_id/:resource_id/testpaper", indexController.Edit)
+	e.GET("edit/:group_id/:chapter_id/:resource_id/video", indexController.Edit)
+	e.GET("userGroups", indexController.Home)
+
+	authGroup.GET("/getEditGroup/:id", resourceController.GetRowGroup)
+	authGroup.POST("/delChapter/:id", resourceController.DeleteChapter)
+	authGroup.POST("/saveResource",resourceController.SaveResource)
+	authGroup.GET("/getResource/:id", resourceController.GetRawResource)
+	authGroup.POST("/saveGroup", resourceController.SaveGorup)
+	authGroup.GET("/getUserGroups", resourceController.GetUserGroups)
+
+	//用户
 	authGroup.GET("/getUser", userController.GetUser)
 	authGroup.GET("/getUserCollection", userController.GetUserCollection)
 	authGroup.POST("/changeCollecton", userController.ChangeUserCollection)
@@ -144,6 +161,9 @@ func (this *Server) Start() error {
 	e.GET("userCollection", indexController.Home)
 
 	e.GET("testpaper/:id", indexController.Testpaper)
+
+
+	e.GET("qrcode/:content", indexController.Qrcode)
 
 	this.module.Info("端口监听在:  %s", this.addr)
 	this.echo = e

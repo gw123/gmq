@@ -96,3 +96,6 @@ modules:
          key_secret: "xasdasdwxjioxxqweqweqwx"
          sign_name: "学用通"
          template_code: "SMS_190920123"
+
+  RedisModule:
+    type: inner

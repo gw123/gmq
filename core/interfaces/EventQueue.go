@@ -1,6 +1,6 @@
 package interfaces
 
 type EventQueue interface {
-	Push(event Event) error
-	Pop() (Event, error)
+	Push(event Msg) error
+	Pop() (Msg, error)
 }

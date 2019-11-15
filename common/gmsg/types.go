@@ -1,4 +1,4 @@
-package common_types
+package gmsg
 
 import (
 	"encoding/json"

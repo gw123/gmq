@@ -45,7 +45,7 @@ if (!mix.inProduction()) {
 // =======================
 // m
 var srcPath = './assets/m';
-var version = "v11";
+var version = "v13";
 mix.styles([
     srcPath + '/sass/iconfont.css',
     srcPath + '/sass/app.scss',
@@ -61,9 +61,10 @@ mix.js(srcPath + '/js/news.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/group.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/home.js', path + '/m/js/' + version);
 mix.js(srcPath + '/js/tagNews.js', path + '/m/js/' + version);
-//mix.js(srcPath + '/js/edit.js', path + '/m/js/' + version);
+
 
 mix.js(srcPath + '/modules/testpaper/testpaper.js', path + '/m/js/' + version);
+mix.js(srcPath + '/modules/create/create.js', path + '/m/js/' + version);
 
 //登录页面
 mix.styles([

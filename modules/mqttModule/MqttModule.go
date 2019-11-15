@@ -3,7 +3,7 @@ package mqttModule
 import (
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/eclipse/paho.mqtt.golang"
 	"encoding/json"
 	"time"
@@ -65,12 +65,12 @@ func (this *MqttModule) initAliIot(app interfaces.App, config interfaces.ModuleC
 	params.DefaultHandel = func(client mqtt.Client, msg mqtt.Message) {
 		switch msg.Topic() {
 		case "/ota/device/upgrade/" + params.ProductKey + "/" + params.DeviceName:
-			event := &common_types.Event{}
+			event := &gmsg.Msg{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;
 		case "/" + params.ProductKey + "/" + params.DeviceName + "/get":
-			event := &common_types.Event{}
+			event := &gmsg.Msg{}
 			json.Unmarshal(msg.Payload(), event)
 			this.App.Pub(event)
 			break;
@@ -92,7 +92,7 @@ func (this *MqttModule) UnInit() error {
 	return nil
 }
 
-func (this *MqttModule) Push(event interfaces.Event) (err error) {
+func (this *MqttModule) Push(event interfaces.Msg) (err error) {
 	err = this.BaseModule.Push(event)
 	return
 }
@@ -125,7 +125,7 @@ func (this *MqttModule) Start() {
 	}
 }
 
-func (this *MqttModule) service(event interfaces.Event) error {
+func (this *MqttModule) service(event interfaces.Msg) error {
 	this.Debug("service " + event.GetEventName() + " " + event.GetSourceModule() + " " + event.GetMsgId() + " " + string(event.GetPayload()))
 	//data, err := json.Marshal()
 	//if err != nil {

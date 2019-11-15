@@ -1,7 +1,7 @@
-package common_types
+package gmsg
 
 type MobileMessageEvent struct {
-	Event
+	Msg
 	Code    string
 	Modbile string
 }

@@ -74,7 +74,7 @@ func (this *DllModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 	return nil
 }
 
-func (this *DllModule) Handle(event interfaces.Event) error {
+func (this *DllModule) Handle(event interfaces.Msg) error {
 	return nil
 }
 

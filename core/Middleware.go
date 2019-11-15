@@ -16,7 +16,7 @@ func NewMiddlewareManager(app interfaces.App) *MiddlewareManager {
 	return this
 }
 
-func (this *MiddlewareManager) Handel(event interfaces.Event) bool {
+func (this *MiddlewareManager) Handel(event interfaces.Msg) bool {
 	for _, middleware := range this.middlewares {
 		flag := middleware.Handel(event)
 		if !flag {

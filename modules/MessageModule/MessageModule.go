@@ -3,7 +3,7 @@ package MessageModule
 import (
 	"errors"
 	"fmt"
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/base"
 )
@@ -41,8 +41,8 @@ func (this *MessageModule) Init(app interfaces.App, config interfaces.ModuleConf
 	return nil
 }
 
-func (this *MessageModule) Handle(event interfaces.Event) error {
-	mobileMessageEvent := event.(*common_types.MobileMessageEvent)
+func (this *MessageModule) Handle(event interfaces.Msg) error {
+	mobileMessageEvent := event.(*gmsg.MobileMessageEvent)
 	content := fmt.Sprintf(`{"code":"%s"}`, mobileMessageEvent.Code)
 	return this.client.SendCode(mobileMessageEvent.Modbile, content)
 }

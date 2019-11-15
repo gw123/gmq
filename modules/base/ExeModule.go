@@ -47,7 +47,7 @@ func (this *ExeModule) Init(app interfaces.App, config interfaces.ModuleConfig) 
 }
 
 
-func (this *ExeModule) Handle(event interfaces.Event) error {
+func (this *ExeModule) Handle(event interfaces.Msg) error {
 	type Event struct {
 		MsgId     string
 		EventType string

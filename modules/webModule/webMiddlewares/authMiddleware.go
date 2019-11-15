@@ -1,10 +1,12 @@
 package webMiddlewares
 
 import (
+	"github.com/gw123/GMQ/common/ctxdata"
 	"github.com/gw123/GMQ/common/utils"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -35,6 +37,14 @@ func NewAuthMiddleware(module interfaces.Module) echo.MiddlewareFunc {
 				return ctx.JSON(http.StatusOK, ret)
 			}
 			ctx.Set("jwt", infos)
+			userId, _ := strconv.Atoi(infos.Id)
+			if userId == 0 {
+				ret := make(map[string]interface{}, 0)
+				ret["code"] = 401
+				ret["msg"] = "授权失败2"
+				return ctx.JSON(http.StatusOK, ret)
+			}
+			ctxdata.SetUserId(ctx, uint(userId))
 			return next(ctx)
 		}
 	}

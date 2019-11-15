@@ -22,14 +22,14 @@ type Module interface {
 	//取消事件订阅
 	UnInit() error
 
-	Push(event Event) error
+	Push(event Msg) error
 
 	GetStatus() uint64
 
 	GetModuleName() string
 
 	//发布消息
-	Pub(event Event)
+	Pub(event Msg)
 
 	//订阅消息, filter 过滤函数从接收到的消息中过滤不合法的消息
 	Sub(eventName string, filter ...func(interface{}) bool)
@@ -41,7 +41,7 @@ type Module interface {
 	Start()
 
 	//处理事件
-	Handle(event Event) (err error)
+	Handle(event Msg) (err error)
 
 	//定时调用方法
 	Watch(index int)

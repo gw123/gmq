@@ -1,7 +1,7 @@
 package webSocketModule
 
 import (
-	"github.com/gw123/GMQ/common/common_types"
+	"github.com/gw123/GMQ/common/gmsg"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/base"
 	"github.com/gw123/GMQ/modules/grpcModule/grpcModel"
@@ -20,7 +20,7 @@ type Gserver struct {
 	ctlChan    chan int
 }
 
-func NewGserver(module *GrpcModule, msgChan chan interfaces.Event) *Gserver {
+func NewGserver(module *GrpcModule, msgChan chan interfaces.Msg) *Gserver {
 	if module == nil {
 		return nil
 	}
@@ -59,7 +59,7 @@ func (this *Gserver) RWStream(stream grpcModel.Conn_RWStreamServer) error {
 				this.module.Warning("stream recv :" + err.Error())
 				return
 			}
-			event := common_types.NewEvent(msg.EventName, []byte(msg.Payload))
+			event := gmsg.NewEvent(msg.EventName, []byte(msg.Payload))
 			this.module.Push(event)
 			//fmt.Println(msg.ModuleName, msg.EventName, msg.MsgId, msg.Payload)
 			time.Sleep(time.Millisecond)
@@ -72,7 +72,7 @@ func (this *Gserver) Server() {
 
 }
 
-func (this *Gserver) Push(msg2 interfaces.Event) error {
+func (this *Gserver) Push(msg2 interfaces.Msg) error {
 	if this.stream == nil {
 		return errors.New("client not connect")
 	}
@@ -127,7 +127,7 @@ func (this *GrpcModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *GrpcModule) Handle(event interfaces.Event) error {
+func (this *GrpcModule) Handle(event interfaces.Msg) error {
 	err := this.gServer.Push(event)
 	return err
 }
