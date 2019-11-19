@@ -34,91 +34,91 @@ type BaseModule struct {
 	Ctx       context.Context
 }
 
-func (this *BaseModule) Init(app interfaces.App, module interfaces.Module, config interfaces.ModuleConfig) error {
-	this.App = app
-	this.Config = config
-	this.muduleNmae = config.GetModuleName()
-	this.InitQueue(1024)
-	this.StopFlag = false
-	this.module = module
-	this.Handle = module.Handle
-	this.Watch = module.Watch
+func (b *BaseModule) Init(app interfaces.App, module interfaces.Module, config interfaces.ModuleConfig) error {
+	b.App = app
+	b.Config = config
+	b.muduleNmae = config.GetModuleName()
+	b.InitQueue(1024)
+	b.StopFlag = false
+	b.module = module
+	b.Handle = module.Handle
+	b.Watch = module.Watch
 	evnetsStr := config.GetStringItem("subs")
 	events := strings.Split(evnetsStr, ",")
 
-	this.eventNames = events
+	b.eventNames = events
 	for _, eventName := range events {
 		if eventName != "" {
-			this.App.Sub(eventName, module)
+			b.App.Sub(eventName, module)
 		}
 	}
 	rootCtx := context.Background()
 	ctx, cancelFun := context.WithCancel(rootCtx)
-	this.cancelFun = cancelFun
-	this.Ctx = ctx
+	b.cancelFun = cancelFun
+	b.Ctx = ctx
 
 	return nil
 }
 
-func (this *BaseModule) UnInit() error {
-	this.StopFlag = true
-	for _, eventName := range this.eventNames {
-		this.App.UnSub(eventName, this.module)
+func (b *BaseModule) UnInit() error {
+	b.StopFlag = true
+	for _, eventName := range b.eventNames {
+		b.App.UnSub(eventName, b.module)
 	}
-	this.Debug("BaseModule UnInit :" + this.GetModuleName())
-	this.Stop()
+	b.Debug("BaseModule UnInit :" + b.GetModuleName())
+	b.Stop()
 	return nil
 }
 
 //这里不做处理留给子模块实现
-func (this *BaseModule) BeforeStart() error {
+func (b *BaseModule) BeforeStart() error {
 	return nil
 }
 
-func (this *BaseModule) GetStatus() uint64 {
+func (b *BaseModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *BaseModule) GetVersion() string {
-	return this.Version
+func (b *BaseModule) GetVersion() string {
+	return b.Version
 }
 
-func (this *BaseModule) InitQueue(length int) {
-	this.length = length
-	this.fullFlag = FullFlag_DropOld
-	this.queue = make(chan interfaces.Msg, length)
+func (b *BaseModule) InitQueue(length int) {
+	b.length = length
+	b.fullFlag = FullFlag_DropOld
+	b.queue = make(chan interfaces.Msg, length)
 }
 
-func (this *BaseModule) SetFullFlag(flag int) {
-	this.fullFlag = flag
+func (b *BaseModule) SetFullFlag(flag int) {
+	b.fullFlag = flag
 }
 
-func (this *BaseModule) Push(event interfaces.Msg) (err error) {
-	this.isBusyMutex.Lock()
-	defer this.isBusyMutex.Unlock()
-	if len(this.queue) >= this.length {
-		if this.fullFlag == FullFlag_DropOld {
-			<-this.queue
+func (b *BaseModule) Push(event interfaces.Msg) (err error) {
+	b.isBusyMutex.Lock()
+	defer b.isBusyMutex.Unlock()
+	if len(b.queue) >= b.length {
+		if b.fullFlag == FullFlag_DropOld {
+			<-b.queue
 		} else {
 			return errors.New("queue is full")
 		}
 	}
-	this.queue <- event
+	b.queue <- event
 	return
 }
 
-func (this *BaseModule) startDaemon() {
+func (b *BaseModule) startDaemon() {
 	index := 0
 	for ; ; {
 		select {
-		case _ = <-this.Ctx.Done():
-			this.Info("Stop Module  start goroutine " + this.GetModuleName())
+		case _ = <-b.Ctx.Done():
+			b.Info("Stop Module  start goroutine " + b.GetModuleName())
 			return
 		default:
 			break
 		}
 		time.Sleep(time.Second)
-		this.Watch(index)
+		b.Watch(index)
 		index++
 		if index > 1000000 {
 			index = 0
@@ -126,30 +126,30 @@ func (this *BaseModule) startDaemon() {
 	}
 }
 
-func (this *BaseModule) Stop() {
-	if this.cancelFun != nil {
-		this.Info("StopModule : " + this.GetModuleName())
-		this.cancelFun()
-		this.cancelFun = nil
+func (b *BaseModule) Stop() {
+	if b.cancelFun != nil {
+		b.Info("StopModule : " + b.GetModuleName())
+		b.cancelFun()
+		b.cancelFun = nil
 	} else {
-		this.Warning("StopModule : cancelFun not exist " + this.GetModuleName())
+		b.Warning("StopModule : cancelFun not exist " + b.GetModuleName())
 	}
 }
 
-func (this *BaseModule) Start() {
-	go this.startDaemon()
+func (b *BaseModule) Start() {
+	go b.startDaemon()
 	for ; ; {
 		select {
-		case _ = <-this.Ctx.Done():
-			this.Info("StopModule : stop Start goroutine " + this.GetModuleName())
+		case _ = <-b.Ctx.Done():
+			b.Info("StopModule : stop Start goroutine " + b.GetModuleName())
 			return
 			break
 
-		case event := <-this.queue:
-			if this.Handle != nil {
-				err := this.Handle(event)
+		case event := <-b.queue:
+			if b.Handle != nil {
+				err := b.Handle(event)
 				if err != nil {
-					this.Error("Handel 执行失败 " + event.GetEventName() + err.Error())
+					b.Error("Handel 执行失败 " + event.GetEventName() + err.Error())
 				}
 			}
 			break
@@ -157,51 +157,51 @@ func (this *BaseModule) Start() {
 	}
 }
 
-func (this *BaseModule) GetModuleName() string {
-	return this.muduleNmae
+func (b *BaseModule) GetModuleName() string {
+	return b.muduleNmae
 }
 
-func (this *BaseModule) Info(content string, a ...interface{}) {
-	this.App.Info(this.GetModuleName(), content, a ...)
+func (b *BaseModule) Info(content string, a ...interface{}) {
+	b.App.Info(b.GetModuleName(), content, a ...)
 }
 
-func (this *BaseModule) Warning(content string, a ...interface{}) {
-	this.App.Warn(this.GetModuleName(), content, a ...)
+func (b *BaseModule) Warning(content string, a ...interface{}) {
+	b.App.Warn(b.GetModuleName(), content, a ...)
 }
 
-func (this *BaseModule) Error(content string, a ...interface{}) {
-	this.App.Error(this.GetModuleName(), content, a ...)
+func (b *BaseModule) Error(content string, a ...interface{}) {
+	b.App.Error(b.GetModuleName(), content, a ...)
 }
 
-func (this *BaseModule) Debug(content string, a ...interface{}) {
-	this.App.Debug(this.GetModuleName(), content, a ...)
+func (b *BaseModule) Debug(content string, a ...interface{}) {
+	b.App.Debug(b.GetModuleName(), content, a ...)
 }
 
-func (this *BaseModule) Pop() interfaces.Msg {
-	return <-this.queue
+func (b *BaseModule) Pop() interfaces.Msg {
+	return <-b.queue
 }
 
 //发布消息
-func (this *BaseModule) Pub(event interfaces.Msg) {
+func (b *BaseModule) Pub(event interfaces.Msg) {
 	if event == nil {
 		return
 	}
-	this.App.Pub(event)
+	b.App.Pub(event)
 }
 
 //订阅消息
-func (this *BaseModule) Sub(eventName string, filter ...func(interface{}) bool) {
+func (b *BaseModule) Sub(eventName string, filter ...func(interface{}) bool) {
 	if eventName == "" {
 		return
 	}
-	this.App.Sub(eventName, this.module)
+	b.App.Sub(eventName, b.module)
 }
 
 //获取app对象
-func (this *BaseModule) GetApp() interfaces.App {
-	return this.App
+func (b *BaseModule) GetApp() interfaces.App {
+	return b.App
 }
 
-func (this *BaseModule) GetConfig() interfaces.ModuleConfig {
-	return this.Config
+func (b *BaseModule) GetConfig() interfaces.ModuleConfig {
+	return b.Config
 }

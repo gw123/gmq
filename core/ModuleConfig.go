@@ -23,104 +23,105 @@ func NewModuleConfig(moduleName string, appConfig interfaces.AppConfig) *ModuleC
 	return this
 }
 
-func (this *ModuleConfig) GetPath() string {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
+func (m *ModuleConfig) GetPath() string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
-	value, ok := this.Configs["path"].(string)
+	value, ok := m.Configs["path"].(string)
 	if ok {
 		return value
 	}
-	fmt.Printf("模块 %s 获取配置 %s 失败", this.GetModuleName(), "path")
+	fmt.Printf("模块 %s 获取配置 %s 失败", m.GetModuleName(), "path")
 	return value
 }
 
 //默认情况下是内部模块
-func (this *ModuleConfig) IsInnerModule() bool {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
+func (m *ModuleConfig) IsInnerModule() bool {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
-	return this.Configs["inner"] == "true" ||
-		this.Configs["inner"] == "1" ||
-		this.Configs["inner"] == "" ||
-		this.Configs["inner"] == nil
+	return m.Configs["inner"] == "true" ||
+		m.Configs["inner"] == "1" ||
+		m.Configs["inner"] == "" ||
+		m.Configs["inner"] == nil
 }
 
 //是否启动
-func (this *ModuleConfig) IsEnable() bool {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.Configs["enable"] == "true" ||
-		this.Configs["enable"] == "1" ||
-		this.Configs["enable"] == "" ||
-		this.Configs["enable"] == "yes" ||
-		this.Configs["enable"] == nil
+func (m *ModuleConfig) IsEnable() bool {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.Configs["enable"] == "true" ||
+		m.Configs["enable"] == true ||
+		m.Configs["enable"] == "1" ||
+		m.Configs["enable"] == "" ||
+		m.Configs["enable"] == "yes" ||
+		m.Configs["enable"] == nil
 }
 
-func (this *ModuleConfig) GetModuleName() string {
-	return this.ModuleName
+func (m *ModuleConfig) GetModuleName() string {
+	return m.ModuleName
 }
 
-func (this *ModuleConfig) SetItem(key string, value interface{}) {
+func (m *ModuleConfig) SetItem(key string, value interface{}) {
 	key1 := strings.ToLower(key)
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
-	this.Configs[key1] = value
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.Configs[key1] = value
 }
 
-func (this *ModuleConfig) GetItems() (value map[string]interface{}) {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.Configs
+func (m *ModuleConfig) GetItems() (value map[string]interface{}) {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.Configs
 }
 
-func (this *ModuleConfig) GetItem(key string) (value interface{}) {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.Configs[key]
+func (m *ModuleConfig) GetItem(key string) (value interface{}) {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.Configs[key]
 }
 
-func (this *ModuleConfig) GetGlobalItem(key string) (value string) {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.GlobalConfig.GetItem(key)
+func (m *ModuleConfig) GetGlobalItem(key string) (value string) {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.GlobalConfig.GetItem(key)
 }
 
-func (this *ModuleConfig) GetGlobalItems() (value map[string]interface{}) {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.GlobalConfig.GetItems()
+func (m *ModuleConfig) GetGlobalItems() (value map[string]interface{}) {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.GlobalConfig.GetItems()
 }
 
-func (this *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+func (m *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	if config == nil {
 		return
 	}
-	this.GlobalConfig = config
+	m.GlobalConfig = config
 }
 
-func (this *ModuleConfig) GetStringItem(key string) (value string) {
+func (m *ModuleConfig) GetStringItem(key string) (value string) {
 	key1 := strings.ToLower(key)
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	value, ok := this.Configs[key1].(string)
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	value, ok := m.Configs[key1].(string)
 	if ok {
 		return value
 	}
-	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", m.GetModuleName(), key)
 	return ""
 }
 
-func (this *ModuleConfig) GetArrayItem(key string) (value []string) {
+func (m *ModuleConfig) GetArrayItem(key string) (value []string) {
 	key1 := strings.ToLower(key)
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	//fmt.Println(this.Configs[key1])
-	values, ok := this.Configs[key1].([]interface{})
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	//fmt.Println(m.Configs[key1])
+	values, ok := m.Configs[key1].([]interface{})
 	if !ok {
-		fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+		fmt.Printf("模块 %s 获取配置 %s 失败\n", m.GetModuleName(), key)
 		return nil
 	}
 
@@ -133,66 +134,64 @@ func (this *ModuleConfig) GetArrayItem(key string) (value []string) {
 	return value
 }
 
-func (this *ModuleConfig) GetMapItem(key string) (value map[string]interface{}) {
+func (m *ModuleConfig) GetMapItem(key string) (value map[string]interface{}) {
 	key1 := strings.ToLower(key)
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	value, ok := this.Configs[key1].(map[string]interface{})
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	value, ok := m.Configs[key1].(map[string]interface{})
 	if ok {
 		return value
 	}
-	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", m.GetModuleName(), key)
 	return nil
 }
 
-
-
-func (this *ModuleConfig) GetIntItem(key string) int {
+func (m *ModuleConfig) GetIntItem(key string) int {
 	key1 := strings.ToLower(key)
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	value, ok := this.Configs[key1].(int)
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	value, ok := m.Configs[key1].(int)
 	if ok {
 		return value
 	}
-	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", m.GetModuleName(), key)
 	return 0
 }
 
-func (this *ModuleConfig) GetBoolItem(key string) bool {
+func (m *ModuleConfig) GetBoolItem(key string) bool {
 	key1 := strings.ToLower(key)
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	value, ok := this.Configs[key1].(bool)
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	value, ok := m.Configs[key1].(bool)
 	if ok {
 		return value
 	}
-	fmt.Printf("模块 %s 获取配置 %s 失败\n", this.GetModuleName(), key)
+	fmt.Printf("模块 %s 获取配置 %s 失败\n", m.GetModuleName(), key)
 	return false
 }
 
-func (this *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool {
+func (m *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool {
 	newConfigItems := newCofig.GetGlobalItems()
 	isChange := false
 	for key, newConfigItem := range newConfigItems {
-		oldConfig := this.GetStringItem(key)
+		oldConfig := m.GetStringItem(key)
 		if newConfigItem != oldConfig {
-			this.SetItem(key, newConfigItem)
+			m.SetItem(key, newConfigItem)
 			isChange = true
 		}
 	}
 	return isChange
 }
-func (this *ModuleConfig) GetModuleType() string {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	return this.GetStringItem("type")
+func (m *ModuleConfig) GetModuleType() string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return m.GetStringItem("type")
 }
 
-func (this *ModuleConfig) GetItemOrDefault(key, defaultval string) string {
-	this.mutex.RLock()
-	defer this.mutex.RUnlock()
-	ret := this.GetStringItem(key)
+func (m *ModuleConfig) GetItemOrDefault(key, defaultval string) string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	ret := m.GetStringItem(key)
 	if ret == "" {
 		return defaultval
 	}

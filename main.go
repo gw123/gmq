@@ -10,11 +10,12 @@ import (
 	//_ "net/http/pprof"
 )
 
-
 func main() {
 	//go func() {
 	//	log.Println(http.ListenAndServe("localhost:8282", nil))
 	//}()
+
+	//defer profile.Start().Stop()
 
 	moduleName := flag.String("newModule", "", "模块名称  eg:RedisModule")
 	serviceName := flag.String("newService", "", "service名称  eg:UserService")

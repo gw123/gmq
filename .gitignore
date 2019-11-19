@@ -47,6 +47,6 @@ qiniuUpload.sh
 main
 upload
 node_modules/
-
+logs/
 
 

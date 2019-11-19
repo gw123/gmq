@@ -748,13 +748,17 @@ func (s *ResourceService) GetRawResource(id uint) (*models.Resource, error) {
 	return resource, nil
 }
 
-func (s *ResourceService) CheckGroupAuth(ctx echo.Context, groupId uint) bool {
+func (s *ResourceService) CheckGroupAuth(ctx echo.Context, g models.Group) bool {
 	userId := ctxdata.GetUserId(ctx)
 	if userId == 0 {
 		return false
 	}
+	if g.UserId != userId {
+		return false
+	}
+
 	group := &models.Group{}
-	if err := s.db.Select("id").Where("id = ? and user_id = ?", groupId, userId).First(group).Error; err != nil {
+	if err := s.db.Select("id").Where("id = ? and user_id = ?", g.ID, userId).First(group).Error; err != nil {
 		return false
 	}
 	return true

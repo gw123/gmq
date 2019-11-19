@@ -99,3 +99,11 @@ modules:
 
   RedisModule:
     type: inner
+
+  debug:
+    enable: true
+    type: inner
+    #格式 cpu,mem,metex,thread,trace
+    mode: "mem"
+    #一个文件记录的周期
+    period: 600

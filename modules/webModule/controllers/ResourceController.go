@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gw123/GMQ/common/ctxdata"
 	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/common/statusCode"
 	"github.com/gw123/GMQ/core/interfaces"
@@ -105,8 +106,9 @@ func (c *ResourceController) SaveGorup(ctx echo.Context) error {
 	if err := ctx.Bind(&group); err != nil {
 		return c.Fail(ctx, ErrorArgument, err.Error(), err)
 	}
-
-	if !c.ResourceService.CheckGroupAuth(ctx, group.ID) {
+	if group.ID == 0 {
+		group.UserId = ctxdata.GetUserId(ctx)
+	} else if !c.ResourceService.CheckGroupAuth(ctx, group) {
 		return c.FailCode(ctx, statusCode.NotAuth)
 	}
 
