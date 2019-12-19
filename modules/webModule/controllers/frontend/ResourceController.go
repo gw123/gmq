@@ -1,4 +1,4 @@
-package controllers
+package frontend
 
 import (
 	"errors"
@@ -7,19 +7,20 @@ import (
 	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/common/statusCode"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/services"
 	"github.com/labstack/echo"
 	"strconv"
 )
 
 type ResourceController struct {
-	BaseController
+	controllers.BaseController
 	ResourceService *services.ResourceService
 }
 
 func NewResourceController(module interfaces.Module) *ResourceController {
 	temp := new(ResourceController)
-	temp.BaseController.module = module
+	temp.BaseController.Module = module
 	ResourceService, ok := module.GetApp().GetService("ResourceService").(*services.ResourceService)
 	if !ok {
 		module.Error("ResourceService not found")
@@ -35,9 +36,8 @@ func (c *ResourceController) GetResource(ctx echo.Context) error {
 		//userId, _ := strconv.Atoi(jwtToken.Id)
 	}
 
-	ResourceService, _ := c.module.GetApp().GetService("ResourceService").(*services.ResourceService)
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	resource, err := ResourceService.GetResource(id)
+	resource, err := c.ResourceService.GetResource(id)
 	if err != nil {
 		return err
 	}
@@ -104,16 +104,16 @@ func (c *ResourceController) GetCategoryCtrl(ctx echo.Context) error {
 func (c *ResourceController) SaveGorup(ctx echo.Context) error {
 	var group models.Group
 	if err := ctx.Bind(&group); err != nil {
-		return c.Fail(ctx, ErrorArgument, err.Error(), err)
+		return c.Fail(ctx, controllers.ErrorArgument, err.Error(), err)
 	}
 	if group.ID == 0 {
 		group.UserId = ctxdata.GetUserId(ctx)
-	} else if !c.ResourceService.CheckGroupAuth(ctx, group) {
+	} else if !c.ResourceService.CheckGroupAuth(ctx, &group) {
 		return c.FailCode(ctx, statusCode.NotAuth)
 	}
 
 	if err := c.ResourceService.SaveGroup(ctx, &group); err != nil {
-		return c.Fail(ctx, ErrorArgument, err.Error(), err)
+		return c.Fail(ctx, controllers.ErrorArgument, err.Error(), err)
 	}
 	return c.Success(ctx, group)
 }
@@ -122,15 +122,15 @@ func (c *ResourceController) GetRowGroup(ctx echo.Context) error {
 	groupIdStr := ctx.Param("id")
 	groupId, _ := strconv.Atoi(groupIdStr)
 	if groupId == 0 {
-		return c.Fail(ctx, ErrorArgument, "请求参数错误", errors.New("请求参数错误"))
+		return c.Fail(ctx, controllers.ErrorArgument, "请求参数错误", errors.New("请求参数错误"))
 	}
 
 	groupItem, err := c.ResourceService.GetRawGroup(uint(groupId))
 	if err != nil {
-		return c.Fail(ctx, ErrorDb, err.Error(), err)
+		return c.Fail(ctx, controllers.ErrorDb, err.Error(), err)
 	}
 
-	if !c.ResourceService.CheckGroupAuth(ctx, groupItem.ID) {
+	if !c.ResourceService.CheckGroupAuth(ctx, groupItem) {
 		return c.FailCode(ctx, statusCode.NotAuth)
 	}
 
@@ -141,7 +141,7 @@ func (c *ResourceController) DeleteChapter(ctx echo.Context) error {
 	IdStr := ctx.Param("id")
 	id, _ := strconv.Atoi(IdStr)
 	if id == 0 {
-		return c.Fail(ctx, ErrorArgument, "请求参数错误", errors.New("请求参数错误"))
+		return c.Fail(ctx, controllers.ErrorArgument, "请求参数错误", errors.New("请求参数错误"))
 	}
 
 	if !c.ResourceService.CheckChapterAuth(ctx, uint(id)) {
@@ -150,7 +150,7 @@ func (c *ResourceController) DeleteChapter(ctx echo.Context) error {
 
 	err := c.ResourceService.DeleteChapter(uint(id))
 	if err != nil {
-		return c.Fail(ctx, ErrorDb, err.Error(), err)
+		return c.Fail(ctx, controllers.ErrorDb, err.Error(), err)
 	}
 
 	return c.Success(ctx, nil)
@@ -159,15 +159,15 @@ func (c *ResourceController) DeleteChapter(ctx echo.Context) error {
 func (c *ResourceController) SaveResource(ctx echo.Context) error {
 	resource := &models.Resource{}
 	if err := ctx.Bind(resource); err != nil {
-		return c.Fail(ctx, ErrorArgument, err.Error(), err)
+		return c.Fail(ctx, controllers.ErrorArgument, err.Error(), err)
 	}
 
-	if !c.ResourceService.CheckGroupAuth(ctx, resource.GroupId) {
+	if !c.ResourceService.CheckGroupAuthByID(ctx, resource.GroupId) {
 		return c.FailCode(ctx, statusCode.NotAuth)
 	}
 
 	if err := c.ResourceService.SaveResource(ctx, resource); err != nil {
-		return c.Fail(ctx, ErrorDb, "保存失败", err)
+		return c.Fail(ctx, controllers.ErrorDb, "保存失败", err)
 	}
 	return c.Success(ctx, resource)
 }
@@ -176,10 +176,10 @@ func (c *ResourceController) GetRawResource(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	resource, err := c.ResourceService.GetRawResource(uint(id))
 	if err != nil {
-		return c.Fail(ctx, ErrorDb, "获取资源失败", err)
+		return c.Fail(ctx, controllers.ErrorDb, "获取资源失败", err)
 	}
 
-	if !c.ResourceService.CheckGroupAuth(ctx, resource.GroupId) {
+	if !c.ResourceService.CheckGroupAuthByID(ctx, resource.GroupId) {
 		return c.FailCode(ctx, statusCode.NotAuth)
 	}
 
@@ -189,7 +189,7 @@ func (c *ResourceController) GetRawResource(ctx echo.Context) error {
 func (c *ResourceController) GetUserGroups(ctx echo.Context) error {
 	groups, err := c.ResourceService.GetUserGroups(ctx)
 	if err != nil {
-		return c.Fail(ctx, ErrorDb, "获取资源失败", err)
+		return c.Fail(ctx, controllers.ErrorDb, "获取资源失败", err)
 	}
 
 	return c.BaseController.Success(ctx, groups)

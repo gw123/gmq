@@ -2,13 +2,9 @@ package core
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/services"
 	"github.com/sirupsen/logrus"
 	"io"
-
 	"os"
 	"strconv"
 	"strings"
@@ -174,25 +170,25 @@ func (this *LogManager) filter(logLevel, category string, format string, a ...in
 	}).Logf(lvl, format, a...)
 }
 
-func (this *LogManager) PushEs(level, category, date, msg string) {
-	item := LogItem{
-		CreatedAt: date,
-		Level:     level,
-		Cate:      category,
-		Msg:       msg,
-	}
-	esService, ok := this.app.GetService("EsService").(*services.EsService)
-	if !ok {
-		return
-	}
-	data, _ := json.Marshal(item)
-
-	es := esService.GetEs()
-	_, err := es.Index(EsLogIndex, bytes.NewReader(data))
-	if err != nil {
-		fmt.Println(err)
-	}
-}
+//func (this *LogManager) PushEs(level, category, date, msg string) {
+//	item := LogItem{
+//		CreatedAt: date,
+//		Level:     level,
+//		Cate:      category,
+//		Msg:       msg,
+//	}
+//	esService, ok := this.app.GetService("EsService").(*services.EsService)
+//	if !ok {
+//		return
+//	}
+//	data, _ := json.Marshal(item)
+//
+//	es := esService.GetEs()
+//	_, err := es.Index(EsLogIndex, bytes.NewReader(data))
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//}
 
 func (this *LogManager) Write(data []byte) (n int, err error) {
 	return this.buffer.Write([]byte(data))
@@ -214,19 +210,19 @@ func (this *LogManager) Start() {
 				time.Sleep(time.Second * time.Duration(this.interval))
 				continue
 			}
-			fmt.Print(line)
-			if this.app.GetConfig().GetBool("logger.enable") {
-				esService, ok := this.app.GetService("EsService").(*services.EsService)
-				if !ok {
-					fmt.Println("es 服务错误")
-					continue
-				}
-				es := esService.GetEs()
-				_, err = es.Index(EsLogIndex, strings.NewReader(line))
-				if err != nil {
-					fmt.Println(err)
-				}
-			}
+			//fmt.Print(line)
+			//if this.app.GetConfig().GetBool("logger.enable") {
+			//	esService, ok := this.app.GetService("EsService").(*services.EsService)
+			//	if !ok {
+			//		fmt.Println("es 服务错误")
+			//		continue
+			//	}
+			//	es := esService.GetEs()
+			//	_, err = es.Index(EsLogIndex, strings.NewReader(line))
+			//	if err != nil {
+			//		fmt.Println(err)
+			//	}
+			//}
 			//_, err = this.fileHandel.Write(buffer[0:readLen])
 			//if err != nil {
 			//	logrus.Error("this.fileHandel.Write(buffer[0:readLen]): "+err.Error())

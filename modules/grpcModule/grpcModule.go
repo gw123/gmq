@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	"net"
-	"qiniupkg.com/x/errors.v7"
+	"errors"
 	"time"
 )
 

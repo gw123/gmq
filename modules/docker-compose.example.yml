@@ -1,0 +1,32 @@
+version: '2.2'
+services:
+  envoy:
+    image: envoyproxy/envoy:latest
+    container_name: envoy
+    volumes:
+      - $PWD/envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - 8080:8080 #访问端口
+      - 9901:9901 #管理端口
+    networks:
+      - gateway-net
+  gateway:
+    container_name: gateway
+    image: ccr.ccs.tencentyun.com/g-docker/gateway
+    ports: 
+      - 9090:9090
+    volumes:
+      - ./config.docker.yml:/usr/local/bin/config/config.yml
+    environment:
+      COMMENT_ADDR: 0.0.0.0:9090
+      DB_HOST: 172.21.0.1
+      DB_USER: root
+      DB_PWD: root
+    networks:
+       - gateway-net
+volumes:
+  gateway:
+    driver: local
+
+networks:
+  gateway-net:

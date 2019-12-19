@@ -1,9 +1,10 @@
-package controllers
+package frontend
 
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gw123/GMQ/common/models"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/services"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
@@ -11,12 +12,12 @@ import (
 )
 
 type CommentController struct {
-	BaseController
+	controllers.BaseController
 }
 
 func NewCommentController(module interfaces.Module) *CommentController {
 	temp := new(CommentController)
-	temp.BaseController.module = module
+	temp.BaseController.Module = module
 	return temp
 }
 
@@ -32,7 +33,7 @@ func (this *CommentController) CommentList(ctx echo.Context) error {
 	//currentPage := ctx.QueryParam("currentPage")
 	//pageSize := ctx.QueryParam("pageSize")
 
-	db, err := this.module.GetApp().GetDefaultDb()
+	db, err := this.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return err
 	}
@@ -75,7 +76,7 @@ func (this *CommentController) Comment(ctx echo.Context) error {
 		//ParentId: request["type"].(string),
 	}
 
-	db, err := this.module.GetApp().GetDefaultDb()
+	db, err := this.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return err
 	}

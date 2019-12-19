@@ -3,7 +3,8 @@ package server
 import (
 	"github.com/go-playground/validator"
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/modules/webModule/controllers"
+	"github.com/gw123/GMQ/modules/webModule/controllers/admin"
+	"github.com/gw123/GMQ/modules/webModule/controllers/frontend"
 	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
 	"github.com/gw123/GMQ/modules/webModule/webMiddlewares"
@@ -84,12 +85,11 @@ func (this *Server) Start() error {
 
 	//e.Use(loggerMiddleware)
 	//e.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
-
-	indexController := controllers.NewIndexController(this.module)
-	taskController := controllers.NewTaskController(this.module)
-	commentController := controllers.NewCommentController(this.module)
-	resourceController := controllers.NewResourceController(this.module)
-	userController := controllers.NewUserController(this.module)
+	indexController := frontend.NewIndexController(this.module)
+	taskController := admin.NewTaskController(this.module)
+	commentController := frontend.NewCommentController(this.module)
+	resourceController := frontend.NewResourceController(this.module)
+	userController := frontend.NewUserController(this.module)
 
 	normalGroup := e.Group("/gapi")
 	//normalGroup.Use(webMiddlewares.NewPingMiddleware(this.module.GetApp()))
@@ -108,8 +108,6 @@ func (this *Server) Start() error {
 	normalGroup.POST("/login", userController.Login)
 	normalGroup.POST("/register", userController.Register)
 	normalGroup.POST("/comments", commentController.CommentList)
-
-
 	//需要授权
 	authGroup := e.Group("/gapi")
 	authGroup.Use(webMiddlewares.NewAuthMiddleware(this.module))
@@ -133,13 +131,12 @@ func (this *Server) Start() error {
 	authGroup.POST("/changeCollecton", userController.ChangeUserCollection)
 
 	authGroup.POST("/comment", commentController.Comment)
-
 	authGroup.POST("/addTask", taskController.AddTask)
 	authGroup.GET("queryTasksByName", taskController.QueryTasksByName)
 	authGroup.POST("/addClientTask", taskController.AddClientTask)
 
 	//client
-	clientController := controllers.NewClientController(this.module)
+	clientController := admin.NewClientController(this.module)
 	authGroup.GET("/clientList", clientController.ClientList)
 	authGroup.GET("/client/:client_id", clientController.ClientInfo)
 
@@ -161,8 +158,6 @@ func (this *Server) Start() error {
 	e.GET("userCollection", indexController.Home)
 
 	e.GET("testpaper/:id", indexController.Testpaper)
-
-
 	e.GET("qrcode/:content", indexController.Qrcode)
 
 	this.module.Info("端口监听在:  %s", this.addr)

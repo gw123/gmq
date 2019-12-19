@@ -23,76 +23,77 @@ type WebSocketModule struct {
 	base.BaseModule
 }
 
+
 func NewWebSocketModule() *WebSocketModule {
 	this := new(WebSocketModule)
 	return this
 }
 
-func (this *WebSocketModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
-	this.BaseModule.Init(app, config)
-	this.originUrl = config.GetStringItem("originUrl")
-	this.websocketUrl = config.GetStringItem("websocketUrl")
-	go this.InitWebSocket()
+func (w *WebSocketModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
+	w.BaseModule.Init(app, w, config)
+	w.originUrl = config.GetStringItem("originUrl")
+	w.websocketUrl = config.GetStringItem("websocketUrl")
+	go w.InitWebSocket()
 	return nil
 }
 
-func (this *WebSocketModule) UnInit() error {
-	this.BaseModule.UnInit()
-	this.Conn.Close()
+func (w *WebSocketModule) UnInit() error {
+	w.BaseModule.UnInit()
+	w.Conn.Close()
 	return nil
 }
 
-func (this *WebSocketModule) GetStatus() uint64 {
+func (w *WebSocketModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *WebSocketModule) Start() {
+func (w *WebSocketModule) Start() {
 
 	for ; ; {
-		event := this.BaseModule.Pop()
-		err := this.service(event)
+		event := w.BaseModule.Pop()
+		err := w.service(event)
 		if err != nil {
 			//执行失败
 			fmt.Println("WebSocketModule service " + err.Error())
 			//replay := NewPrinterResultEvent(event.GetMsgId(), "打印失败"+err.Error())
-			//this.App.Pub(replay)
+			//w.App.Pub(replay)
 		} else {
 			//执行成功
 			//replay := NewPrinterResultEvent(event.GetMsgId(), "打印成功")
-			//this.App.Pub(replay)
+			//w.App.Pub(replay)
 		}
 		time.Sleep(time.Second)
 	}
 }
 
-func (this *WebSocketModule) Handel(event interfaces.Msg) error {
-	this.Info(event.GetEventName() + ", " + event.GetMsgId() + " ," + string(event.GetPayload()))
-	if this.Conn == nil {
+func (w *WebSocketModule) Handel(event interfaces.Msg) error {
+	w.Info(event.GetEventName() + ", " + event.GetMsgId() + " ," + string(event.GetPayload()))
+	if w.Conn == nil {
 		return errors.New("WebSocket 连接未建立")
 	}
 	eventData, err := json.Marshal(event)
 	if err != nil {
-		this.Error("json.Marshal " + err.Error())
+		w.Error("json.Marshal " + err.Error())
 		return err
 	}
-	//	this.Debug("eventData:" + string(eventData))
-	_, err = this.Conn.Write(eventData)
+	//	w.Debug("eventData:" + string(eventData))
+	_, err = w.Conn.Write(eventData)
 	if err != nil {
-		this.Error("Conn.Write " + err.Error())
+		w.Error("Conn.Write " + err.Error())
 		return err
 	}
 	return nil
 }
 
-func (this *WebSocketModule) InitWebSocket() error {
-	url := this.websocketUrl + "?authToken=token_gw123&clientName=innerLogServer"
-	//this.Debug("url" + url)
-	ws, err := websocket.Dial(url, "", this.originUrl)
+func (w *WebSocketModule) InitWebSocket() error {
+	url := w.websocketUrl + "?authToken=token_gw123&clientName=innerLogServer"
+	//w.Debug("url" + url)
+	ws, err := websocket.Dial(url, "", w.originUrl)
 	if err != nil {
-		this.Error("InitWebSocket " + err.Error())
+		w.Error("InitWebSocket " + err.Error())
 		return err
 	}
-	this.Conn = ws
+	w.Conn = ws
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func(wg sync.WaitGroup) {
@@ -104,19 +105,27 @@ func (this *WebSocketModule) InitWebSocket() error {
 				if strings.Contains(err.Error(), "forcibly closed") {
 					break
 				}
-				this.Error("InitWebSocket " + err.Error())
+				w.Error("InitWebSocket " + err.Error())
 				continue
 			}
 			event := &gmsg.Msg{}
 			err = json.Unmarshal(msg[0:length], event)
 			if err != nil {
-				this.Error("InitWebSocket " + err.Error())
+				w.Error("InitWebSocket " + err.Error())
 				continue
 
 			}
-			this.Push(event)
+			w.Push(event)
 		}
 	}(wg)
 	wg.Wait()
 	return nil
+}
+
+func (w *WebSocketModule) Handle(event interfaces.Msg) (err error) {
+	panic("implement me")
+}
+
+func (w *WebSocketModule) Watch(index int) {
+	panic("implement me")
 }
