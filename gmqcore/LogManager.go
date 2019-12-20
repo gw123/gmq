@@ -28,7 +28,7 @@ type LogItem struct {
 const EsLogIndex = "gmq-log"
 
 type LogManager struct {
-	app                 gmq.App
+	app                 App
 	fileHandel          *os.File
 	isAsync             bool
 	interval            int
@@ -42,7 +42,7 @@ type LogManager struct {
 	timestampFormat     string
 }
 
-func NewLogManager(app gmq.App) *LogManager {
+func NewLogManager(app App) *LogManager {
 	this := new(LogManager)
 	this.app = app
 	this.buffer = new(bytes.Buffer)

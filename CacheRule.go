@@ -6,7 +6,7 @@ import (
 
 /**
 const (
-Resource         gmq.CacheKey = "Resource:"
+Resource         CacheKey = "Resource:"
 Group            gmq.CacheKey = "Group:"
 GroupLatestNews  gmq.CacheKey = "GroupLatestNews:%d"
 Chapter          gmq.CacheKey = "Chapter:"

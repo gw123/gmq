@@ -1,6 +1,7 @@
 package gmqcore
 
 import (
+	"github.com/gw123/gmq"
 	"sync"
 	"strings"
 	"time"

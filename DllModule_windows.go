@@ -27,7 +27,7 @@ func (this *DllModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *DllModule) Init(app gmq.App, config gmq.ModuleConfig) error {
+func (this *DllModule) Init(app App, config ModuleConfig) error {
 	this.BaseModule.Init(app, this,config)
 	var err error
 	path := config.GetPath()
@@ -97,7 +97,7 @@ func (this *DllModule) Init(app gmq.App, config gmq.ModuleConfig) error {
 }
 
 
-func (this *DllModule) Handle(event gmq.Msg) error {
+func (this *DllModule) Handle(event Msg) error {
 	type Event struct {
 		MsgId     string
 		EventName string

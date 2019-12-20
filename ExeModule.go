@@ -24,7 +24,7 @@ func (this *ExeModule) GetStatus() uint64 {
 	return 1
 }
 
-func (this *ExeModule) Init(app gmq.App, config gmq.ModuleConfig) (err error) {
+func (this *ExeModule) Init(app App, config ModuleConfig) (err error) {
 	this.BaseModule.Init(app, this,config)
 	this.execPath = config.GetPath()
 	//this.Debug("path :" + path)
@@ -46,7 +46,7 @@ func (this *ExeModule) Init(app gmq.App, config gmq.ModuleConfig) (err error) {
 }
 
 
-func (this *ExeModule) Handle(event gmq.Msg) error {
+func (this *ExeModule) Handle(event Msg) error {
 	type Event struct {
 		MsgId     string
 		EventType string
