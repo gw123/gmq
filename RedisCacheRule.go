@@ -11,10 +11,9 @@ func MakeCacheKey(patten CacheKey, args ...interface{}) string {
 }
 
 /***
-    KeyPatten  example : group:102 , chapter:102, resource:102
+    CacheKey  example : group:102 , chapter:102, resource:102
 	Callback   call to update  cache  with MakeCacheKey(KeyPatten  , arg...)
 */
-
 type CacheRule interface {
 	GetCacheKey() CacheKey
 	GetCallback() UpdateCacheCallback
