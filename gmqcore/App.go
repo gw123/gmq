@@ -146,6 +146,7 @@ func (app *App) LoadDb() {
 			password);
 		if err != nil {
 			app.Warn("App", "db load error, %s: ", err.Error())
+			continue
 		}
 
 		maxIdles := app.configData.GetInt("dbpool." + key + ".max_idles")
