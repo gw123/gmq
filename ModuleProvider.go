@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 type ModuleProvider interface {
 	//获取模块名

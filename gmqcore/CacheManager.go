@@ -1,23 +1,22 @@
-package core
+package gmqcore
 
 import (
 	"encoding/json"
 	"errors"
 	"github.com/go-redis/redis"
-	"github.com/gw123/gmq/common/gmsg"
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"sync"
 	"time"
 )
 
 type CacheManager struct {
-	app         interfaces.App
+	app         gmq.App
 	redisClient *redis.Client
-	cacheMap    map[interfaces.CacheKey]interfaces.CacheRule
+	cacheMap    map[gmq.CacheKey]gmq.CacheRule
 	mutex       sync.RWMutex
 }
 
-func NewCacheManager(app interfaces.App) *CacheManager {
+func NewCacheManager(app gmq.App) *CacheManager {
 	redisClient, err := app.GetDefaultRedis()
 	if err != nil {
 		app.Error("CacheManager", "app.GetDefaultRedis() is nil")
@@ -25,15 +24,15 @@ func NewCacheManager(app interfaces.App) *CacheManager {
 	return &CacheManager{
 		app:         app,
 		redisClient: redisClient,
-		cacheMap:    make(map[interfaces.CacheKey]interfaces.CacheRule),
+		cacheMap:    make(map[gmq.CacheKey]gmq.CacheRule),
 	}
 }
 
-func (c CacheManager) UpdateCache(patten interfaces.CacheKey, arg ...interface{}) error {
+func (c CacheManager) UpdateCache(patten gmq.CacheKey, arg ...interface{}) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	key := interfaces.MakeCacheKey(patten, arg...)
+	key := gmq.MakeCacheKey(patten, arg...)
 
 	rule, ok := c.cacheMap[patten]
 	if !ok {
@@ -57,10 +56,10 @@ func (c CacheManager) UpdateCache(patten interfaces.CacheKey, arg ...interface{}
 	return redisClient.Set(key, tmp, time.Hour*24*30).Err()
 }
 
-func (c CacheManager) GetCache(out interface{},patten interfaces.CacheKey,  arg ...interface{}, ) error {
+func (c CacheManager) GetCache(out interface{},patten gmq.CacheKey,  arg ...interface{}, ) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
-	key := interfaces.MakeCacheKey(patten, arg...)
+	key := gmq.MakeCacheKey(patten, arg...)
 	rule, ok := c.cacheMap[patten]
 	if !ok {
 		return errors.New("not set CacheRule")
@@ -84,13 +83,13 @@ func (c CacheManager) GetCache(out interface{},patten interfaces.CacheKey,  arg 
 	return json.Unmarshal([]byte(data), out)
 }
 
-func (c CacheManager) AddCacheRule(rule interfaces.CacheRule) {
+func (c CacheManager) AddCacheRule(rule gmq.CacheRule) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.cacheMap[rule.GetCacheKey()] = rule
 }
 
-func (c CacheManager) DelCacheRule(patten interfaces.CacheKey) {
+func (c CacheManager) DelCacheRule(patten gmq.CacheKey) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	delete(c.cacheMap, patten)

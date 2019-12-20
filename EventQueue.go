@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 type EventQueue interface {
 	Push(event Msg) error

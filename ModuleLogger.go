@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 type ModuleLogger interface {
 	Info(format string, a ...interface{})

@@ -1,4 +1,4 @@
-package helper
+package cmd
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 var moduleContent = `package DebugModule
 
 import (
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"github.com/gw123/gmq/modules/base"
 )
 
@@ -24,13 +24,13 @@ func NewDebugModule() *DebugModule {
 	return this
 }
 
-func (this *DebugModule) Init(app interfaces.App, config interfaces.ModuleConfig) error {
+func (this *DebugModule) Init(app gmq.App, config gmq.ModuleConfig) error {
 	this.BaseModule.Init(app, this, config)
 	//app.Sub("debug", this)
 	return nil
 }
 
-func (this *DebugModule) Handle(event interfaces.Msg) error {
+func (this *DebugModule) Handle(event gmq.Msg) error {
 	return nil
 }
 
@@ -41,10 +41,10 @@ func (this *DebugModule) Watch(index int) {
 
 var moduleProviderContent = `package DebugModule
 
-import "github.com/gw123/gmq/core/interfaces"
+import "github.com/gw123/gmq"
 
 type DebugModuleProvider struct {
-	module interfaces.Module
+	module gmq.Module
 }
 
 func NewDebugModuleProvider() *DebugModuleProvider {
@@ -59,7 +59,7 @@ func (this *DebugModuleProvider) GetModuleName() string {
 func (this *DebugModuleProvider) Register() {
 }
 
-func (this *DebugModuleProvider) GetModule() interfaces.Module {
+func (this *DebugModuleProvider) GetModule() gmq.Module {
 	if this.module != nil {
 		return this.module
 	}
@@ -67,7 +67,7 @@ func (this *DebugModuleProvider) GetModule() interfaces.Module {
 	return this.module
 }
 
-func (this *DebugModuleProvider) GetNewModule() interfaces.Module {
+func (this *DebugModuleProvider) GetNewModule() gmq.Module {
 	this.module = NewDebugModule()
 	return this.module
 }

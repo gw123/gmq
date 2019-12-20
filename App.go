@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 import (
 	"github.com/go-redis/redis"

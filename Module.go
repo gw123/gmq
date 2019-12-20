@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 const ModuleLoadSuccess = 0x01
 const ModuleLoadFailed = 0x02

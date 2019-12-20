@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 type AppConfig interface {
 	GetItem(key string) (value string)

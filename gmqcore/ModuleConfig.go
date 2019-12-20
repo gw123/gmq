@@ -1,8 +1,8 @@
-package core
+package gmqcore
 
 import (
 	"fmt"
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"strings"
 	"sync"
 )
@@ -11,10 +11,10 @@ type ModuleConfig struct {
 	mutex        sync.RWMutex
 	ModuleName   string                 `json:"module_name"`
 	Configs      map[string]interface{} `json:"configs"`
-	GlobalConfig interfaces.AppConfig
+	GlobalConfig gmq.AppConfig
 }
 
-func NewModuleConfig(moduleName string, appConfig interfaces.AppConfig) *ModuleConfig {
+func NewModuleConfig(moduleName string, appConfig gmq.AppConfig) *ModuleConfig {
 	this := new(ModuleConfig)
 	this.ModuleName = moduleName
 	this.Configs = make(map[string]interface{})
@@ -93,7 +93,7 @@ func (m *ModuleConfig) GetGlobalItems() (value map[string]interface{}) {
 	return m.GlobalConfig.GetItems()
 }
 
-func (m *ModuleConfig) SetGlobalConfig(config interfaces.AppConfig) {
+func (m *ModuleConfig) SetGlobalConfig(config gmq.AppConfig) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	if config == nil {
@@ -170,7 +170,7 @@ func (m *ModuleConfig) GetBoolItem(key string) bool {
 	return false
 }
 
-func (m *ModuleConfig) MergeNewConfig(newCofig interfaces.ModuleConfig) bool {
+func (m *ModuleConfig) MergeNewConfig(newCofig gmq.ModuleConfig) bool {
 	newConfigItems := newCofig.GetGlobalItems()
 	isChange := false
 	for key, newConfigItem := range newConfigItems {

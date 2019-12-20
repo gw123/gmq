@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 const GROUP = "group"
 const RESOURCE = "group"

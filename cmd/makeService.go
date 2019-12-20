@@ -1,4 +1,4 @@
-package helper
+package cmd
 
 import (
 	"errors"
@@ -10,19 +10,19 @@ import (
 var serviceContent = `package services
 
 import (
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 )
 
 
 type UserService struct {
-	app   interfaces.App
+	app   gmq.App
 	db    *gorm.DB
 	redis *redis.Client
 }
 
-func NewUserService(app interfaces.App) (*UserService, error) {
+func NewUserService(app gmq.App) (*UserService, error) {
 	db, err := app.GetDefaultDb()
 	if err != nil {
 		return nil, err

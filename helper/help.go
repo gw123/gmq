@@ -1,4 +1,4 @@
-package gmq2
+package helper
 
 import (
 	"encoding/json"

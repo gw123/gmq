@@ -1,24 +1,23 @@
-package core
+package gmqcore
 
 import (
-	"github.com/gw123/gmq/core/interfaces"
 	"sync"
 	"strings"
 	"time"
 )
 
 type Dispatch struct {
-	EventQueueBinds map[string][]interfaces.Module
-	EventQueues     interfaces.EventQueue
-	app             interfaces.App
+	EventQueueBinds map[string][]gmq.Module
+	EventQueues     gmq.EventQueue
+	app             gmq.App
 	mutex           sync.Mutex
 	appEventNames   []string
 }
 
-func NewDispath(app interfaces.App) *Dispatch {
+func NewDispath(app gmq.App) *Dispatch {
 	this := new(Dispatch)
 	this.app = app
-	this.EventQueueBinds = make(map[string][]interfaces.Module)
+	this.EventQueueBinds = make(map[string][]gmq.Module)
 	this.EventQueues = NewEventQueue(app)
 	return this
 }
@@ -62,7 +61,7 @@ func (this *Dispatch) Start() {
 	}
 }
 
-func (this *Dispatch) PushToModule(event interfaces.Msg) {
+func (this *Dispatch) PushToModule(event gmq.Msg) {
 	eventName := event.GetEventName()
 	modules := this.EventQueueBinds[eventName]
 	//this.app.Debug("Dispatch",fmt.Sprintf("Bingdings modules len %d", len(modules)))
@@ -75,14 +74,14 @@ func (this *Dispatch) PushToModule(event interfaces.Msg) {
 	}
 }
 
-func (this *Dispatch) handel(event interfaces.Msg) {
+func (this *Dispatch) handel(event gmq.Msg) {
 	app, ok := this.app.(*App)
 	if ok {
 		app.Handel(event)
 	}
 }
 
-func (this *Dispatch) Sub(eventName string, module interfaces.Module) {
+func (this *Dispatch) Sub(eventName string, module gmq.Module) {
 	if eventName == "" || eventName == " " {
 		this.app.Warn("Dispatch", "Sub eventName 为空,"+" moduleName: "+module.GetModuleName())
 		return
@@ -100,7 +99,7 @@ func (this *Dispatch) Sub(eventName string, module interfaces.Module) {
 	this.EventQueueBinds[eventName] = append(this.EventQueueBinds[eventName], module)
 }
 
-func (this *Dispatch) UnSub(eventName string, module interfaces.Module) {
+func (this *Dispatch) UnSub(eventName string, module gmq.Module) {
 	if eventName == "" {
 		this.app.Warn("Dispatch", "UnSub eventName 为空")
 		return
@@ -118,7 +117,7 @@ func (this *Dispatch) UnSub(eventName string, module interfaces.Module) {
 	}
 }
 
-func (this *Dispatch) Pub(event interfaces.Msg) {
+func (this *Dispatch) Pub(event gmq.Msg) {
 	if event.GetEventName() == "" {
 		this.app.Warn("Dispatch", "Pub eventName 为空"+"moduleName:"+event.GetEventName()+"srouceModule"+event.GetSourceModule())
 		return

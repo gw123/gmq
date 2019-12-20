@@ -1,9 +1,8 @@
-package core
+package gmqcore
 
 import (
 	"github.com/go-redis/redis"
-	"github.com/gw123/gmq/common/utils"
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/pkg/errors"
 )
@@ -12,10 +11,10 @@ type RedisPool struct {
 	pool    map[string]*redis.Client
 	defualt string
 	config  map[string]interface{}
-	app     interfaces.App
+	app     gmq.App
 }
 
-func NewRedisPool(config map[string]interface{}, app interfaces.App) *RedisPool {
+func NewRedisPool(config map[string]interface{}, app gmq.App) *RedisPool {
 	this := new(RedisPool)
 	this.pool = make(map[string]*redis.Client)
 	this.config = config

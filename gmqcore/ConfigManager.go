@@ -1,9 +1,9 @@
 // + !debug
 
-package core
+package gmqcore
 
 import (
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"github.com/spf13/viper"
 	"os"
 	"regexp"
@@ -15,16 +15,16 @@ import (
  * 2. 管理配置,更新模块配置
  */
 type ConfigManager struct {
-	ModuleConfigs map[string]interfaces.ModuleConfig
-	app           interfaces.App
-	GlobalConfig  interfaces.AppConfig
+	ModuleConfigs map[string]gmq.ModuleConfig
+	app           gmq.App
+	GlobalConfig  gmq.AppConfig
 	ConfigData    *viper.Viper
 }
 
-func NewConfigManager(app interfaces.App, configData *viper.Viper) *ConfigManager {
+func NewConfigManager(app gmq.App, configData *viper.Viper) *ConfigManager {
 	this := new(ConfigManager)
 	this.app = app
-	this.ModuleConfigs = make(map[string]interfaces.ModuleConfig)
+	this.ModuleConfigs = make(map[string]gmq.ModuleConfig)
 	this.GlobalConfig = NewAppConfig()
 	this.ConfigData = configData
 	err := this.ParseConfig()

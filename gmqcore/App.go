@@ -1,11 +1,10 @@
-package core
+package gmqcore
 
 import (
 	"encoding/json"
 	"errors"
 	"github.com/go-redis/redis"
-	"github.com/gw123/gmq/common/gmsg"
-	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 	"os"
@@ -22,10 +21,10 @@ type App struct {
 	appEventNames     string
 	Version           string
 	configData        *viper.Viper
-	DbPool            interfaces.DbPool
-	RedisPool         interfaces.RedisPool
-	CacheManager      interfaces.CacheManager
-	Services          map[string]interfaces.Service
+	DbPool            gmq.DbPool
+	RedisPool         gmq.RedisPool
+	CacheManager      gmq.CacheManager
+	Services          map[string]gmq.Service
 }
 
 func NewApp(viper2 *viper.Viper) *App {
@@ -36,7 +35,7 @@ func NewApp(viper2 *viper.Viper) *App {
 	this.dispatch = NewDispath(this)
 	this.logManager = NewLogManager(this)
 	this.logManager.Start()
-	this.Services = make(map[string]interfaces.Service)
+	this.Services = make(map[string]gmq.Service)
 	this.configManager = NewConfigManager(this, viper2)
 	this.moduleManager = NewModuleManager(this, this.configManager)
 	this.errorManager = NewErrorManager(this)
@@ -186,12 +185,12 @@ func (app *App) doWorker() {
 	app.moduleManager.LoadModules()
 	app.appEventNames = "stopModule,startModule,configChange"
 	app.dispatch.SetEventNames(app.appEventNames)
-	event := gmsg.NewEvent("appReady", []byte{})
+	event := gmq.NewEvent("appReady", []byte{})
 	app.Pub(event)
 	go app.dispatch.Start()
 }
 
-func (app *App) Handel(event interfaces.Msg) {
+func (app *App) Handel(event gmq.Msg) {
 	//app.Debug("App", "App event"+event.GetEventName())
 	switch event.GetEventName() {
 	case "configChange":
@@ -219,7 +218,7 @@ func (app *App) Handel(event interfaces.Msg) {
 	}
 }
 
-func (app *App) Sub(eventName string, module interfaces.Module) {
+func (app *App) Sub(eventName string, module gmq.Module) {
 	if app.dispatch != nil {
 		app.dispatch.Sub(eventName, module)
 	} else {
@@ -227,7 +226,7 @@ func (app *App) Sub(eventName string, module interfaces.Module) {
 	}
 }
 
-func (app *App) UnSub(eventName string, module interfaces.Module) {
+func (app *App) UnSub(eventName string, module gmq.Module) {
 	if app.dispatch != nil {
 		app.dispatch.UnSub(eventName, module)
 	} else {
@@ -235,7 +234,7 @@ func (app *App) UnSub(eventName string, module interfaces.Module) {
 	}
 }
 
-func (app *App) Pub(event interfaces.Msg) {
+func (app *App) Pub(event gmq.Msg) {
 	if app.middlewareManager.Handel(event) {
 		app.dispatch.Pub(event)
 	}
@@ -294,7 +293,7 @@ func (app *App) GetAppConfigItem(key string) (string, error) {
 }
 
 /***/
-func (app *App) LoadModuleProvider(provider interfaces.ModuleProvider) {
+func (app *App) LoadModuleProvider(provider gmq.ModuleProvider) {
 	app.moduleManager.LoadModuleProvider(provider)
 }
 
@@ -312,7 +311,7 @@ func (app *App) GetDefaultDb() (*gorm.DB, error) {
 	return app.GetDb(dbname)
 }
 
-func (app *App) RegisterService(name string, service interfaces.Service) {
+func (app *App) RegisterService(name string, service gmq.Service) {
 	if name == "" {
 		name = service.GetServiceName()
 	}
@@ -324,7 +323,7 @@ func (app *App) RegisterService(name string, service interfaces.Service) {
 	return
 }
 
-func (app *App) GetService(name string) interfaces.Service {
+func (app *App) GetService(name string) gmq.Service {
 	return app.Services[name]
 }
 
@@ -336,14 +335,14 @@ func (app *App) GetDefaultRedis() (*redis.Client, error) {
 	return app.RedisPool.GetDb("default")
 }
 
-func (app *App) GetCacheManager() (interfaces.CacheManager, error) {
+func (app *App) GetCacheManager() (gmq.CacheManager, error) {
 	if app.CacheManager == nil {
 		return nil, errors.New("app.cacheManager is nil")
 	}
 	return app.CacheManager, nil
 }
 
-func (app *App) GetLogger() (interfaces.Logger) {
+func (app *App) GetLogger() (gmq.Logger) {
 	return app.logManager
 }
 

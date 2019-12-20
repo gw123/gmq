@@ -1,4 +1,4 @@
-package gmq2
+package gmq
 
 import (
 	"github.com/go-redis/redis"
@@ -6,11 +6,11 @@ import (
 
 /**
 const (
-Resource         interfaces.CacheKey = "Resource:"
-Group            interfaces.CacheKey = "Group:"
-GroupLatestNews  interfaces.CacheKey = "GroupLatestNews:%d"
-Chapter          interfaces.CacheKey = "Chapter:"
-GroupTag         interfaces.CacheKey = "GroupTag:"
+Resource         gmq.CacheKey = "Resource:"
+Group            gmq.CacheKey = "Group:"
+GroupLatestNews  gmq.CacheKey = "GroupLatestNews:%d"
+Chapter          gmq.CacheKey = "Chapter:"
+GroupTag         gmq.CacheKey = "GroupTag:"
 )
 */
 

@@ -1,12 +1,11 @@
 // + !debug
 
-package core
+package gmqcore
 
 import (
 	"errors"
 	"fmt"
-	"github.com/gw123/gmq/core/interfaces"
-	"github.com/gw123/gmq/modules/base"
+	"github.com/gw123/gmq"
 	"strings"
 )
 
@@ -17,18 +16,18 @@ import (
  */
 type ModuleManager struct {
 	configManager *ConfigManager
-	Modules       map[string]interfaces.Module
-	app           interfaces.App
+	Modules       map[string]gmq.Module
+	app           gmq.App
 	ConfigData    []byte
-	providers     map[string]interfaces.ModuleProvider
+	providers     map[string]gmq.ModuleProvider
 }
 
-func NewModuleManager(app interfaces.App, configManger *ConfigManager) *ModuleManager {
+func NewModuleManager(app gmq.App, configManger *ConfigManager) *ModuleManager {
 	this := new(ModuleManager)
 	this.app = app
 	this.configManager = configManger
-	this.Modules = make(map[string]interfaces.Module)
-	this.providers = make(map[string]interfaces.ModuleProvider, 0)
+	this.Modules = make(map[string]gmq.Module)
+	this.providers = make(map[string]gmq.ModuleProvider, 0)
 	return this
 }
 
@@ -63,7 +62,7 @@ func (m *ModuleManager) LoadModules() {
 	}
 }
 
-func (m *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
+func (m *ModuleManager) LoadModule(moduleName string, config gmq.ModuleConfig) (err error) {
 	moduleType := config.GetModuleType()
 	if moduleType == "" {
 		moduleType = "inner"
@@ -97,8 +96,8 @@ func (m *ModuleManager) UnLoadModule(moduleName string) (err error) {
 	return
 }
 
-func (m *ModuleManager) loadDll(moduleName string, config interfaces.ModuleConfig) (err error) {
-	module := base.NewDllModule()
+func (m *ModuleManager) loadDll(moduleName string, config gmq.ModuleConfig) (err error) {
+	module := gmq.NewDllModule()
 	err = module.Init(m.app, config)
 
 	if err == nil {
@@ -108,8 +107,8 @@ func (m *ModuleManager) loadDll(moduleName string, config interfaces.ModuleConfi
 	return err
 }
 
-func (m *ModuleManager) loadExe(moduleName string, config interfaces.ModuleConfig) (err error) {
-	module := base.NewExeModule()
+func (m *ModuleManager) loadExe(moduleName string, config gmq.ModuleConfig) (err error) {
+	module := gmq.NewExeModule()
 	err = module.Init(m.app, config)
 	if err == nil {
 		m.Modules[moduleName] = module
@@ -118,14 +117,14 @@ func (m *ModuleManager) loadExe(moduleName string, config interfaces.ModuleConfi
 }
 
 //注意模块统一小写
-func (m *ModuleManager) LoadModuleProvider(provider interfaces.ModuleProvider) {
+func (m *ModuleManager) LoadModuleProvider(provider gmq.ModuleProvider) {
 	if provider == nil {
 		return
 	}
 	m.providers[strings.ToLower(provider.GetModuleName())] = provider
 }
 
-func (m *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
+func (m *ModuleManager) loadInnerModule(moduleName string, config gmq.ModuleConfig) (err error) {
 	provider, ok := m.providers[moduleName]
 	if ok {
 		newModule := provider.GetModule()
