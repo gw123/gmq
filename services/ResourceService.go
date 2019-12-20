@@ -177,7 +177,6 @@ func (s *ResourceService) LoadCacheRule() {
 			}
 
 			latestItems, err := s.GetGroupLatestResource(groupId)
-
 			return latestItems, err
 		},
 		s.redis,
@@ -432,9 +431,9 @@ func (s *ResourceService) GetRawIndexCtrl(maxId, currentId int) ([]*IndexCtl, er
 		}
 
 		if block.Data.Type == common.GROUP {
-			latestItem := []LatestGroupItem{}
-			err := s.cacheManager.GetCache(caches.GroupLatestNews, &latestItem, block.Data.Id)
+			var latestItem []LatestGroupItem
 			block.Data.Latest = make([]LatestGroupItem, 0)
+			err := s.cacheManager.GetCache(&latestItem, caches.GroupLatestNews, block.Data.Id)
 			if err == nil {
 				block.Data.Latest = append(block.Data.Latest, latestItem...)
 			} else {
@@ -748,13 +747,30 @@ func (s *ResourceService) GetRawResource(id uint) (*models.Resource, error) {
 	return resource, nil
 }
 
-func (s *ResourceService) CheckGroupAuth(ctx echo.Context, groupId uint) bool {
+func (s *ResourceService) CheckGroupAuth(ctx echo.Context, g *models.Group) bool {
 	userId := ctxdata.GetUserId(ctx)
 	if userId == 0 {
 		return false
 	}
+	if g.UserId != userId {
+		return false
+	}
+
 	group := &models.Group{}
-	if err := s.db.Select("id").Where("id = ? and user_id = ?", groupId, userId).First(group).Error; err != nil {
+	if err := s.db.Select("id").Where("id = ? and user_id = ?", g.ID, userId).First(group).Error; err != nil {
+		return false
+	}
+	return true
+}
+
+func (s *ResourceService) CheckGroupAuthByID(ctx echo.Context, groupID uint) bool {
+	userId := ctxdata.GetUserId(ctx)
+	if userId == 0 {
+		return false
+	}
+
+	group := &models.Group{}
+	if err := s.db.Select("id").Where("id = ? and user_id = ?", groupID, userId).First(group).Error; err != nil {
 		return false
 	}
 	return true
@@ -770,7 +786,7 @@ func (s *ResourceService) CheckChapterAuth(ctx echo.Context, chapterId uint) boo
 		return false
 	}
 
-	return s.CheckGroupAuth(ctx, chapter.GroupId)
+	return s.CheckGroupAuthByID(ctx, chapter.GroupId)
 }
 
 func (s *ResourceService) GetUserGroups(ctx echo.Context) ([]models.Group, error) {

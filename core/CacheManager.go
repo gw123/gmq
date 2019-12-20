@@ -57,7 +57,7 @@ func (c CacheManager) UpdateCache(patten interfaces.CacheKey, arg ...interface{}
 	return redisClient.Set(key, tmp, time.Hour*24*30).Err()
 }
 
-func (c CacheManager) GetCache(patten interfaces.CacheKey, out interface{}, arg ...interface{}, ) error {
+func (c CacheManager) GetCache(out interface{},patten interfaces.CacheKey,  arg ...interface{}, ) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	key := interfaces.MakeCacheKey(patten, arg...)

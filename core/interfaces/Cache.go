@@ -23,10 +23,9 @@ type CacheRule interface {
 	GetRedisClient() *redis.Client
 }
 
-
 type CacheManager interface {
 	UpdateCache(patten CacheKey, arg ...interface{}) error
-	GetCache(patten CacheKey, out interface{}, arg ...interface{}) error
+	GetCache(out interface{}, patten CacheKey, arg ...interface{}) error
 	AddCacheRule(rule CacheRule)
 	DelCacheRule(patten CacheKey)
 }

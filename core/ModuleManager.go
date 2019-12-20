@@ -32,37 +32,38 @@ func NewModuleManager(app interfaces.App, configManger *ConfigManager) *ModuleMa
 	return this
 }
 
-func (this *ModuleManager) LoadModules() {
-	for moduleName, moduleConfig := range this.configManager.ModuleConfigs {
+func (m *ModuleManager) LoadModules() {
+	for moduleName, moduleConfig := range m.configManager.ModuleConfigs {
 		if moduleConfig.IsEnable() == false {
-			//this.app.Info("ConfigManager", "禁止加载 "+moduleName)
+			//m.app.Debug("ConfigManager","enable:%v,", moduleConfig.GetItem("enable"))
+			m.app.Info("ConfigManager", "禁止加载 "+moduleName)
 			continue
 		}
-		err := this.LoadModule(moduleName, moduleConfig)
+		err := m.LoadModule(moduleName, moduleConfig)
 		if err != nil {
-			this.app.Error("ModuleManager", "模块加载失败 "+moduleName+" "+err.Error())
+			m.app.Error("ModuleManager", "模块加载失败 "+moduleName+" "+err.Error())
 			continue
 		} else {
-			this.app.Info("ModuleManager", "加载成功 "+moduleName)
+			m.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
 
-		err = this.Modules[moduleName].BeforeStart()
+		err = m.Modules[moduleName].BeforeStart()
 		if err != nil {
-			this.app.Error("ModuleManager", "模块加载失败 on BeforeStart "+moduleName+" "+err.Error())
+			m.app.Error("ModuleManager", "模块加载失败 on BeforeStart "+moduleName+" "+err.Error())
 			continue
 		} else {
-			this.app.Info("ModuleManager", "加载成功 "+moduleName)
+			m.app.Info("ModuleManager", "加载成功 "+moduleName)
 		}
 	}
 
-	for _, module := range this.Modules {
+	for _, module := range m.Modules {
 		if module != nil {
 			go module.Start()
 		}
 	}
 }
 
-func (this *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
+func (m *ModuleManager) LoadModule(moduleName string, config interfaces.ModuleConfig) (err error) {
 	moduleType := config.GetModuleType()
 	if moduleType == "" {
 		moduleType = "inner"
@@ -70,17 +71,17 @@ func (this *ModuleManager) LoadModule(moduleName string, config interfaces.Modul
 
 	switch moduleType {
 	case "inner":
-		this.app.Info("ModuleManager", "加载内部模块 "+moduleName)
-		err = this.loadInnerModule(moduleName, config)
+		m.app.Info("ModuleManager", "加载内部模块 "+moduleName)
+		err = m.loadInnerModule(moduleName, config)
 		break
 	case "dll":
 	case "lib":
-		this.app.Info("ModuleManager", "加载外部模块 "+moduleName)
-		err = this.loadDll(moduleName, config)
+		m.app.Info("ModuleManager", "加载外部模块 "+moduleName)
+		err = m.loadDll(moduleName, config)
 		break
 	case "exe":
-		this.app.Info("ModuleManager", "加载外部模块 "+moduleName)
-		err = this.loadExe(moduleName, config)
+		m.app.Info("ModuleManager", "加载外部模块 "+moduleName)
+		err = m.loadExe(moduleName, config)
 		break
 	default:
 		err = errors.New("not support module type 不支持的模块类型")
@@ -88,49 +89,49 @@ func (this *ModuleManager) LoadModule(moduleName string, config interfaces.Modul
 	return err
 }
 
-func (this *ModuleManager) UnLoadModule(moduleName string) (err error) {
-	if this.Modules[moduleName] == nil {
+func (m *ModuleManager) UnLoadModule(moduleName string) (err error) {
+	if m.Modules[moduleName] == nil {
 		return
 	}
-	this.Modules[moduleName].UnInit()
+	m.Modules[moduleName].UnInit()
 	return
 }
 
-func (this *ModuleManager) loadDll(moduleName string, config interfaces.ModuleConfig) (err error) {
+func (m *ModuleManager) loadDll(moduleName string, config interfaces.ModuleConfig) (err error) {
 	module := base.NewDllModule()
-	err = module.Init(this.app, config)
+	err = module.Init(m.app, config)
 
 	if err == nil {
-		this.Modules[moduleName] = module
+		m.Modules[moduleName] = module
 	}
 
 	return err
 }
 
-func (this *ModuleManager) loadExe(moduleName string, config interfaces.ModuleConfig) (err error) {
+func (m *ModuleManager) loadExe(moduleName string, config interfaces.ModuleConfig) (err error) {
 	module := base.NewExeModule()
-	err = module.Init(this.app, config)
+	err = module.Init(m.app, config)
 	if err == nil {
-		this.Modules[moduleName] = module
+		m.Modules[moduleName] = module
 	}
 	return
 }
 
 //注意模块统一小写
-func (this *ModuleManager) LoadModuleProvider(provider interfaces.ModuleProvider) {
+func (m *ModuleManager) LoadModuleProvider(provider interfaces.ModuleProvider) {
 	if provider == nil {
 		return
 	}
-	this.providers[strings.ToLower(provider.GetModuleName())] = provider
+	m.providers[strings.ToLower(provider.GetModuleName())] = provider
 }
 
-func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
-	provider, ok := this.providers[moduleName]
+func (m *ModuleManager) loadInnerModule(moduleName string, config interfaces.ModuleConfig) (err error) {
+	provider, ok := m.providers[moduleName]
 	if ok {
 		newModule := provider.GetModule()
-		err = newModule.Init(this.app, config)
+		err = newModule.Init(m.app, config)
 		if err == nil {
-			this.Modules[moduleName] = newModule
+			m.Modules[moduleName] = newModule
 		}
 	} else {
 		err = errors.New("没有这样的模块")
@@ -138,9 +139,9 @@ func (this *ModuleManager) loadInnerModule(moduleName string, config interfaces.
 	return err
 }
 
-func (this ModuleManager) GetModuleStatus() string {
+func (m ModuleManager) GetModuleStatus() string {
 	str := ""
-	for moduleName, module := range this.Modules {
+	for moduleName, module := range m.Modules {
 		str += fmt.Sprintf("%s: %d\n", moduleName, module.GetStatus())
 	}
 	return str

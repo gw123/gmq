@@ -11,19 +11,19 @@ type Container struct {
 	Mutex  sync.Mutex
 }
 
-func (this *Container) Write(buf []byte) (err error) {
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	_, err = this.Buffer.Write(buf)
+func (c *Container) Write(buf []byte) (err error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	_, err = c.Buffer.Write(buf)
 	if err != nil {
 		return err
 	}
 	return
 }
 
-func (this *Container) Read() (line []byte, err error) {
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	line, err = this.Buffer.ReadBytes('\n')
+func (c *Container) Read() (line []byte, err error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	line, err = c.Buffer.ReadBytes('\n')
 	return
 }

@@ -1,19 +1,19 @@
 package models
 
 import (
-	"golang.org/x/net/websocket"
-	"sync"
 	"context"
 	"encoding/json"
-	"io"
-	"math/rand"
-	"time"
 	"fmt"
 	"github.com/gw123/GMQ/core/interfaces"
 	"github.com/gw123/GMQ/modules/webModule/webEvent"
+	"golang.org/x/net/websocket"
+	"io"
+	"math/rand"
+	"sync"
+	"time"
 )
 
-var gbuffer = make([]byte, 1024*1024)
+
 
 type WsClientModel struct {
 	webSocket  *websocket.Conn
@@ -21,7 +21,7 @@ type WsClientModel struct {
 	Token      string
 	ModuleName string
 	context    context.Context
-	webEvent  interfaces.Module
+	webEvent   interfaces.Module
 	runFlag    bool
 }
 
@@ -36,70 +36,70 @@ func NewWsClientModel(conn *websocket.Conn, ctx context.Context, module interfac
 	return this
 }
 
-func (this *WsClientModel) IsSafe(event *webEvent.RequestEvent) bool {
-	return true
-	if event.Token == this.Token {
+func (ws *WsClientModel) IsSafe(event *webEvent.RequestEvent) bool {
+	if event.Token == ws.Token {
 		return true
 	}
 	return false
 }
 
-func (this *WsClientModel) Stop() {
-	this.runFlag = false
-	if this.webSocket.IsClientConn() || this.webSocket.IsServerConn() {
-		this.webSocket.Close()
+func (ws *WsClientModel) Stop() {
+	ws.runFlag = false
+	if ws.webSocket.IsClientConn() || ws.webSocket.IsServerConn() {
+		_ = ws.webSocket.Close()
 	}
 }
 
-func (this *WsClientModel) Run() {
-	for this.runFlag {
+func (ws *WsClientModel) Run() {
+	for ws.runFlag {
 		select {
-		case <-this.context.Done():
-			this.runFlag = false
+		case <-ws.context.Done():
+			ws.runFlag = false
 			break
 		default:
 		}
-		//this.webEvent.Info("ws handel ->6")
-		event, err := this.ReadMsg()
+		//ws.webEvent.Info("ws handel ->6")
+		event, err := ws.ReadMsg()
 
 		if err == io.EOF {
-			this.webEvent.Warning("ReadMsg: 连接断开")
+			ws.webEvent.Warning("ReadMsg: 连接断开")
 			break
 		}
 		if err != nil {
-			this.webEvent.Warning("ReadMsg:" + err.Error())
-			if this.webSocket.IsClientConn() && this.webSocket.IsServerConn() {
+			ws.webEvent.Warning("ReadMsg:" + err.Error())
+			if ws.webSocket.IsClientConn() && ws.webSocket.IsServerConn() {
 				continue
 			} else {
 				break
 			}
 		}
-		this.DealMsg(event)
+		ws.DealMsg(event)
 	}
 }
 
-func (this *WsClientModel) DealMsg(event *webEvent.RequestEvent) {
-	this.webEvent.Debug(fmt.Sprintf("EeventName:%s; ModuleName:%s; Payload:%s", event.EventName, this.ModuleName, event.Payload))
+func (ws *WsClientModel) DealMsg(event *webEvent.RequestEvent) {
+	ws.webEvent.Debug(fmt.Sprintf("EeventName:%s; ModuleName:%s; Payload:%s", event.EventName, ws.ModuleName, event.Payload))
 	switch event.EventName {
 	case "auth":
-		this.ModuleName = event.SourcModuleName
+		ws.ModuleName = event.SourcModuleName
 		rand.Seed(time.Now().UnixNano())
-		this.Token = fmt.Sprintf("%d", rand.Uint64())
-		ev := webEvent.NewEvent("auth_reply", this.Token)
-		this.SendMsg(ev)
+		ws.Token = fmt.Sprintf("%d", rand.Uint64())
+		ev := webEvent.NewEvent("auth_reply", ws.Token)
+		ws.SendMsg(ev)
 		break
 	default:
-		if this.IsSafe(event) {
-			this.webEvent.Pub(event)
+		if ws.IsSafe(event) {
+			ws.webEvent.Pub(event)
 		} else {
-			this.webEvent.Warning("未认证连接")
-			this.Stop()
+			ws.webEvent.Warning("未认证连接")
+			ws.Stop()
 		}
 	}
 }
 
-func (this *WsClientModel) ReadMsg() (*webEvent.RequestEvent, error) {
-	n, err := this.webSocket.Read(gbuffer)
+func (ws *WsClientModel) ReadMsg() (*webEvent.RequestEvent, error) {
+	var gbuffer = make([]byte, 1024*1024)
+	n, err := ws.webSocket.Read(gbuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (this *WsClientModel) ReadMsg() (*webEvent.RequestEvent, error) {
 	return event, nil
 }
 
-func (this *WsClientModel) SendMsg(event interfaces.Msg) error {
+func (ws *WsClientModel) SendMsg(event interfaces.Msg) error {
 	event2 := &webEvent.Event{}
 	event2.EventName = event.GetEventName()
 	event2.Payload = string(event.GetPayload())
@@ -122,9 +122,9 @@ func (this *WsClientModel) SendMsg(event interfaces.Msg) error {
 		return err
 	}
 
-	this.Mutex.Lock()
-	defer this.Mutex.Unlock()
-	_, err = this.webSocket.Write(eventData)
+	ws.Mutex.Lock()
+	defer ws.Mutex.Unlock()
+	_, err = ws.webSocket.Write(eventData)
 	if err != nil {
 		return err
 	}

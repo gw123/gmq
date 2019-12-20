@@ -1,20 +1,20 @@
-package controllers
+package admin
 
 import (
 	"errors"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/modules/webModule/db_models"
 	"github.com/labstack/echo"
-	"net/http"
 )
 
 type TaskController struct {
-	BaseController
+	controllers.BaseController
 }
 
 func NewTaskController(module interfaces.Module) *TaskController {
 	temp := new(TaskController)
-	temp.BaseController.module = module
+	temp.BaseController.Module = module
 	return temp
 }
 
@@ -45,7 +45,7 @@ func (t *TaskController) AddTask(ctx echo.Context) error {
 
 	task := new(db_models.Task)
 
-	db, err := t.module.GetApp().GetDefaultDb()
+	db, err := t.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return t.Fail(ctx, 0, "保存失败 001", err)
 	}
@@ -80,7 +80,7 @@ func (t *TaskController) AddClientTask(ctx echo.Context) error {
 
 	task := new(db_models.ClientTask)
 
-	db, err := t.module.GetApp().GetDefaultDb()
+	db, err := t.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return t.Fail(ctx, 0, "保存失败 001", err)
 	}
@@ -103,7 +103,7 @@ func (t *TaskController) AddClientTask(ctx echo.Context) error {
 
 func (t *TaskController) QueryTasksByName(ctx echo.Context) error {
 	key := ctx.QueryParam("key")
-	db, err := t.module.GetApp().GetDefaultDb()
+	db, err := t.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return t.Fail(ctx, 0, "查找失败 001", err)
 	}
@@ -112,7 +112,7 @@ func (t *TaskController) QueryTasksByName(ctx echo.Context) error {
 	//db.LogMode(true)
 	res := db.Where("name like ?", "%"+key+"%").Find(&tasks)
 	if res.Error != nil && !res.RecordNotFound() {
-		return t.Fail(ctx, ErrorDb, "查找失败 002", err)
+		return t.Fail(ctx, controllers.ErrorDb, "查找失败 002", err)
 	}
 	return t.Success(ctx, tasks)
 }
@@ -125,27 +125,3 @@ func (t *TaskController) Download(ctx echo.Context) error {
 	return t.Success(ctx, nil)
 }
 
-type OrderResponse struct {
-	HttpStatusCode int    `json:"-"`
-	Code           string `json:"code"`
-	Message        string `json:"message"`
-	Payment        *Order `json:"payment"`
-}
-
-type Order struct {
-	OrderNo string `json:"order_no"`
-	Status  string `json:"status"`
-}
-
-func (t *TaskController) CreateTestOrder(ctx echo.Context) error {
-	response := &OrderResponse{
-		HttpStatusCode: http.StatusOK,
-		Code:           "0",
-		Message:        "success",
-		Payment: &Order{
-			OrderNo: "12312123123123",
-			Status:  "success",
-		},
-	}
-	return ctx.JSON(http.StatusOK, response)
-}

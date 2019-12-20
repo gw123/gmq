@@ -1,4 +1,39 @@
-{{> header}}
+<!DOCTYPE html>
+<html style="font-size: 40px">
+<head>
+    <meta charset="utf-8">
+    <meta property="article: author" content="xytschool.com" />
+    <meta name="keywords" content="{{group.title}},代码学用通,代码笔记,网站开发,电子技术,手工制作,golang学习,物联网,趣味生活">
+    <meta name="description" content="{{group.desc}}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="x5-fullscreen" content="true"/>
+    <meta name="full-screen" content="true"/>
+    <meta name="apple-mobile-web-app-capable" content="false">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,minimum-scale=1.0">
+    <title>{{group.title}}-代码学用通</title>
+    <link href="{{staticWithVersion "m/css" "app.css"}}" rel="stylesheet">
+    <style>
+        body{max-width: 1000px;margin: 0 auto; }
+    </style>
+</head>
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
 <style xmlns="">
     .wrap-title {
         padding-left: 5px;

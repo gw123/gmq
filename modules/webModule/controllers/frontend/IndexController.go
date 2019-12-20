@@ -1,10 +1,11 @@
-package controllers
+package frontend
 
 import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/services"
 	"github.com/labstack/echo"
 	"github.com/skip2/go-qrcode"
@@ -14,14 +15,14 @@ import (
 )
 
 type IndexController struct {
-	BaseController
+	controllers.BaseController
 	UserService     *services.UserService
 	ResourceService *services.ResourceService
 }
 
 func NewIndexController(module interfaces.Module) *IndexController {
 	temp := new(IndexController)
-	temp.BaseController.module = module
+	temp.BaseController.Module = module
 	UserService, ok := module.GetApp().GetService("UserService").(*services.UserService)
 	if !ok {
 		module.Error("UserService not found")
@@ -122,9 +123,9 @@ func (c *IndexController) Edit(ctx echo.Context) error {
 
 //获取一个二维码
 func (c *IndexController) Qrcode(ctx echo.Context) error {
-	redisClient, err := c.module.GetApp().GetDefaultRedis()
+	redisClient, err := c.Module.GetApp().GetDefaultRedis()
 	if err != nil {
-		c.module.Error("c.module.GetApp(): " + err.Error())
+		c.Module.Error("c.Module.GetApp(): " + err.Error())
 		return err
 	}
 
@@ -133,16 +134,16 @@ func (c *IndexController) Qrcode(ctx echo.Context) error {
 	redisKey := "Qrcode:" + content
 	pngData, err = redisClient.Get(redisKey).Bytes()
 	if err != nil && err != redis.Nil {
-		c.module.Error("redisClient.get(content): " + err.Error())
+		c.Module.Error("redisClient.get(content): " + err.Error())
 	}
 
 	if err == redis.Nil {
 		pngData, err = qrcode.Encode(content, qrcode.Highest, 120)
 		if err != nil {
-			c.module.Error("qrcode.Encode: " + err.Error())
+			c.Module.Error("qrcode.Encode: " + err.Error())
 			return err
 		}
-		c.module.Error("not use qrcode cache")
+		c.Module.Error("not use qrcode cache")
 		redisClient.Set(redisKey, pngData, time.Hour)
 	}
 

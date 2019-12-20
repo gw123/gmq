@@ -22,10 +22,10 @@ func LoadServices(app interfaces.App) {
 	app.RegisterService("", userService)
 
 
-	esService, err := services.NewEsService(app)
-	if err != nil {
-		panic(err)
-	}
-	app.RegisterService("", esService)
+	//esService, err := services.NewEsService(app)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//app.RegisterService("", esService)
 	return
 }

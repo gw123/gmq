@@ -67,12 +67,12 @@ func PathExists(path string) (bool, error) {
 }
 
 type BaseController struct {
-	module interfaces.Module
+	Module interfaces.Module
 }
 
 func NewBaseController(module interfaces.Module) *BaseController {
 	baseController := new(BaseController)
-	baseController.module = module
+	baseController.Module = module
 	return baseController
 }
 
@@ -144,8 +144,8 @@ func (this *BaseController) uploadFile(ctx echo.Context, formname, cate string) 
 }
 
 func (this *BaseController) getUploadPath(cate string) (string, string) {
-	rootPath := this.module.GetConfig().GetItemOrDefault("uploadRootPath", "./upload")
-	pathFormat := this.module.GetConfig().GetItemOrDefault("uploadPathFormat", "mouth")
+	rootPath := this.Module.GetConfig().GetItemOrDefault("uploadRootPath", "./upload")
+	pathFormat := this.Module.GetConfig().GetItemOrDefault("uploadPathFormat", "mouth")
 	relativePath := ""
 
 	switch pathFormat {

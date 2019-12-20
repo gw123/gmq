@@ -1,19 +1,20 @@
-package controllers
+package admin
 
 import (
 	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/labstack/echo"
+	"github.com/gw123/GMQ/modules/webModule/controllers"
 	"github.com/gw123/GMQ/modules/webModule/db_models"
+	"github.com/labstack/echo"
 	"strconv"
 )
 
 type ClientController struct {
-	BaseController
+	controllers.BaseController
 }
 
 func NewClientController(module interfaces.Module) *ClientController {
 	temp := new(ClientController)
-	temp.BaseController.module = module
+	temp.BaseController.Module = module
 	return temp
 }
 
@@ -21,7 +22,7 @@ func NewClientController(module interfaces.Module) *ClientController {
  * 登录并且检测是否有新的版本
  */
 func (this *ClientController) ClientList(ctx echo.Context) error {
-	db, err := this.module.GetApp().GetDefaultDb()
+	db, err := this.Module.GetApp().GetDefaultDb()
 	if err != nil {
 		return this.Fail(ctx, 0, "获取列表失败1", err)
 	}
@@ -40,7 +41,7 @@ func (this *ClientController) ClientList(ctx echo.Context) error {
  */
 
 func (this *ClientController) ClientInfo(ctx echo.Context) error {
-	db, err := this.module.GetApp().GetDefaultDb()
+	db, err := this.Module.GetApp().GetDefaultDb()
 	client_id_r := ctx.Param("client_id")
 	client_id, err := strconv.Atoi(client_id_r)
 	if err != nil {
@@ -54,12 +55,12 @@ func (this *ClientController) ClientInfo(ctx echo.Context) error {
 	//db.LogMode(true)
 	err = db.First(client, map[string]interface{}{"id": client_id}).Error
 	if err != nil {
-		return this.Fail(ctx, ErrorDb, "find client err", err)
+		return this.Fail(ctx, controllers.ErrorDb, "find client err", err)
 	}
 
 	res := db.Find(&client.ClientTasks, map[string]interface{}{"client_id": client_id})
 	if res.Error != nil && !res.RecordNotFound() {
-		return this.Fail(ctx, ErrorDb, "find client_task err", err)
+		return this.Fail(ctx, controllers.ErrorDb, "find client_task err", err)
 	}
 
 	return this.Success(ctx, client)
