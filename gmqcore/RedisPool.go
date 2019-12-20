@@ -3,6 +3,7 @@ package gmqcore
 import (
 	"github.com/go-redis/redis"
 	"github.com/gw123/gmq"
+	"github.com/gw123/gmq/helper"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/pkg/errors"
 )
@@ -37,15 +38,15 @@ func (this *RedisPool) loadConfig() {
 		host, ok := configMap["host"].(string)
 		if !ok {
 			host = "127.0.0.1"
-		} else if utils.IsEvnParam(host) {
-			host = utils.LoadFromEnv(host)
+		} else if helper.IsEvnParam(host) {
+			host = helper.LoadFromEnv(host)
 		}
 
 		port, ok := configMap["port"].(string)
 		if !ok || port == "" {
 			port = "6379"
-		} else if utils.IsEvnParam(port) {
-			port = utils.LoadFromEnv(port)
+		} else if helper.IsEvnParam(port) {
+			port = helper.LoadFromEnv(port)
 		}
 
 		database, ok := configMap["database"].(int)
@@ -56,8 +57,8 @@ func (this *RedisPool) loadConfig() {
 		password, ok := configMap["password"].(string)
 		if !ok {
 			password = ""
-		} else if utils.IsEvnParam(password) {
-			password = utils.LoadFromEnv(password)
+		} else if helper.IsEvnParam(password) {
+			password = helper.LoadFromEnv(password)
 		}
 		this.app.Info("App", "load redis name:%s ,database:%s", key, database)
 		db, err := this.NewRedis(

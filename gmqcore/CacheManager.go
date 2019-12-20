@@ -49,9 +49,7 @@ func (c CacheManager) UpdateCache(patten gmq.CacheKey, arg ...interface{}) error
 	}
 	//if set rule  redisclient , use it first
 	redisClient := c.redisClient
-	if rule.GetRedisClient() != nil {
-		redisClient = rule.GetRedisClient()
-	}
+
 	c.app.Debug("CacheManager", "key : %s , tmp  %s", key, tmp)
 	return redisClient.Set(key, tmp, time.Hour*24*30).Err()
 }
@@ -60,22 +58,17 @@ func (c CacheManager) GetCache(out interface{},patten gmq.CacheKey,  arg ...inte
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	key := gmq.MakeCacheKey(patten, arg...)
-	rule, ok := c.cacheMap[patten]
+	_, ok := c.cacheMap[patten]
 	if !ok {
 		return errors.New("not set CacheRule")
 	}
 
-	//if set rule  redisclient , use it first
 	redisClient := c.redisClient
-	if rule.GetRedisClient() != nil {
-		redisClient = rule.GetRedisClient()
-	}
-
 	cmd := redisClient.Get(key)
 	if cmd.Err() != nil {
 		//更新缓存
 		if cmd.Err().Error() == "redis: nil" {
-			c.app.Pub(gmsg.NewUpdateCacheMsg(patten, arg))
+			c.app.Pub(gmq.NewUpdateCacheMsg(patten, arg))
 		}
 		return cmd.Err()
 	}

@@ -1,7 +1,6 @@
 package gmq
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -15,7 +14,6 @@ type Msg interface {
 	GetInterface() interface{}
 	GetSourceModule() string
 	GetDstModule() string
-	GetContext() context.Context
 }
 
 type BaseMsg struct {
