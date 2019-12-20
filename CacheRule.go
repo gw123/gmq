@@ -28,7 +28,7 @@ func (c RedisCacheRule) GetCacheKey() CacheKey {
 	return c.KeyPatten
 }
 
-func (c RedisCacheRule) GetCallback() func(arg ...interface{}) (interface{}, error) {
+func (c RedisCacheRule) GetCallback() UpdateCacheCallback {
 	return c.Callback
 }
 
