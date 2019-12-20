@@ -5,8 +5,8 @@ package core
 import (
 	"errors"
 	"fmt"
-	"github.com/gw123/GMQ/core/interfaces"
-	"github.com/gw123/GMQ/modules/base"
+	"github.com/gw123/gmq/core/interfaces"
+	"github.com/gw123/gmq/modules/base"
 	"strings"
 )
 

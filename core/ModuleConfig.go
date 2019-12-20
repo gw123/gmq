@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/gmq/core/interfaces"
 	"strings"
 	"sync"
 )

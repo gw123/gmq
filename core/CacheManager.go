@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-redis/redis"
-	"github.com/gw123/GMQ/common/gmsg"
-	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/gmq/common/gmsg"
+	"github.com/gw123/gmq/core/interfaces"
 	"sync"
 	"time"
 )

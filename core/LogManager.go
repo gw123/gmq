@@ -2,7 +2,7 @@ package core
 
 import (
 	"bytes"
-	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/gmq/core/interfaces"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"

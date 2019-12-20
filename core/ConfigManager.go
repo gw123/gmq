@@ -3,7 +3,7 @@
 package core
 
 import (
-	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/gmq/core/interfaces"
 	"github.com/spf13/viper"
 	"os"
 	"regexp"

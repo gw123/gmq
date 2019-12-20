@@ -2,8 +2,8 @@ package core
 
 import (
 	"github.com/go-redis/redis"
-	"github.com/gw123/GMQ/common/utils"
-	"github.com/gw123/GMQ/core/interfaces"
+	"github.com/gw123/gmq/common/utils"
+	"github.com/gw123/gmq/core/interfaces"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/pkg/errors"
 )
